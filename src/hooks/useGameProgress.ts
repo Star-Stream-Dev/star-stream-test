@@ -118,7 +118,7 @@ export function useGameProgress() {
           // Create new session
           const { data, error } = await supabase
             .rpc('start_game_session', {
-              p_caller_id: user.id,
+              p_session_token: sessionToken!,
               p_game_url: gameUrl,
               p_game_title: gameTitle,
               p_game_id: gameId || null,
