@@ -576,7 +576,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
     const muteUntil = duration ? new Date(Date.now() + parseInt(duration)).toISOString() : null;
     
     await supabase.rpc('upsert_my_notification_setting', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_muted_user_id: userId,
       p_mute_until: muteUntil,
     });
