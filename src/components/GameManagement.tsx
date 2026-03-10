@@ -20,7 +20,7 @@ interface Game {
 const categories = ['fnf', 'rhythm', 'arcade', 'utility', 'racing'];
 
 export function GameManagement() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingGame, setEditingGame] = useState<Game | null>(null);
