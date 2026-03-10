@@ -46,7 +46,7 @@ function generateDefaultPositions(ids: string[], theme: string): Record<string, 
 }
 
 export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const { customBackground } = useTheme();
   const [theme, setTheme] = useState<DesktopTheme>(() => {
     return (localStorage.getItem('solarnova-desktop-theme') as DesktopTheme) || 'windows';
