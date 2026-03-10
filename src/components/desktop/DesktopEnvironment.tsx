@@ -109,7 +109,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
         if (pinSaveTimeout.current) clearTimeout(pinSaveTimeout.current);
         pinSaveTimeout.current = setTimeout(() => {
           supabase.rpc('upsert_my_pinned_apps', {
-            p_caller_id: user.id,
+            p_session_token: sessionToken!,
             p_pinned_apps: next as any,
           }).then(() => {});
         }, 500);
