@@ -131,7 +131,7 @@ export function GameManagement() {
 
     try {
       const { error } = await supabase.rpc('update_game', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_game_id: editingGame.id,
         p_title: formData.title,
         p_description: formData.description,
