@@ -87,7 +87,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
       if (fsSaveTimeout.current) clearTimeout(fsSaveTimeout.current);
       fsSaveTimeout.current = setTimeout(() => {
         supabase.rpc('upsert_my_file_system', {
-          p_caller_id: user.id,
+          p_session_token: sessionToken!,
           p_file_system: fs as any,
         }).then(() => {});
       }, 1500);
