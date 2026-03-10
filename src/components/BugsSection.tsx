@@ -53,7 +53,7 @@ export function BugsSection() {
     if (!user || !newCategory.trim() || !newTitle.trim()) return;
 
     const { error } = await supabase.rpc('create_bug', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_category: newCategory.trim(),
       p_title: newTitle.trim(),
       p_status: newStatus
