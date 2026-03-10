@@ -17,7 +17,7 @@ interface BugCategory {
 }
 
 export function BugsSection() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const [bugs, setBugs] = useState<Bug[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
