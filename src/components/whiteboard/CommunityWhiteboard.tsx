@@ -53,7 +53,7 @@ export const CommunityWhiteboard = () => {
         if (now - lastReset > twentyFourHours && user && isAdmin) {
           // Auto-reset if admin is viewing
           await supabase.rpc('clear_community_whiteboard', {
-            p_admin_id: user.id,
+            p_session_token: sessionToken!,
           });
         }
       }
