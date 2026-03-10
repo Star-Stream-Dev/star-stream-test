@@ -565,7 +565,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const unblockUser = async (userId: string) => {
     if (!user) return;
     await supabase.rpc('unblock_user', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_blocked_id: userId,
     });
     fetchBlocks();
