@@ -162,7 +162,7 @@ export function GameManagement() {
 
     try {
       const { error } = await supabase.rpc('delete_game', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_game_id: gameId,
       });
 

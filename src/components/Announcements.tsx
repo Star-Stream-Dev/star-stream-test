@@ -144,7 +144,7 @@ export function Announcements() {
     if (!user || !confirm('Are you sure you want to delete this announcement?')) return;
 
     const { error } = await supabase.rpc('delete_announcement', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_announcement_id: id
     });
 

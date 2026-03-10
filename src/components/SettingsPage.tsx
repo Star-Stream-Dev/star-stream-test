@@ -198,7 +198,7 @@ export function SettingsPage({ friends: propFriends, nicknames: propNicknames, o
     setIsSaving(true);
 
     await supabase.rpc('upsert_my_profile', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_display_name: displayName.trim() || null,
       p_avatar_url: selectedAvatar,
     });

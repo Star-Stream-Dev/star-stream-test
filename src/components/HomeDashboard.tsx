@@ -127,7 +127,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     const fetchUnreadDM = async () => {
       if (!user) return;
       const { data } = await supabase.rpc('get_my_unread_dms', {
-        p_user_id: user.id,
+        p_session_token: sessionToken!,
       });
       if (data && data.length > 0) {
         setUnreadMessage({

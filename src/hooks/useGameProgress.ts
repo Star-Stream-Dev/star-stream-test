@@ -220,7 +220,7 @@ export function useGameProgress() {
     if (!user) return;
 
     try {
-      await supabase.rpc('clear_my_game_progress', { p_caller_id: user.id });
+      await supabase.rpc('clear_my_game_progress', { p_session_token: sessionToken! });
       setSessions([]);
     } catch (e) {
       console.error('Error clearing progress:', e);

@@ -104,7 +104,7 @@ export function FNFSection({ onGameClick, onBack }: FNFSectionProps) {
       if (!game) throw new Error('Game not found');
 
       const { error: updateError } = await supabase.rpc('update_game', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_game_id: gameId,
         p_title: game.title,
         p_description: game.description,

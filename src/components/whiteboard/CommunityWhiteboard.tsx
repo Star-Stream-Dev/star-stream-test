@@ -138,7 +138,7 @@ export const CommunityWhiteboard = () => {
 
     // Call admin clear function
     const { error } = await supabase.rpc('clear_community_whiteboard', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
     });
 
     if (!error) {

@@ -75,7 +75,7 @@ export function BugsSection() {
     if (!user || !confirm('Are you sure you want to remove this bug?')) return;
 
     const { error } = await supabase.rpc('delete_bug', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_bug_id: bugId
     });
 

@@ -410,7 +410,7 @@ export function SpotifyMusicPlayer() {
 
     try {
       const { error } = await supabase.rpc('delete_uploaded_music', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_music_id: trackId,
       });
 
