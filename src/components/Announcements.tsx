@@ -103,7 +103,7 @@ export function Announcements() {
     if (!user || !newTitle.trim() || !newContent.trim()) return;
 
     const { error } = await supabase.rpc('create_announcement', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_title: newTitle.trim(),
       p_content: newContent.trim()
     });
