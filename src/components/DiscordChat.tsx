@@ -587,7 +587,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const unmuteUser = async (userId: string) => {
     if (!user) return;
     await supabase.rpc('delete_my_notification_setting', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_muted_user_id: userId,
     });
     fetchMuteSettings();
