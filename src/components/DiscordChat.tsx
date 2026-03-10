@@ -1087,9 +1087,8 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
                                       onClick={async () => {
                                         if (!user) return;
                                         await supabase.rpc('toggle_reaction', {
-                                          p_caller_id: user.id,
+                                          p_session_token: sessionToken!,
                                           p_message_id: msg.id,
-                                          p_username: user.username,
                                           p_emoji: emoji,
                                           p_message_type: 'server',
                                         });
