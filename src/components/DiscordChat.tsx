@@ -93,7 +93,7 @@ interface FriendNickname {
 type ChatView = 'server' | 'friends' | 'dm';
 
 export function DiscordChat({ onClose }: DiscordChatProps) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [view, setView] = useState<ChatView>('server');
   const [selectedDmUser, setSelectedDmUser] = useState<AppUser | null>(null);
   
