@@ -525,8 +525,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const sendFriendRequest = async (toUser: AppUser) => {
     if (!user) return;
     await supabase.rpc('send_friend_request', {
-      p_caller_id: user.id,
-      p_caller_username: user.username,
+      p_session_token: sessionToken!,
       p_to_user_id: toUser.id,
       p_to_username: toUser.username,
     });
