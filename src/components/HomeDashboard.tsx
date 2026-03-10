@@ -26,7 +26,7 @@ const STATS_KEY = 'solarnova_user_stats';
 const GAMES_HISTORY_KEY = 'solarnova_games_history';
 
 export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDashboardProps) => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const { glassEnabled } = useTheme();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [unreadAnnouncements, setUnreadAnnouncements] = useState(0);
