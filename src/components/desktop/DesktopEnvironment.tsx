@@ -123,7 +123,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
     if (customSaveTimeout.current) clearTimeout(customSaveTimeout.current);
     customSaveTimeout.current = setTimeout(() => {
       supabase.rpc('upsert_my_desktop_customizations', {
-        p_caller_id: user.id,
+        p_session_token: sessionToken!,
         p_hidden_apps: (updates.hidden_apps || []) as any,
         p_custom_icons: (updates.custom_icons || {}) as any,
         p_custom_names: (updates.custom_names || {}) as any,
