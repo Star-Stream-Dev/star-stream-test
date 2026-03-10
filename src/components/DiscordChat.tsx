@@ -484,17 +484,17 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   };
 
   const fetchDmMessages = async (otherUserId: string) => {
-    const { data } = await supabase.rpc('get_my_direct_messages', {
-      p_user_id: user?.id,
-      p_other_user_id: otherUserId,
-    });
-    setDmMessages(data || []);
+      const { data } = await supabase.rpc('get_my_direct_messages', {
+        p_session_token: sessionToken!,
+        p_other_user_id: otherUserId,
+      });
+      setDmMessages(data || []);
     
-    // Mark as read
-    await supabase.rpc('mark_dms_read', {
-      p_user_id: user?.id,
-      p_sender_id: otherUserId,
-    });
+      // Mark as read
+      await supabase.rpc('mark_dms_read', {
+        p_session_token: sessionToken!,
+        p_sender_id: otherUserId,
+      });
     
     setUnreadCounts(prev => ({ ...prev, [otherUserId]: 0 }));
   };
