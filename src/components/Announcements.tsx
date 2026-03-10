@@ -21,7 +21,7 @@ interface Comment {
 }
 
 export function Announcements() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [isLoading, setIsLoading] = useState(true);
