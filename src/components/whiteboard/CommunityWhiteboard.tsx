@@ -29,7 +29,7 @@ interface Stroke {
 }
 
 export const CommunityWhiteboard = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<{ id: string; username: string; color: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +53,7 @@ export const CommunityWhiteboard = () => {
         if (now - lastReset > twentyFourHours && user && isAdmin) {
           // Auto-reset if admin is viewing
           await supabase.rpc('clear_community_whiteboard', {
-            p_admin_id: user.id,
+            p_session_token: sessionToken!,
           });
         }
       }
@@ -138,7 +138,7 @@ export const CommunityWhiteboard = () => {
 
     // Call admin clear function
     const { error } = await supabase.rpc('clear_community_whiteboard', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
     });
 
     if (!error) {

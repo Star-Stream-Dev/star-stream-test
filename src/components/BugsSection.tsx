@@ -17,7 +17,7 @@ interface BugCategory {
 }
 
 export function BugsSection() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const [bugs, setBugs] = useState<Bug[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -53,7 +53,7 @@ export function BugsSection() {
     if (!user || !newCategory.trim() || !newTitle.trim()) return;
 
     const { error } = await supabase.rpc('create_bug', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_category: newCategory.trim(),
       p_title: newTitle.trim(),
       p_status: newStatus
@@ -75,7 +75,7 @@ export function BugsSection() {
     if (!user || !confirm('Are you sure you want to remove this bug?')) return;
 
     const { error } = await supabase.rpc('delete_bug', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_bug_id: bugId
     });
 

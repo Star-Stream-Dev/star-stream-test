@@ -93,7 +93,7 @@ interface FriendNickname {
 type ChatView = 'server' | 'friends' | 'dm';
 
 export function DiscordChat({ onClose }: DiscordChatProps) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [view, setView] = useState<ChatView>('server');
   const [selectedDmUser, setSelectedDmUser] = useState<AppUser | null>(null);
   
@@ -484,17 +484,17 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   };
 
   const fetchDmMessages = async (otherUserId: string) => {
-    const { data } = await supabase.rpc('get_my_direct_messages', {
-      p_user_id: user?.id,
-      p_other_user_id: otherUserId,
-    });
-    setDmMessages(data || []);
+      const { data } = await supabase.rpc('get_my_direct_messages', {
+        p_session_token: sessionToken!,
+        p_other_user_id: otherUserId,
+      });
+      setDmMessages(data || []);
     
-    // Mark as read
-    await supabase.rpc('mark_dms_read', {
-      p_user_id: user?.id,
-      p_sender_id: otherUserId,
-    });
+      // Mark as read
+      await supabase.rpc('mark_dms_read', {
+        p_session_token: sessionToken!,
+        p_sender_id: otherUserId,
+      });
     
     setUnreadCounts(prev => ({ ...prev, [otherUserId]: 0 }));
   };
@@ -525,8 +525,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const sendFriendRequest = async (toUser: AppUser) => {
     if (!user) return;
     await supabase.rpc('send_friend_request', {
-      p_caller_id: user.id,
-      p_caller_username: user.username,
+      p_session_token: sessionToken!,
       p_to_user_id: toUser.id,
       p_to_username: toUser.username,
     });
@@ -536,7 +535,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const acceptFriendRequest = async (request: FriendRequest) => {
     if (!user) return;
     await supabase.rpc('accept_friend_request', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_request_id: request.id,
     });
     setShowNotification(null);
@@ -547,7 +546,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const rejectFriendRequest = async (request: FriendRequest) => {
     if (!user) return;
     await supabase.rpc('reject_friend_request', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_request_id: request.id,
     });
     setShowNotification(null);
@@ -557,7 +556,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const blockUser = async (userId: string) => {
     if (!user) return;
     await supabase.rpc('block_user', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_blocked_id: userId,
     });
     fetchBlocks();
@@ -566,7 +565,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const unblockUser = async (userId: string) => {
     if (!user) return;
     await supabase.rpc('unblock_user', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_blocked_id: userId,
     });
     fetchBlocks();
@@ -577,7 +576,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
     const muteUntil = duration ? new Date(Date.now() + parseInt(duration)).toISOString() : null;
     
     await supabase.rpc('upsert_my_notification_setting', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_muted_user_id: userId,
       p_mute_until: muteUntil,
     });
@@ -588,7 +587,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const unmuteUser = async (userId: string) => {
     if (!user) return;
     await supabase.rpc('delete_my_notification_setting', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_muted_user_id: userId,
     });
     fetchMuteSettings();
@@ -1088,9 +1087,8 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
                                       onClick={async () => {
                                         if (!user) return;
                                         await supabase.rpc('toggle_reaction', {
-                                          p_caller_id: user.id,
+                                          p_session_token: sessionToken!,
                                           p_message_id: msg.id,
-                                          p_username: user.username,
                                           p_emoji: emoji,
                                           p_message_type: 'server',
                                         });
@@ -1212,9 +1210,8 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
                                     onClick={async () => {
                                       if (!user) return;
                                       await supabase.rpc('toggle_reaction', {
-                                        p_caller_id: user.id,
+                                        p_session_token: sessionToken!,
                                         p_message_id: msg.id,
-                                        p_username: user.username,
                                         p_emoji: emoji,
                                         p_message_type: 'dm',
                                       });

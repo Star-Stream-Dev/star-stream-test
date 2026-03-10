@@ -17,7 +17,7 @@ interface GameProgress {
 }
 
 export function useGameProgress() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [sessions, setSessions] = useState<GameProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -102,7 +102,7 @@ export function useGameProgress() {
           // Update last played time
           const { data, error } = await supabase
             .rpc('start_game_session', {
-              p_caller_id: user.id,
+              p_session_token: sessionToken!,
               p_game_url: gameUrl,
               p_game_title: gameTitle,
               p_game_id: gameId || null,
@@ -118,7 +118,7 @@ export function useGameProgress() {
           // Create new session
           const { data, error } = await supabase
             .rpc('start_game_session', {
-              p_caller_id: user.id,
+              p_session_token: sessionToken!,
               p_game_url: gameUrl,
               p_game_title: gameTitle,
               p_game_id: gameId || null,
@@ -149,7 +149,7 @@ export function useGameProgress() {
 
       try {
         await supabase.rpc('update_game_play_time', {
-          p_caller_id: user.id,
+          p_session_token: sessionToken!,
           p_game_url: gameUrl,
           p_additional_seconds: additionalSeconds,
         });
@@ -174,7 +174,7 @@ export function useGameProgress() {
           : {};
         const mergedSettings = { ...existingSettings, ...settings };
         await supabase.rpc('save_game_settings', {
-          p_caller_id: user.id,
+          p_session_token: sessionToken!,
           p_game_url: gameUrl,
           p_custom_settings: mergedSettings as any,
         });
@@ -220,7 +220,7 @@ export function useGameProgress() {
     if (!user) return;
 
     try {
-      await supabase.rpc('clear_my_game_progress', { p_caller_id: user.id });
+      await supabase.rpc('clear_my_game_progress', { p_session_token: sessionToken! });
       setSessions([]);
     } catch (e) {
       console.error('Error clearing progress:', e);

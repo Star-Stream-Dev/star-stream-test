@@ -9,7 +9,7 @@ interface MusicUploadProps {
 }
 
 export function MusicUpload({ onUploadComplete }: MusicUploadProps) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState('');
   const [artist, setArtist] = useState('');
@@ -56,7 +56,7 @@ export function MusicUpload({ onUploadComplete }: MusicUploadProps) {
 
       // Add metadata to database
       const { error: dbError } = await supabase.rpc('add_uploaded_music', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_title: title.trim(),
         p_artist: artist.trim() || 'Unknown Artist',
         p_file_path: fileName,

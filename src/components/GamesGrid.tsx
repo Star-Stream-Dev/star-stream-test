@@ -138,7 +138,7 @@ const defaultGames: Game[] = [
 ];
 
 export function GamesGrid({ onGameClick }: GamesGridProps) {
-  const { isAdmin, user } = useAuth();
+  const { isAdmin, user, sessionToken } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [games, setGames] = useState<Game[]>(defaultGames);
@@ -233,7 +233,7 @@ export function GamesGrid({ onGameClick }: GamesGridProps) {
 
       // Update game in database
       const { error: updateError } = await supabase.rpc('update_game', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_game_id: gameId,
         p_title: games.find(g => g.id === gameId)?.title || '',
         p_description: games.find(g => g.id === gameId)?.description || '',

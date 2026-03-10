@@ -61,7 +61,7 @@ export function GameOverlayBar({ onClose }: GameOverlayBarProps) {
   const [dmMessages, setDmMessages] = useState<DirectMessage[]>([]);
   const [dmMessage, setDmMessage] = useState('');
 
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   
   // Use YouTube Music context instead of old music player
   const {
@@ -160,7 +160,7 @@ export function GameOverlayBar({ onClose }: GameOverlayBarProps) {
     
     const fetchDms = async () => {
       const { data } = await supabase.rpc('get_my_direct_messages', {
-        p_user_id: user.id,
+        p_session_token: sessionToken!,
         p_other_user_id: selectedFriend.id,
       });
       

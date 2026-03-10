@@ -26,7 +26,7 @@ interface PresenceContextType {
 const PresenceContext = createContext<PresenceContextType | undefined>(undefined);
 
 export function PresenceProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [friends, setFriends] = useState<string[]>([]);
   const [statusCache, setStatusCache] = useState<Map<string, UserStatus>>(new Map());
@@ -36,7 +36,7 @@ export function PresenceProvider({ children }: { children: ReactNode }) {
   // Update user status in database
   const updateUserStatus = useCallback(async (userId: string, isOnline: boolean) => {
     const { error } = await supabase.rpc('upsert_my_status', {
-      p_caller_id: userId,
+      p_session_token: sessionToken!,
       p_is_online: isOnline,
     });
 

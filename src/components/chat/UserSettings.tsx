@@ -53,7 +53,7 @@ const AVATAR_OPTIONS = [
 ];
 
 export function UserSettings({ onClose, friends, nicknames, onNicknamesChange, onProfileChange }: UserSettingsProps) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const { snowfallEnabled, setSnowfallEnabled } = useSnowfall();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [displayName, setDisplayName] = useState('');
@@ -138,7 +138,7 @@ export function UserSettings({ onClose, friends, nicknames, onNicknamesChange, o
     setIsSaving(true);
 
     await supabase.rpc('upsert_my_profile', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_display_name: displayName.trim() || null,
       p_avatar_url: selectedAvatar,
     });

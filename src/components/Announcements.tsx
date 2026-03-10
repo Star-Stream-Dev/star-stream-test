@@ -21,7 +21,7 @@ interface Comment {
 }
 
 export function Announcements() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -103,7 +103,7 @@ export function Announcements() {
     if (!user || !newTitle.trim() || !newContent.trim()) return;
 
     const { error } = await supabase.rpc('create_announcement', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_title: newTitle.trim(),
       p_content: newContent.trim()
     });
@@ -123,7 +123,7 @@ export function Announcements() {
     if (!user || !newTitle.trim() || !newContent.trim()) return;
 
     const { error } = await supabase.rpc('update_announcement', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_announcement_id: id,
       p_title: newTitle.trim(),
       p_content: newContent.trim()
@@ -144,7 +144,7 @@ export function Announcements() {
     if (!user || !confirm('Are you sure you want to delete this announcement?')) return;
 
     const { error } = await supabase.rpc('delete_announcement', {
-      p_admin_id: user.id,
+      p_session_token: sessionToken!,
       p_announcement_id: id
     });
 

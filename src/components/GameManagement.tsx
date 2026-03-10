@@ -20,7 +20,7 @@ interface Game {
 const categories = ['fnf', 'rhythm', 'arcade', 'utility', 'racing'];
 
 export function GameManagement() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingGame, setEditingGame] = useState<Game | null>(null);
@@ -102,7 +102,7 @@ export function GameManagement() {
 
     try {
       const { data, error } = await supabase.rpc('create_game', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_title: formData.title,
         p_description: formData.description,
         p_url: formData.url,
@@ -131,7 +131,7 @@ export function GameManagement() {
 
     try {
       const { error } = await supabase.rpc('update_game', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_game_id: editingGame.id,
         p_title: formData.title,
         p_description: formData.description,
@@ -162,7 +162,7 @@ export function GameManagement() {
 
     try {
       const { error } = await supabase.rpc('delete_game', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_game_id: gameId,
       });
 

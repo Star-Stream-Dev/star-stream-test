@@ -41,7 +41,7 @@ interface UploadedMusic {
 const GENRES = ['Favorites', 'All', 'Hip-Hop', 'R&B', 'Pop', 'Rock', 'Electronic', 'Jazz', 'Classical', 'Country', 'Latin', 'Other'];
 
 export function SpotifyMusicPlayer() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeGenre, setActiveGenre] = useState('All');
@@ -410,7 +410,7 @@ export function SpotifyMusicPlayer() {
 
     try {
       const { error } = await supabase.rpc('delete_uploaded_music', {
-        p_admin_id: user.id,
+        p_session_token: sessionToken!,
         p_music_id: trackId,
       });
 
