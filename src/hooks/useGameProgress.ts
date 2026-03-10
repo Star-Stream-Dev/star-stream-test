@@ -149,7 +149,7 @@ export function useGameProgress() {
 
       try {
         await supabase.rpc('update_game_play_time', {
-          p_caller_id: user.id,
+          p_session_token: sessionToken!,
           p_game_url: gameUrl,
           p_additional_seconds: additionalSeconds,
         });
