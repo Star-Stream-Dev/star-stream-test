@@ -53,7 +53,7 @@ const AVATAR_OPTIONS = [
 ];
 
 export function UserSettings({ onClose, friends, nicknames, onNicknamesChange, onProfileChange }: UserSettingsProps) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const { snowfallEnabled, setSnowfallEnabled } = useSnowfall();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [displayName, setDisplayName] = useState('');

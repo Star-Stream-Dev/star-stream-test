@@ -138,7 +138,7 @@ const defaultGames: Game[] = [
 ];
 
 export function GamesGrid({ onGameClick }: GamesGridProps) {
-  const { isAdmin, user } = useAuth();
+  const { isAdmin, user, sessionToken } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [games, setGames] = useState<Game[]>(defaultGames);

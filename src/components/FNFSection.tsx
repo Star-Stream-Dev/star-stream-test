@@ -38,7 +38,7 @@ const defaultFNFGames: Game[] = [
 ];
 
 export function FNFSection({ onGameClick, onBack }: FNFSectionProps) {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [games, setGames] = useState<Game[]>(defaultFNFGames);
   const [loading, setLoading] = useState(true);

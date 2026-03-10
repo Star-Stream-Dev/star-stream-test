@@ -60,7 +60,7 @@ const THEME_OPTIONS: { id: ThemePreset; name: string; color: string }[] = [
 ];
 
 export function SettingsPage({ friends: propFriends, nicknames: propNicknames, onNicknamesChange, onProfileChange }: SettingsPageProps) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const { snowfallEnabled, setSnowfallEnabled } = useSnowfall();
   const { currentTheme, setCurrentTheme, customBackground, setCustomBackground, glassEnabled, setGlassEnabled } = useTheme();
   const { layoutMode, setLayoutMode } = useGameLayout();

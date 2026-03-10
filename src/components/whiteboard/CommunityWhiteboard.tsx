@@ -29,7 +29,7 @@ interface Stroke {
 }
 
 export const CommunityWhiteboard = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, sessionToken } = useAuth();
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<{ id: string; username: string; color: string }[]>([]);
   const [loading, setLoading] = useState(true);

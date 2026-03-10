@@ -17,7 +17,7 @@ interface GameProgress {
 }
 
 export function useGameProgress() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [sessions, setSessions] = useState<GameProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

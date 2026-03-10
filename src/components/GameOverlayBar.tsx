@@ -61,7 +61,7 @@ export function GameOverlayBar({ onClose }: GameOverlayBarProps) {
   const [dmMessages, setDmMessages] = useState<DirectMessage[]>([]);
   const [dmMessage, setDmMessage] = useState('');
 
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   
   // Use YouTube Music context instead of old music player
   const {

@@ -9,7 +9,7 @@ interface MusicUploadProps {
 }
 
 export function MusicUpload({ onUploadComplete }: MusicUploadProps) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState('');
   const [artist, setArtist] = useState('');
