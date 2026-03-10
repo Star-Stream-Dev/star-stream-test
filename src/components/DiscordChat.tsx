@@ -535,7 +535,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const acceptFriendRequest = async (request: FriendRequest) => {
     if (!user) return;
     await supabase.rpc('accept_friend_request', {
-      p_caller_id: user.id,
+      p_session_token: sessionToken!,
       p_request_id: request.id,
     });
     setShowNotification(null);
