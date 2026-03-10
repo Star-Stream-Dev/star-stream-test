@@ -174,7 +174,7 @@ export function useGameProgress() {
           : {};
         const mergedSettings = { ...existingSettings, ...settings };
         await supabase.rpc('save_game_settings', {
-          p_caller_id: user.id,
+          p_session_token: sessionToken!,
           p_game_url: gameUrl,
           p_custom_settings: mergedSettings as any,
         });
