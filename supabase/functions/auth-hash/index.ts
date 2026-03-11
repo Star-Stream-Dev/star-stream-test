@@ -219,6 +219,31 @@ serve(async (req) => {
         session_token: sessionTokenValue,
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
+    } else if (action === "create_admin") {
+      // Create additional admin - requires valid admin session
+      const verifiedUserId = await verifySession(session_token);
+      const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: verifiedUserId, _role: "admin" });
+      if (!isAdmin) {
+        return new Response(JSON.stringify({ error: "Only admins can create admin users" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { hash, salt } = await hashPasswordPBKDF2(password);
+      const { data: newUser, error: createError } = await supabase
+        .from("app_users")
+        .insert({ username, password_hash: hash, password_salt: salt, created_by: verifiedUserId })
+        .select("id")
+        .single();
+
+      if (createError) throw createError;
+
+      await supabase.from("user_roles").insert({ user_id: newUser.id, role: "admin" });
+
+      return new Response(JSON.stringify({ user_id: newUser.id, username, role: "admin" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+
     } else if (action === "logout") {
       // Invalidate session token
       if (session_token) {
