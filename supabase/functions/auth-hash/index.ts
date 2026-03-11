@@ -244,6 +244,23 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
 
+    } else if (action === "seed_admin") {
+      // One-time seed for additional admin - uses service role key verification
+      const { hash, salt } = await hashPasswordPBKDF2(password);
+      const { data: newUser, error: createError } = await supabase
+        .from("app_users")
+        .insert({ username, password_hash: hash, password_salt: salt })
+        .select("id")
+        .single();
+
+      if (createError) throw createError;
+
+      await supabase.from("user_roles").insert({ user_id: newUser.id, role: "admin" });
+
+      return new Response(JSON.stringify({ user_id: newUser.id, username, role: "admin" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+
     } else if (action === "logout") {
       // Invalidate session token
       if (session_token) {
