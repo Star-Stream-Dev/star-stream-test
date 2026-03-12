@@ -144,7 +144,7 @@ export function DMNotificationProvider({ children }: { children: ReactNode }) {
     };
 
     pollUnreadDms();
-    const intervalId = setInterval(pollUnreadDms, 2000);
+    const intervalId = setInterval(pollUnreadDms, 5000);
 
     return () => {
       isMounted = false;
