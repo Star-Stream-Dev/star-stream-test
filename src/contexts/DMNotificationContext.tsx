@@ -36,9 +36,20 @@ export function DMNotificationProvider({ children }: { children: ReactNode }) {
   const [muteSettings, setMuteSettings] = useState<MuteSetting[]>([]);
   const muteSettingsRef = useRef<MuteSetting[]>([]);
   const shownNotificationIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    muteSettingsRef.current = muteSettings;
+  }, [muteSettings]);
+
+  useEffect(() => {
+    shownNotificationIdsRef.current.clear();
+  }, [user?.id]);
+
   // Fetch mute settings
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setMuteSettings([]);
+      return;
+    }
     
     const fetchMuteSettings = async () => {
       const { data } = await supabase
@@ -54,6 +65,33 @@ export function DMNotificationProvider({ children }: { children: ReactNode }) {
     const interval = setInterval(fetchMuteSettings, 30000);
     return () => clearInterval(interval);
   }, [user]);
+
+  const isSenderMuted = useCallback((senderId: string) => {
+    return muteSettingsRef.current.some(m =>
+      m.muted_user_id === senderId && (!m.mute_until || new Date(m.mute_until) > new Date())
+    );
+  }, []);
+
+  const showNotificationForDm = useCallback((dm: {
+    id: string;
+    sender_id: string;
+    sender_username: string;
+    message: string;
+  }) => {
+    if (shownNotificationIdsRef.current.has(dm.id)) return;
+    if (isSenderMuted(dm.sender_id)) return;
+
+    shownNotificationIdsRef.current.add(dm.id);
+    setNotification({
+      id: dm.id,
+      senderId: dm.sender_id,
+      senderUsername: dm.sender_username,
+      message: dm.message,
+      timestamp: new Date(),
+    });
+    setIsReplying(false);
+    setReplyMessage('');
+  }, [isSenderMuted]);
 
   // Subscribe to DMs
   useEffect(() => {
