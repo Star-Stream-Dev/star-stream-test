@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 
@@ -29,12 +29,13 @@ interface MuteSetting {
 }
 
 export function DMNotificationProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [notification, setNotification] = useState<DMNotification | null>(null);
   const [isReplying, setIsReplying] = useState(false);
   const [replyMessage, setReplyMessage] = useState('');
   const [muteSettings, setMuteSettings] = useState<MuteSetting[]>([]);
-
+  const muteSettingsRef = useRef<MuteSetting[]>([]);
+  const shownNotificationIdsRef = useRef<Set<string>>(new Set());
   // Fetch mute settings
   useEffect(() => {
     if (!user) return;
