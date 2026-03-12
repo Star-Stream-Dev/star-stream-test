@@ -930,7 +930,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
                 <button
                   onClick={async () => {
                     if (!confirm('Clear all server messages? This cannot be undone.')) return;
-                    const { error } = await (supabase.rpc as any)('clear_chat_messages', { p_admin_id: user.id });
+                    const { error } = await supabase.rpc('clear_chat_messages', { p_session_token: sessionToken! });
                     if (!error) setServerMessages([]);
                   }}
                   className="flex items-center gap-1 text-xs text-destructive hover:text-destructive/80 transition-colors"
