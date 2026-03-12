@@ -154,6 +154,11 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   }, [reactionPickerMsgId]);
 
 
+  // Keep ref in sync with selectedDmUser state
+  useEffect(() => {
+    selectedDmUserRef.current = selectedDmUser;
+  }, [selectedDmUser]);
+
   const emojiAutocompleteQuery = useMemo(() => {
     const match = newMessage.match(/:([a-zA-Z0-9_+-]*)$/);
     return match ? match[1] : null;
