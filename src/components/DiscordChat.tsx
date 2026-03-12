@@ -266,25 +266,15 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
         const newDm = payload.new as DirectMessage;
         if (newDm.receiver_id === user.id || newDm.sender_id === user.id) {
           // Only add to displayed messages if this DM is with the currently selected user
-          setDmMessages(prev => {
-            // Determine the other user in this DM
-            const otherUserId = newDm.sender_id === user.id ? newDm.receiver_id : newDm.sender_id;
-            
-            // Check if we should add this message (only if it's from/to the selected user)
-            // We check the existing messages to see which conversation is active
-            if (prev.length === 0) return prev;
-            
-            const currentConversationUserId = prev[0].sender_id === user.id 
-              ? prev[0].receiver_id 
-              : prev[0].sender_id;
-            
-            if (otherUserId === currentConversationUserId) {
-              // Prevent duplicates
+          const otherUserId = newDm.sender_id === user.id ? newDm.receiver_id : newDm.sender_id;
+          const currentSelectedId = selectedDmUserRef.current?.id;
+          
+          if (currentSelectedId && otherUserId === currentSelectedId) {
+            setDmMessages(prev => {
               if (prev.some(m => m.id === newDm.id)) return prev;
               return [...prev, newDm];
-            }
-            return prev;
-          });
+            });
+          }
           
           // Show notification if not muted
           if (newDm.sender_id !== user.id) {
