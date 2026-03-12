@@ -112,25 +112,7 @@ export function DMNotificationProvider({ children }: { children: ReactNode }) {
 
           // Only show notification if we're the receiver
           if (newDm.receiver_id !== user.id) return;
-
-          // Check if sender is muted
-          const isMuted = muteSettings.some(m => 
-            m.muted_user_id === newDm.sender_id && 
-            (!m.mute_until || new Date(m.mute_until) > new Date())
-          );
-          
-          if (isMuted) return;
-
-          // Show notification
-          setNotification({
-            id: newDm.id,
-            senderId: newDm.sender_id,
-            senderUsername: newDm.sender_username,
-            message: newDm.message,
-            timestamp: new Date(),
-          });
-          setIsReplying(false);
-          setReplyMessage('');
+          showNotificationForDm(newDm);
         }
       )
       .subscribe();
@@ -138,7 +120,37 @@ export function DMNotificationProvider({ children }: { children: ReactNode }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, muteSettings]);
+  }, [user, showNotificationForDm]);
+
+  // Poll unread DMs as a fallback for missed realtime events
+  useEffect(() => {
+    if (!user || !sessionToken) return;
+
+    let isMounted = true;
+
+    const pollUnreadDms = async () => {
+      const { data, error } = await supabase.rpc('get_my_unread_dms', {
+        p_session_token: sessionToken,
+      });
+
+      if (!isMounted || error || !data || data.length === 0) return;
+
+      for (const dm of data) {
+        if (dm.receiver_id === user.id) {
+          showNotificationForDm(dm);
+          break;
+        }
+      }
+    };
+
+    pollUnreadDms();
+    const intervalId = setInterval(pollUnreadDms, 2000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, [user, sessionToken, showNotificationForDm]);
 
   // Auto-dismiss notification after 5 seconds (unless replying)
   useEffect(() => {
