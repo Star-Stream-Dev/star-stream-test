@@ -96,6 +96,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
   const { user, sessionToken } = useAuth();
   const [view, setView] = useState<ChatView>('server');
   const [selectedDmUser, setSelectedDmUser] = useState<AppUser | null>(null);
+  const selectedDmUserRef = useRef<AppUser | null>(null);
   
   // Server chat
   const [serverMessages, setServerMessages] = useState<Message[]>([]);
