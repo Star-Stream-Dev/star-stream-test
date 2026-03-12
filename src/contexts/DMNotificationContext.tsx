@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 
@@ -29,15 +29,27 @@ interface MuteSetting {
 }
 
 export function DMNotificationProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [notification, setNotification] = useState<DMNotification | null>(null);
   const [isReplying, setIsReplying] = useState(false);
   const [replyMessage, setReplyMessage] = useState('');
   const [muteSettings, setMuteSettings] = useState<MuteSetting[]>([]);
+  const muteSettingsRef = useRef<MuteSetting[]>([]);
+  const shownNotificationIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    muteSettingsRef.current = muteSettings;
+  }, [muteSettings]);
+
+  useEffect(() => {
+    shownNotificationIdsRef.current.clear();
+  }, [user?.id]);
 
   // Fetch mute settings
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setMuteSettings([]);
+      return;
+    }
     
     const fetchMuteSettings = async () => {
       const { data } = await supabase
@@ -53,6 +65,33 @@ export function DMNotificationProvider({ children }: { children: ReactNode }) {
     const interval = setInterval(fetchMuteSettings, 30000);
     return () => clearInterval(interval);
   }, [user]);
+
+  const isSenderMuted = useCallback((senderId: string) => {
+    return muteSettingsRef.current.some(m =>
+      m.muted_user_id === senderId && (!m.mute_until || new Date(m.mute_until) > new Date())
+    );
+  }, []);
+
+  const showNotificationForDm = useCallback((dm: {
+    id: string;
+    sender_id: string;
+    sender_username: string;
+    message: string;
+  }) => {
+    if (shownNotificationIdsRef.current.has(dm.id)) return;
+    if (isSenderMuted(dm.sender_id)) return;
+
+    shownNotificationIdsRef.current.add(dm.id);
+    setNotification({
+      id: dm.id,
+      senderId: dm.sender_id,
+      senderUsername: dm.sender_username,
+      message: dm.message,
+      timestamp: new Date(),
+    });
+    setIsReplying(false);
+    setReplyMessage('');
+  }, [isSenderMuted]);
 
   // Subscribe to DMs
   useEffect(() => {
@@ -73,25 +112,7 @@ export function DMNotificationProvider({ children }: { children: ReactNode }) {
 
           // Only show notification if we're the receiver
           if (newDm.receiver_id !== user.id) return;
-
-          // Check if sender is muted
-          const isMuted = muteSettings.some(m => 
-            m.muted_user_id === newDm.sender_id && 
-            (!m.mute_until || new Date(m.mute_until) > new Date())
-          );
-          
-          if (isMuted) return;
-
-          // Show notification
-          setNotification({
-            id: newDm.id,
-            senderId: newDm.sender_id,
-            senderUsername: newDm.sender_username,
-            message: newDm.message,
-            timestamp: new Date(),
-          });
-          setIsReplying(false);
-          setReplyMessage('');
+          showNotificationForDm(newDm);
         }
       )
       .subscribe();
@@ -99,7 +120,37 @@ export function DMNotificationProvider({ children }: { children: ReactNode }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, muteSettings]);
+  }, [user, showNotificationForDm]);
+
+  // Poll unread DMs as a fallback for missed realtime events
+  useEffect(() => {
+    if (!user || !sessionToken) return;
+
+    let isMounted = true;
+
+    const pollUnreadDms = async () => {
+      const { data, error } = await supabase.rpc('get_my_unread_dms', {
+        p_session_token: sessionToken,
+      });
+
+      if (!isMounted || error || !data || data.length === 0) return;
+
+      for (const dm of data) {
+        if (dm.receiver_id === user.id) {
+          showNotificationForDm(dm);
+          break;
+        }
+      }
+    };
+
+    pollUnreadDms();
+    const intervalId = setInterval(pollUnreadDms, 2000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, [user, sessionToken, showNotificationForDm]);
 
   // Auto-dismiss notification after 5 seconds (unless replying)
   useEffect(() => {
