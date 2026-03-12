@@ -321,6 +321,47 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
     };
   }, [user]);
 
+  // Fallback live sync for DMs (keeps messages updating even when realtime delivery is unavailable)
+  useEffect(() => {
+    if (!user || !sessionToken || view !== 'dm' || !selectedDmUser) return;
+
+    let isActive = true;
+
+    const syncDmConversation = async () => {
+      const { data, error } = await supabase.rpc('get_my_direct_messages', {
+        p_session_token: sessionToken,
+        p_other_user_id: selectedDmUser.id,
+      });
+
+      if (!isActive || error) return;
+
+      const nextMessages = data || [];
+      setDmMessages(prev => {
+        const prevLastId = prev[prev.length - 1]?.id;
+        const nextLastId = nextMessages[nextMessages.length - 1]?.id;
+        if (prev.length === nextMessages.length && prevLastId === nextLastId) return prev;
+        return nextMessages;
+      });
+
+      setUnreadCounts(prev => {
+        if (!prev[selectedDmUser.id]) return prev;
+        return { ...prev, [selectedDmUser.id]: 0 };
+      });
+
+      await supabase.rpc('mark_dms_read', {
+        p_session_token: sessionToken,
+        p_sender_id: selectedDmUser.id,
+      });
+    };
+
+    const intervalId = window.setInterval(syncDmConversation, 1200);
+
+    return () => {
+      isActive = false;
+      window.clearInterval(intervalId);
+    };
+  }, [user, sessionToken, view, selectedDmUser]);
+
   // Track previous message counts to only scroll on new messages
   const prevServerMessagesCount = useRef(serverMessages.length);
   const prevDmMessagesCount = useRef(dmMessages.length);
