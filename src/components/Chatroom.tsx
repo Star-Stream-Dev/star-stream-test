@@ -16,7 +16,7 @@ interface Message {
 }
 
 export function Chatroom() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [step, setStep] = useState<'verify' | 'chat'>('verify');
   const [password, setPassword] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
