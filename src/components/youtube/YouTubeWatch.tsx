@@ -82,8 +82,8 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
       if (video) {
         const watchMs = Date.now() - watchStartTime.current;
         const newState = recordEngagement(
-          loadAlgorithmState(), videoId, video.channelTitle, video.title,
-          { watchDurationMs: watchMs }
+          loadAlgorithmState(user?.id), videoId, video.channelTitle, video.title,
+          { watchDurationMs: watchMs }, user?.id
         );
         setAlgoState(newState);
       }
