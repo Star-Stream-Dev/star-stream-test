@@ -144,8 +144,8 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
         saveToHistory(videoData);
 
         // Record initial view engagement
-        const state = loadAlgorithmState();
-        const newState = recordEngagement(state, videoId, videoData.channelTitle, videoData.title, { watchDurationMs: 1000 });
+        const state = loadAlgorithmState(user?.id);
+        const newState = recordEngagement(state, videoId, videoData.channelTitle, videoData.title, { watchDurationMs: 1000 }, user?.id);
         setAlgoState(newState);
       }
 
