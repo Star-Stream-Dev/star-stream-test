@@ -242,7 +242,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
     try { localStorage.setItem(`yt_comments_${videoId}`, JSON.stringify(updated)); } catch {}
 
     // Record comment engagement
-    const newState = recordEngagement(algoState, videoId, video.channelTitle, video.title, { commented: true });
+    const newState = recordEngagement(algoState, videoId, video.channelTitle, video.title, { commented: true }, user?.id);
     setAlgoState(newState);
     toast.success('Comment added! This helps tune your feed.');
   };
