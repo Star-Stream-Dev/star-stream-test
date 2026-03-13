@@ -44,7 +44,7 @@ export function YouTubeShorts({ onBack }: YouTubeShortsProps) {
     }
 
     try {
-      const currentState = loadAlgorithmState();
+      const currentState = loadAlgorithmState(user?.id);
       // Get 3 diverse queries based on user preferences
       const queries = getRecommendedQueries(currentState, 3);
       
