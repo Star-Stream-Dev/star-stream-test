@@ -1,17 +1,11 @@
 /**
  * YouTube Recommendation Algorithm
-import { supabase } from '@/integrations/supabase/client';
  * 
  * Full-platform recommendation engine inspired by YouTube's actual algorithm.
- * Tracks user engagement signals across all YouTube features:
- * - Likes, dislikes, comments, subscribes
- * - Watch duration / completion rate  
- * - Skips (Shorts)
- * - Content variety (no same-creator repetition)
- * - Topic affinity learning over time
- * - Channel subscriptions boost
- * - Discovery factor for new content
+ * Persists state to database for cross-device sync, with localStorage as cache.
  */
+
+import { supabase } from '@/integrations/supabase/client';
 
 export interface VideoItem {
   id: string;
