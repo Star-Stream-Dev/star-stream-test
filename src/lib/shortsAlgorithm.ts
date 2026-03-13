@@ -132,16 +132,16 @@ export function loadAlgorithmState(userId?: string): AlgorithmState {
   };
 }
 
-function saveAlgorithmState(state: AlgorithmState): void {
+function saveAlgorithmState(state: AlgorithmState, userId?: string): void {
   try {
     if (state.engagementHistory.length > MAX_HISTORY) {
       state.engagementHistory = state.engagementHistory.slice(-MAX_HISTORY);
     }
     if (state.likedVideos.length > 500) state.likedVideos = state.likedVideos.slice(-500);
     if (state.dislikedVideos.length > 500) state.dislikedVideos = state.dislikedVideos.slice(-500);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(getStorageKey(userId), JSON.stringify(state));
     // Clean up legacy key
-    localStorage.removeItem(LEGACY_KEY);
+    if (!userId) localStorage.removeItem(LEGACY_KEY);
   } catch {}
 }
 
