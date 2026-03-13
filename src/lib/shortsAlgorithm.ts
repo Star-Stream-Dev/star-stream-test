@@ -40,7 +40,7 @@ interface TopicAffinity {
   score: number; // -1 to 1, negative = disliked
 }
 
-interface AlgorithmState {
+export interface AlgorithmState {
   engagementHistory: EngagementRecord[];
   topicAffinities: TopicAffinity[];
   channelAffinities: Record<string, number>; // channel -> score

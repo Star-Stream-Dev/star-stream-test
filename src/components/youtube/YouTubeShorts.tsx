@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { ShortsPlayer } from './ShortsPlayer';
 import {
   type ShortItem,
+  type AlgorithmState,
   loadAlgorithmState,
   recordEngagement,
   rankShorts,
