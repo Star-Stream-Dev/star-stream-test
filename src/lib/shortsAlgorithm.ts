@@ -1,5 +1,6 @@
 /**
  * YouTube Recommendation Algorithm
+import { supabase } from '@/integrations/supabase/client';
  * 
  * Full-platform recommendation engine inspired by YouTube's actual algorithm.
  * Tracks user engagement signals across all YouTube features:
