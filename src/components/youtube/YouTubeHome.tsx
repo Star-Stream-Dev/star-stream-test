@@ -128,7 +128,7 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
 
   // Algorithm-powered recommendations
   const fetchAlgorithmRecommendations = async () => {
-    const state = loadAlgorithmState();
+    const state = loadAlgorithmState(user?.id);
     const insights = getAlgorithmInsights(state);
     setAlgoInsights(insights);
 
@@ -245,7 +245,7 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
     return `${Math.floor(seconds / 31536000)} years ago`;
   };
 
-  const algoState = loadAlgorithmState();
+  const algoState = loadAlgorithmState(user?.id);
 
   return (
     <div className="flex-1 overflow-y-auto">

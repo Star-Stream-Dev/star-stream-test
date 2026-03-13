@@ -55,10 +55,14 @@ export interface AlgorithmState {
   commentedVideos: string[];
 }
 
-const STORAGE_KEY = 'solarnova_yt_algo';
+const STORAGE_KEY_PREFIX = 'solarnova_yt_algo';
 const LEGACY_KEY = 'solarnova_shorts_algo';
 const MAX_HISTORY = 300;
 const DIVERSITY_WINDOW = 5;
+
+function getStorageKey(userId?: string): string {
+  return userId ? `${STORAGE_KEY_PREFIX}_${userId}` : STORAGE_KEY_PREFIX;
+}
 
 // Search queries organized by topic category
 const TOPIC_QUERIES: Record<string, string[]> = {
@@ -94,10 +98,11 @@ const TOPIC_KEYWORDS: Record<string, string[]> = {
   sports: ['sport', 'football', 'basketball', 'soccer', 'nba', 'nfl', 'goal', 'match'],
 };
 
-export function loadAlgorithmState(): AlgorithmState {
+export function loadAlgorithmState(userId?: string): AlgorithmState {
   try {
-    // Try new key first, fall back to legacy
-    const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_KEY);
+    const key = getStorageKey(userId);
+    // Try user-specific key first, fall back to legacy
+    const stored = localStorage.getItem(key) || (!userId ? localStorage.getItem(LEGACY_KEY) : null);
     if (stored) {
       const parsed = JSON.parse(stored);
       // Migrate legacy state
@@ -127,16 +132,16 @@ export function loadAlgorithmState(): AlgorithmState {
   };
 }
 
-function saveAlgorithmState(state: AlgorithmState): void {
+function saveAlgorithmState(state: AlgorithmState, userId?: string): void {
   try {
     if (state.engagementHistory.length > MAX_HISTORY) {
       state.engagementHistory = state.engagementHistory.slice(-MAX_HISTORY);
     }
     if (state.likedVideos.length > 500) state.likedVideos = state.likedVideos.slice(-500);
     if (state.dislikedVideos.length > 500) state.dislikedVideos = state.dislikedVideos.slice(-500);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(getStorageKey(userId), JSON.stringify(state));
     // Clean up legacy key
-    localStorage.removeItem(LEGACY_KEY);
+    if (!userId) localStorage.removeItem(LEGACY_KEY);
   } catch {}
 }
 
@@ -168,7 +173,8 @@ export function recordEngagement(
     watchDurationMs?: number;
     skipped?: boolean;
     looped?: boolean;
-  }
+  },
+  userId?: string
 ): AlgorithmState {
   const topicTags = extractTopics(title);
   
@@ -253,12 +259,12 @@ export function recordEngagement(
     commentedVideos: newCommented,
   };
   
-  saveAlgorithmState(newState);
+  saveAlgorithmState(newState, userId);
   return newState;
 }
 
 /** Toggle subscribe to a channel */
-export function toggleSubscribe(state: AlgorithmState, channelTitle: string): AlgorithmState {
+export function toggleSubscribe(state: AlgorithmState, channelTitle: string, userId?: string): AlgorithmState {
   const isSubscribed = state.subscribedChannels.includes(channelTitle);
   const newSubscribed = isSubscribed
     ? state.subscribedChannels.filter(c => c !== channelTitle)
@@ -275,7 +281,7 @@ export function toggleSubscribe(state: AlgorithmState, channelTitle: string): Al
     subscribedChannels: newSubscribed,
     channelAffinities: newChannelAffinities,
   };
-  saveAlgorithmState(newState);
+  saveAlgorithmState(newState, userId);
   return newState;
 }
 
@@ -431,11 +437,11 @@ export function rankVideos(state: AlgorithmState, videos: VideoItem[]): VideoIte
 export const rankShorts = rankVideos;
 
 /** Update last-shown channels for diversity tracking */
-export function trackShown(state: AlgorithmState, channelTitle: string): AlgorithmState {
+export function trackShown(state: AlgorithmState, channelTitle: string, userId?: string): AlgorithmState {
   const lastShown = [...state.lastShownChannels, channelTitle];
   if (lastShown.length > DIVERSITY_WINDOW) lastShown.shift();
   const newState = { ...state, lastShownChannels: lastShown };
-  saveAlgorithmState(newState);
+  saveAlgorithmState(newState, userId);
   return newState;
 }
 

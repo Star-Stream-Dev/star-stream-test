@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronUp, ChevronDown, Loader2, Sparkles, TrendingUp } from
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ShortsPlayer } from './ShortsPlayer';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   type ShortItem,
   type AlgorithmState,
@@ -20,13 +21,14 @@ interface YouTubeShortsProps {
 }
 
 export function YouTubeShorts({ onBack }: YouTubeShortsProps) {
+  const { user } = useAuth();
   const [shorts, setShorts] = useState<ShortItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [muted, setMuted] = useState(false);
   const [liked, setLiked] = useState<Set<string>>(new Set());
-  const [algoState, setAlgoState] = useState<AlgorithmState>(loadAlgorithmState);
+  const [algoState, setAlgoState] = useState<AlgorithmState>(() => loadAlgorithmState(user?.id));
   const [showAlgoTag, setShowAlgoTag] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useRef(false);
@@ -42,7 +44,7 @@ export function YouTubeShorts({ onBack }: YouTubeShortsProps) {
     }
 
     try {
-      const currentState = loadAlgorithmState();
+      const currentState = loadAlgorithmState(user?.id);
       // Get 3 diverse queries based on user preferences
       const queries = getRecommendedQueries(currentState, 3);
       
@@ -138,7 +140,8 @@ export function YouTubeShorts({ onBack }: YouTubeShortsProps) {
       current.id,
       current.channelTitle,
       current.title,
-      { watchDurationMs, skipped, looped }
+      { watchDurationMs, skipped, looped },
+      user?.id
     );
     setAlgoState(newState);
   }, [shorts, currentIndex, algoState]);
@@ -159,7 +162,7 @@ export function YouTubeShorts({ onBack }: YouTubeShortsProps) {
         // Track shown for diversity
         const nextShort = shorts[next];
         if (nextShort) {
-          setAlgoState(s => trackShown(s, nextShort.channelTitle));
+          setAlgoState(s => trackShown(s, nextShort.channelTitle, user?.id));
         }
         viewStartTime.current = Date.now();
         

@@ -58,7 +58,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
-  const [algoState, setAlgoState] = useState<AlgorithmState>(loadAlgorithmState);
+  const [algoState, setAlgoState] = useState<AlgorithmState>(() => loadAlgorithmState(user?.id));
   const containerRef = useRef<HTMLDivElement>(null);
   const watchStartTime = useRef<number>(Date.now());
 
@@ -82,8 +82,8 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
       if (video) {
         const watchMs = Date.now() - watchStartTime.current;
         const newState = recordEngagement(
-          loadAlgorithmState(), videoId, video.channelTitle, video.title,
-          { watchDurationMs: watchMs }
+          loadAlgorithmState(user?.id), videoId, video.channelTitle, video.title,
+          { watchDurationMs: watchMs }, user?.id
         );
         setAlgoState(newState);
       }
@@ -144,8 +144,8 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
         saveToHistory(videoData);
 
         // Record initial view engagement
-        const state = loadAlgorithmState();
-        const newState = recordEngagement(state, videoId, videoData.channelTitle, videoData.title, { watchDurationMs: 1000 });
+        const state = loadAlgorithmState(user?.id);
+        const newState = recordEngagement(state, videoId, videoData.channelTitle, videoData.title, { watchDurationMs: 1000 }, user?.id);
         setAlgoState(newState);
       }
 
@@ -155,7 +155,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
       });
 
       if (relatedData?.items) {
-        const currentAlgoState = loadAlgorithmState();
+        const currentAlgoState = loadAlgorithmState(user?.id);
         const now = Date.now();
         const relatedItems: VideoItem[] = relatedData.items
           .filter((r: any) => (r.id?.videoId || r.id) !== videoId)
@@ -204,7 +204,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
     const newState = recordEngagement(algoState, videoId, video.channelTitle, video.title, {
       liked: newLiked,
       disliked: false,
-    });
+    }, user?.id);
     setAlgoState(newState);
     if (newLiked) toast.success('Liked! Your feed will show more like this.');
   };
@@ -215,14 +215,14 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
     const newState = recordEngagement(algoState, videoId, video.channelTitle, video.title, {
       disliked: newDisliked,
       liked: false,
-    });
+    }, user?.id);
     setAlgoState(newState);
     if (newDisliked) toast('Got it. We\'ll tune your recommendations.');
   };
 
   const handleSubscribe = () => {
     if (!video) return;
-    const newState = toggleSubscribe(algoState, video.channelTitle);
+    const newState = toggleSubscribe(algoState, video.channelTitle, user?.id);
     setAlgoState(newState);
     const isSub = newState.subscribedChannels.includes(video.channelTitle);
     toast.success(isSub ? `Subscribed to ${video.channelTitle}` : `Unsubscribed from ${video.channelTitle}`);
@@ -242,7 +242,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
     try { localStorage.setItem(`yt_comments_${videoId}`, JSON.stringify(updated)); } catch {}
 
     // Record comment engagement
-    const newState = recordEngagement(algoState, videoId, video.channelTitle, video.title, { commented: true });
+    const newState = recordEngagement(algoState, videoId, video.channelTitle, video.title, { commented: true }, user?.id);
     setAlgoState(newState);
     toast.success('Comment added! This helps tune your feed.');
   };
