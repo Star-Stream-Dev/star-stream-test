@@ -140,7 +140,8 @@ export function YouTubeShorts({ onBack }: YouTubeShortsProps) {
       current.id,
       current.channelTitle,
       current.title,
-      { watchDurationMs, skipped, looped }
+      { watchDurationMs, skipped, looped },
+      user?.id
     );
     setAlgoState(newState);
   }, [shorts, currentIndex, algoState]);
