@@ -1,10 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, TrendingUp, Flame, Music, Gamepad2, Film, Newspaper, Trophy, Loader2, Sparkles } from 'lucide-react';
+import { Search, TrendingUp, Flame, Music, Gamepad2, Film, Newspaper, Trophy, Loader2, Sparkles, Brain } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import {
+  loadAlgorithmState,
+  getRecommendedQueries,
+  rankVideos,
+  extractTopics,
+  getAlgorithmInsights,
+  type VideoItem,
+} from '@/lib/shortsAlgorithm';
 
 interface Video {
   id: string;
@@ -14,13 +22,6 @@ interface Video {
   viewCount?: string;
   publishedAt: string;
   duration?: string;
-}
-
-interface WatchHistoryItem {
-  video_id: string;
-  title: string;
-  channel_title: string;
-  thumbnail: string;
 }
 
 interface YouTubeHomeProps {
@@ -48,6 +49,7 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [currentQuery, setCurrentQuery] = useState<string>('');
   const [showRecommended, setShowRecommended] = useState(false);
+  const [algoInsights, setAlgoInsights] = useState<ReturnType<typeof getAlgorithmInsights> | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -86,7 +88,7 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
       }
       
       setNextPageToken(data.nextPageToken || null);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching videos:', error);
       toast.error('Failed to load videos');
     } finally {
@@ -100,11 +102,9 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
     fetchVideos(activeCategory || undefined, currentQuery || undefined, nextPageToken);
   }, [loadingMore, nextPageToken, activeCategory, currentQuery]);
 
-  // Setup intersection observer for infinite scroll
+  // Intersection observer for infinite scroll
   useEffect(() => {
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
+    if (observerRef.current) observerRef.current.disconnect();
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -115,74 +115,85 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
       { threshold: 0.1 }
     );
 
-    if (loadMoreRef.current) {
-      observerRef.current.observe(loadMoreRef.current);
-    }
+    if (loadMoreRef.current) observerRef.current.observe(loadMoreRef.current);
 
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
+    return () => { if (observerRef.current) observerRef.current.disconnect(); };
   }, [nextPageToken, loadingMore, loadMoreVideos]);
 
-  // Fetch trending videos and recommendations on mount
+  // Fetch trending + algorithm-powered recommendations on mount
   useEffect(() => {
     fetchVideos();
-    if (user) {
-      fetchRecommendations();
+    fetchAlgorithmRecommendations();
+  }, []);
+
+  // Algorithm-powered recommendations
+  const fetchAlgorithmRecommendations = async () => {
+    const state = loadAlgorithmState();
+    const insights = getAlgorithmInsights(state);
+    setAlgoInsights(insights);
+
+    // If user has no engagement history, skip personalized recs
+    if (state.engagementHistory.length < 3) {
+      setShowRecommended(false);
+      return;
     }
-  }, [user]);
 
-  // Fetch recommendations based on watch history
-  const fetchRecommendations = async () => {
-    if (!user) return;
-    
     try {
-      // Get watch history from database
-      const { data: historyData, error: historyError } = await supabase
-        .from('youtube_watch_history')
-        .select('channel_title, video_id')
-        .eq('user_id', user.id)
-        .order('watched_at', { ascending: false })
-        .limit(10);
+      // Get algorithm-recommended queries based on user preferences
+      const queries = getRecommendedQueries(state, 3);
+      
+      const results = await Promise.allSettled(
+        queries.map(query =>
+          supabase.functions.invoke('youtube-api', {
+            body: { action: 'search', query, maxResults: 8 }
+          })
+        )
+      );
 
-      if (historyError || !historyData || historyData.length === 0) {
-        setShowRecommended(false);
-        return;
+      const now = Date.now();
+      const allItems: VideoItem[] = [];
+
+      for (const result of results) {
+        if (result.status === 'fulfilled' && !result.value.error) {
+          const items = result.value.data?.items || [];
+          for (const item of items) {
+            const id = item.id?.videoId || item.id;
+            const title = item.snippet?.title || '';
+            allItems.push({
+              id,
+              title,
+              thumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || '',
+              channelTitle: item.snippet?.channelTitle || '',
+              fetchedAt: now,
+              topicTags: extractTopics(title),
+            });
+          }
+        }
       }
 
-      // Get unique channels from history
-      const channels = [...new Set(historyData.map(h => h.channel_title))].slice(0, 3);
-      const watchedIds = new Set(historyData.map(h => h.video_id));
-      const searchTerm = channels.join(' ');
-
-      const { data, error } = await supabase.functions.invoke('youtube-api', {
-        body: { action: 'search', query: searchTerm, maxResults: 16 }
+      // Deduplicate
+      const seen = new Set<string>();
+      const unique = allItems.filter(item => {
+        if (seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
       });
 
-      if (error) throw error;
+      // Rank using algorithm
+      const ranked = rankVideos(state, unique).slice(0, 12);
 
-      const items = data.items || [];
-      const formattedVideos: Video[] = items
-        .filter((item: any) => !watchedIds.has(item.id?.videoId || item.id))
-        .map((item: any) => ({
-          id: item.id?.videoId || item.id,
-          title: item.snippet?.title || '',
-          thumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || '',
-          channelTitle: item.snippet?.channelTitle || '',
-          viewCount: item.statistics?.viewCount,
-          publishedAt: item.snippet?.publishedAt || '',
-          duration: item.contentDetails?.duration,
-        }))
-        .slice(0, 8);
-
-      if (formattedVideos.length > 0) {
-        setRecommendedVideos(formattedVideos);
+      if (ranked.length > 0) {
+        setRecommendedVideos(ranked.map(v => ({
+          id: v.id,
+          title: v.title,
+          thumbnail: v.thumbnail,
+          channelTitle: v.channelTitle,
+          publishedAt: '',
+        })));
         setShowRecommended(true);
       }
     } catch (error) {
-      console.error('Error fetching recommendations:', error);
+      console.error('Error fetching algorithm recommendations:', error);
     }
   };
 
@@ -221,10 +232,10 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
   };
 
   const formatTimeAgo = (dateString: string) => {
+    if (!dateString) return '';
     const date = new Date(dateString);
     const now = new Date();
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
     if (seconds < 60) return 'Just now';
     if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
@@ -233,6 +244,8 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
     if (seconds < 31536000) return `${Math.floor(seconds / 2592000)} months ago`;
     return `${Math.floor(seconds / 31536000)} years ago`;
   };
+
+  const algoState = loadAlgorithmState();
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -297,19 +310,28 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
           </div>
         ) : (
           <>
-            {/* Recommended Section - Only show on home/trending */}
+            {/* Algorithm-Powered Recommendations */}
             {showRecommended && !activeCategory && !currentQuery && recommendedVideos.length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="w-5 h-5 text-amber-500" />
+                  <Brain className="w-5 h-5 text-primary" />
                   <h2 className="text-lg font-semibold text-foreground">Recommended for you</h2>
+                  {algoInsights && algoInsights.topTopics.length > 0 && (
+                    <div className="flex gap-1 ml-2">
+                      {algoInsights.topTopics.map(topic => (
+                        <span key={topic} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize">
+                          {topic}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   {recommendedVideos.map((video, index) => (
                     <button
                       key={`rec-${video.id}-${index}`}
                       onClick={() => onVideoSelect(video.id)}
-                      className="group text-left rounded-xl overflow-hidden bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:border-amber-500/40 transition-colors"
+                      className="group text-left rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 hover:border-primary/40 transition-colors"
                     >
                       <div className="relative aspect-video overflow-hidden">
                         <img
@@ -319,15 +341,33 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                        {algoState.subscribedChannels.includes(video.channelTitle) && (
+                          <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded-full bg-red-500 text-[9px] text-white font-medium">
+                            Subbed
+                          </div>
+                        )}
                       </div>
                       <div className="p-2">
-                        <h3 className="font-medium text-foreground line-clamp-2 text-xs mb-1 group-hover:text-amber-500 transition-colors">
+                        <h3 className="font-medium text-foreground line-clamp-2 text-xs mb-1 group-hover:text-primary transition-colors">
                           {video.title}
                         </h3>
                         <p className="text-xs text-muted-foreground truncate">{video.channelTitle}</p>
                       </div>
                     </button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Subscribed Channels Section */}
+            {!activeCategory && !currentQuery && algoState.subscribedChannels.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-red-500" />
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {algoState.subscribedChannels.length} subscribed channel{algoState.subscribedChannels.length !== 1 ? 's' : ''} 
+                    {algoInsights && algoInsights.likedCount > 0 && ` • ${algoInsights.likedCount} liked videos`}
+                  </span>
                 </div>
               </div>
             )}
@@ -354,6 +394,11 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                    {algoState.subscribedChannels.includes(video.channelTitle) && (
+                      <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded-full bg-red-500 text-[9px] text-white font-medium">
+                        Subbed
+                      </div>
+                    )}
                   </div>
                   <div className="p-3">
                     <h3 className="font-medium text-foreground line-clamp-2 text-sm mb-1 group-hover:text-red-500 transition-colors">
@@ -372,9 +417,7 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
 
             {/* Load more trigger */}
             <div ref={loadMoreRef} className="py-8 flex justify-center">
-              {loadingMore && (
-                <Loader2 className="w-6 h-6 animate-spin text-red-500" />
-              )}
+              {loadingMore && <Loader2 className="w-6 h-6 animate-spin text-red-500" />}
               {!loadingMore && nextPageToken && (
                 <button
                   onClick={loadMoreVideos}
