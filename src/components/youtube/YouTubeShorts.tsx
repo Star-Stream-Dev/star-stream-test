@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronUp, ChevronDown, Loader2, Sparkles, TrendingUp } from
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ShortsPlayer } from './ShortsPlayer';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   type ShortItem,
   type AlgorithmState,
