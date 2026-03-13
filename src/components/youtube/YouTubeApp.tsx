@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { YouTubeHome } from './YouTubeHome';
 import { YouTubeShorts } from './YouTubeShorts';
 import { YouTubeWatch } from './YouTubeWatch';
 import { YouTubeHistory } from './YouTubeHistory';
 import { Home, Flame, Film, History, Youtube } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { setAlgorithmSessionToken, loadAlgorithmStateFromDB } from '@/lib/shortsAlgorithm';
 
 type View = 'home' | 'shorts' | 'watch' | 'history';
 
@@ -12,9 +14,20 @@ interface YouTubeAppProps {
 }
 
 export function YouTubeApp({ onClose }: YouTubeAppProps) {
+  const { user, sessionToken } = useAuth();
   const [view, setView] = useState<View>('home');
   const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Initialize algorithm DB sync on mount
+  useEffect(() => {
+    setAlgorithmSessionToken(sessionToken);
+    if (sessionToken && user?.id) {
+      // Load from DB and cache locally (async, won't block render)
+      loadAlgorithmStateFromDB(sessionToken, user.id).catch(() => {});
+    }
+    return () => { setAlgorithmSessionToken(null); };
+  }, [sessionToken, user?.id]);
 
   const handleVideoSelect = (videoId: string) => {
     setCurrentVideoId(videoId);
