@@ -98,10 +98,11 @@ const TOPIC_KEYWORDS: Record<string, string[]> = {
   sports: ['sport', 'football', 'basketball', 'soccer', 'nba', 'nfl', 'goal', 'match'],
 };
 
-export function loadAlgorithmState(): AlgorithmState {
+export function loadAlgorithmState(userId?: string): AlgorithmState {
   try {
-    // Try new key first, fall back to legacy
-    const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_KEY);
+    const key = getStorageKey(userId);
+    // Try user-specific key first, fall back to legacy
+    const stored = localStorage.getItem(key) || (!userId ? localStorage.getItem(LEGACY_KEY) : null);
     if (stored) {
       const parsed = JSON.parse(stored);
       // Migrate legacy state
