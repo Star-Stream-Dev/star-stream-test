@@ -59,6 +59,60 @@ function getStorageKey(userId?: string): string {
   return userId ? `${STORAGE_KEY_PREFIX}_${userId}` : STORAGE_KEY_PREFIX;
 }
 
+// Debounced DB save — avoids spamming the server on every interaction
+let _dbSaveTimer: ReturnType<typeof setTimeout> | null = null;
+let _dbSaveSessionToken: string | null = null;
+
+/** Set the session token for DB sync (call once on login) */
+export function setAlgorithmSessionToken(token: string | null) {
+  _dbSaveSessionToken = token;
+}
+
+function debouncedSaveToDB(state: AlgorithmState) {
+  if (!_dbSaveSessionToken) return;
+  if (_dbSaveTimer) clearTimeout(_dbSaveTimer);
+  _dbSaveTimer = setTimeout(async () => {
+    try {
+      await supabase.rpc('save_my_algorithm_state', {
+        p_session_token: _dbSaveSessionToken!,
+        p_state: state as any,
+      });
+    } catch (e) {
+      console.error('Failed to sync algorithm state to DB:', e);
+    }
+  }, 2000); // 2s debounce
+}
+
+/** Load algorithm state from DB (call on app init / login) */
+export async function loadAlgorithmStateFromDB(sessionToken: string, userId: string): Promise<AlgorithmState> {
+  try {
+    const { data, error } = await supabase.rpc('get_my_algorithm_state', {
+      p_session_token: sessionToken,
+    });
+    if (!error && data && typeof data === 'object' && Object.keys(data).length > 0) {
+      const parsed = data as any;
+      const state: AlgorithmState = {
+        engagementHistory: parsed.engagementHistory || [],
+        topicAffinities: parsed.topicAffinities || [],
+        channelAffinities: parsed.channelAffinities || {},
+        subscribedChannels: parsed.subscribedChannels || [],
+        lastShownChannels: parsed.lastShownChannels || [],
+        queryRotation: parsed.queryRotation || 0,
+        likedVideos: parsed.likedVideos || [],
+        dislikedVideos: parsed.dislikedVideos || [],
+        commentedVideos: parsed.commentedVideos || [],
+      };
+      // Cache locally
+      localStorage.setItem(getStorageKey(userId), JSON.stringify(state));
+      return state;
+    }
+  } catch (e) {
+    console.error('Failed to load algorithm state from DB:', e);
+  }
+  // Fall back to localStorage
+  return loadAlgorithmState(userId);
+}
+
 // Search queries organized by topic category
 const TOPIC_QUERIES: Record<string, string[]> = {
   comedy: ['funny shorts', 'comedy shorts', 'meme compilation shorts', 'funny videos', 'comedy videos'],
