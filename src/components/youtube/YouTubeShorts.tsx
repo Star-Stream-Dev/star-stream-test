@@ -21,13 +21,14 @@ interface YouTubeShortsProps {
 }
 
 export function YouTubeShorts({ onBack }: YouTubeShortsProps) {
+  const { user } = useAuth();
   const [shorts, setShorts] = useState<ShortItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [muted, setMuted] = useState(false);
   const [liked, setLiked] = useState<Set<string>>(new Set());
-  const [algoState, setAlgoState] = useState<AlgorithmState>(loadAlgorithmState);
+  const [algoState, setAlgoState] = useState<AlgorithmState>(() => loadAlgorithmState(user?.id));
   const [showAlgoTag, setShowAlgoTag] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useRef(false);
