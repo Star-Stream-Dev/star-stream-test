@@ -162,7 +162,7 @@ export function YouTubeShorts({ onBack }: YouTubeShortsProps) {
         // Track shown for diversity
         const nextShort = shorts[next];
         if (nextShort) {
-          setAlgoState(s => trackShown(s, nextShort.channelTitle));
+          setAlgoState(s => trackShown(s, nextShort.channelTitle, user?.id));
         }
         viewStartTime.current = Date.now();
         
