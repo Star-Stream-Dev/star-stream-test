@@ -12,7 +12,6 @@ import {
   getRecommendedQueries,
   extractTopics,
   getAlgorithmInsights,
-  type AlgorithmState,
 } from '@/lib/shortsAlgorithm';
 
 interface YouTubeShortsProps {
