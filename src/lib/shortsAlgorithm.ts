@@ -264,7 +264,7 @@ export function recordEngagement(
 }
 
 /** Toggle subscribe to a channel */
-export function toggleSubscribe(state: AlgorithmState, channelTitle: string): AlgorithmState {
+export function toggleSubscribe(state: AlgorithmState, channelTitle: string, userId?: string): AlgorithmState {
   const isSubscribed = state.subscribedChannels.includes(channelTitle);
   const newSubscribed = isSubscribed
     ? state.subscribedChannels.filter(c => c !== channelTitle)
