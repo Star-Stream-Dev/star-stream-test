@@ -222,7 +222,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
 
   const handleSubscribe = () => {
     if (!video) return;
-    const newState = toggleSubscribe(algoState, video.channelTitle);
+    const newState = toggleSubscribe(algoState, video.channelTitle, user?.id);
     setAlgoState(newState);
     const isSub = newState.subscribedChannels.includes(video.channelTitle);
     toast.success(isSub ? `Subscribed to ${video.channelTitle}` : `Unsubscribed from ${video.channelTitle}`);
