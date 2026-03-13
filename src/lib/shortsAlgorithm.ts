@@ -173,7 +173,8 @@ export function recordEngagement(
     watchDurationMs?: number;
     skipped?: boolean;
     looped?: boolean;
-  }
+  },
+  userId?: string
 ): AlgorithmState {
   const topicTags = extractTopics(title);
   
