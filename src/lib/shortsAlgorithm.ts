@@ -437,11 +437,11 @@ export function rankVideos(state: AlgorithmState, videos: VideoItem[]): VideoIte
 export const rankShorts = rankVideos;
 
 /** Update last-shown channels for diversity tracking */
-export function trackShown(state: AlgorithmState, channelTitle: string): AlgorithmState {
+export function trackShown(state: AlgorithmState, channelTitle: string, userId?: string): AlgorithmState {
   const lastShown = [...state.lastShownChannels, channelTitle];
   if (lastShown.length > DIVERSITY_WINDOW) lastShown.shift();
   const newState = { ...state, lastShownChannels: lastShown };
-  saveAlgorithmState(newState);
+  saveAlgorithmState(newState, userId);
   return newState;
 }
 
