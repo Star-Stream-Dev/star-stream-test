@@ -191,6 +191,8 @@ function saveAlgorithmState(state: AlgorithmState, userId?: string): void {
     localStorage.setItem(getStorageKey(userId), JSON.stringify(state));
     // Clean up legacy key
     if (!userId) localStorage.removeItem(LEGACY_KEY);
+    // Sync to DB (debounced)
+    debouncedSaveToDB(state);
   } catch {}
 }
 
