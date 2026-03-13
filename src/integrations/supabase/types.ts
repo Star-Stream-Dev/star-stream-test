@@ -1135,6 +1135,35 @@ export type Database = {
         }
         Relationships: []
       }
+      youtube_algorithm_state: {
+        Row: {
+          id: string
+          state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          state?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          state?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_algorithm_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       youtube_music_history: {
         Row: {
           artist: string
@@ -1382,6 +1411,10 @@ export type Database = {
           username: string
         }[]
       }
+      get_my_algorithm_state: {
+        Args: { p_session_token: string }
+        Returns: Json
+      }
       get_my_direct_messages: {
         Args: { p_other_user_id: string; p_session_token: string }
         Returns: {
@@ -1447,6 +1480,10 @@ export type Database = {
           p_game_url: string
           p_session_token: string
         }
+        Returns: boolean
+      }
+      save_my_algorithm_state: {
+        Args: { p_session_token: string; p_state: Json }
         Returns: boolean
       }
       seed_admin_user: {
