@@ -58,7 +58,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
-  const [algoState, setAlgoState] = useState<AlgorithmState>(loadAlgorithmState);
+  const [algoState, setAlgoState] = useState<AlgorithmState>(() => loadAlgorithmState(user?.id));
   const containerRef = useRef<HTMLDivElement>(null);
   const watchStartTime = useRef<number>(Date.now());
 
