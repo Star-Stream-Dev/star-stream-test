@@ -204,7 +204,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
     const newState = recordEngagement(algoState, videoId, video.channelTitle, video.title, {
       liked: newLiked,
       disliked: false,
-    });
+    }, user?.id);
     setAlgoState(newState);
     if (newLiked) toast.success('Liked! Your feed will show more like this.');
   };
