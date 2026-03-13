@@ -215,7 +215,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
     const newState = recordEngagement(algoState, videoId, video.channelTitle, video.title, {
       disliked: newDisliked,
       liked: false,
-    });
+    }, user?.id);
     setAlgoState(newState);
     if (newDisliked) toast('Got it. We\'ll tune your recommendations.');
   };
