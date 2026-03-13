@@ -128,7 +128,7 @@ export function YouTubeHome({ onVideoSelect, onShortsClick, searchQuery, setSear
 
   // Algorithm-powered recommendations
   const fetchAlgorithmRecommendations = async () => {
-    const state = loadAlgorithmState();
+    const state = loadAlgorithmState(user?.id);
     const insights = getAlgorithmInsights(state);
     setAlgoInsights(insights);
 
