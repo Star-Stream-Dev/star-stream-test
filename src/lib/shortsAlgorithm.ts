@@ -55,10 +55,14 @@ export interface AlgorithmState {
   commentedVideos: string[];
 }
 
-const STORAGE_KEY = 'solarnova_yt_algo';
+const STORAGE_KEY_PREFIX = 'solarnova_yt_algo';
 const LEGACY_KEY = 'solarnova_shorts_algo';
 const MAX_HISTORY = 300;
 const DIVERSITY_WINDOW = 5;
+
+function getStorageKey(userId?: string): string {
+  return userId ? `${STORAGE_KEY_PREFIX}_${userId}` : STORAGE_KEY_PREFIX;
+}
 
 // Search queries organized by topic category
 const TOPIC_QUERIES: Record<string, string[]> = {
