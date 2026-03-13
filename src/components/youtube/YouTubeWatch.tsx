@@ -155,7 +155,7 @@ export function YouTubeWatch({ videoId, onBack, onVideoSelect }: YouTubeWatchPro
       });
 
       if (relatedData?.items) {
-        const currentAlgoState = loadAlgorithmState();
+        const currentAlgoState = loadAlgorithmState(user?.id);
         const now = Date.now();
         const relatedItems: VideoItem[] = relatedData.items
           .filter((r: any) => (r.id?.videoId || r.id) !== videoId)
