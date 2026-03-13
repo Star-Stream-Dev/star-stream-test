@@ -259,7 +259,7 @@ export function recordEngagement(
     commentedVideos: newCommented,
   };
   
-  saveAlgorithmState(newState);
+  saveAlgorithmState(newState, userId);
   return newState;
 }
 
