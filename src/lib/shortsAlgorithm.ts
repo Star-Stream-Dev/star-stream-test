@@ -281,7 +281,7 @@ export function toggleSubscribe(state: AlgorithmState, channelTitle: string, use
     subscribedChannels: newSubscribed,
     channelAffinities: newChannelAffinities,
   };
-  saveAlgorithmState(newState);
+  saveAlgorithmState(newState, userId);
   return newState;
 }
 
