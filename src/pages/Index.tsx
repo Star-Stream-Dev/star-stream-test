@@ -619,6 +619,11 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
         </div>
       )}
 
+      {/* Emulator - fullscreen */}
+      {activeSection === 'emulator' && (
+        <RetroArchPlayer onClose={() => setActiveSection('home')} />
+      )}
+
       {/* Main content - only show for non-fullscreen sections */}
       {!['chatroom', 'music', 'youtube', 'proxy'].includes(activeSection) && (
         <main className="relative">
