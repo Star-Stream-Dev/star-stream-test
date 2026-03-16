@@ -625,7 +625,7 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
       )}
 
       {/* Main content - only show for non-fullscreen sections */}
-      {!['chatroom', 'music', 'youtube', 'proxy'].includes(activeSection) && (
+      {!['chatroom', 'music', 'youtube', 'proxy', 'emulator'].includes(activeSection) && (
         <main className="relative">
           <div key={activeSection} className="animate-fade-in">
             {activeSection === 'home' && (
