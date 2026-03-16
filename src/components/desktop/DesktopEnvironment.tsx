@@ -272,6 +272,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
     if (win.appId === 'settings') return <SettingsApp theme={theme} onThemeChange={setTheme} />;
     if (win.appId === 'chat') return <DesktopChat />;
     if (win.appId === 'music') return <DesktopMusic />;
+    if (win.appId === 'emulator') return <DesktopEmulatorContent />;
     const game = games.find(g => g.id === win.appId);
     if (game && game.embed) {
       return (
