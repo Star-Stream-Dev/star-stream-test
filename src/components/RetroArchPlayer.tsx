@@ -64,7 +64,7 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
         {/* Emulator */}
         <div className="flex-1 min-h-0">
           <EmulatorJS
-            EJS_core={selectedCore}
+            EJS_core={selectedCore as any}
             EJS_gameUrl={romUrl}
             EJS_pathtodata="https://cdn.emulatorjs.org/stable/data/"
             EJS_startOnLoaded={true}
