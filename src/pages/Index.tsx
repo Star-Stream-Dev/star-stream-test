@@ -44,7 +44,7 @@ import solarnovaIcon from '@/assets/solarnova-icon.png';
 import { useGameLayout } from '@/contexts/GameLayoutContext';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 
-type Section = 'home' | 'games' | 'chatroom' | 'bugs' | 'music' | 'announcements' | 'youtube' | 'uno' | 'tv' | 'solar' | 'settings' | 'proxy' | 'fnf' | 'whiteboard';
+type Section = 'home' | 'games' | 'chatroom' | 'bugs' | 'music' | 'announcements' | 'youtube' | 'uno' | 'tv' | 'solar' | 'settings' | 'proxy' | 'fnf' | 'whiteboard' | 'emulator';
 
 
 const Index = () => {
