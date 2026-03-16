@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Home, Gamepad2, MessageSquare, Bug, Music, LogOut, Shield, Megaphone, Youtube, Eye, EyeOff, Globe, Spade, Tv, Sparkles, Settings, Mic2, Paintbrush } from 'lucide-react';
+import { Home, Gamepad2, MessageSquare, Bug, Music, LogOut, Shield, Megaphone, Youtube, Eye, EyeOff, Globe, Spade, Tv, Sparkles, Settings, Mic2, Paintbrush, Joystick } from 'lucide-react';
 import { DiscordChat } from '@/components/DiscordChat';
 import { BootScreen } from '@/components/BootScreen';
 import { SolarTerminal } from '@/components/SolarTerminal';
@@ -23,6 +23,7 @@ import { StudyHelper } from '@/components/StudyHelper';
 import { SettingsPage } from '@/components/SettingsPage';
 import { ProxyBrowser } from '@/components/proxy/ProxyBrowser';
 import { WhiteboardPage } from '@/components/whiteboard/WhiteboardPage';
+import { RetroArchPlayer } from '@/components/RetroArchPlayer';
 import { ProxyProvider } from '@/contexts/ProxyContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginPage } from '@/components/LoginPage';
@@ -43,7 +44,7 @@ import solarnovaIcon from '@/assets/solarnova-icon.png';
 import { useGameLayout } from '@/contexts/GameLayoutContext';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 
-type Section = 'home' | 'games' | 'chatroom' | 'bugs' | 'music' | 'announcements' | 'youtube' | 'uno' | 'tv' | 'solar' | 'settings' | 'proxy' | 'fnf' | 'whiteboard';
+type Section = 'home' | 'games' | 'chatroom' | 'bugs' | 'music' | 'announcements' | 'youtube' | 'uno' | 'tv' | 'solar' | 'settings' | 'proxy' | 'fnf' | 'whiteboard' | 'emulator';
 
 
 const Index = () => {
@@ -341,6 +342,7 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
     { id: 'chatroom' as const, label: 'Chat', icon: MessageSquare, disabled: false },
     { id: 'uno' as const, label: 'UNO', icon: Spade, disabled: false },
     { id: 'whiteboard' as const, label: 'Whiteboard', icon: Paintbrush, disabled: false },
+    { id: 'emulator' as const, label: 'Emulator', icon: Joystick, disabled: false },
     { id: 'settings' as const, label: 'Settings', icon: Settings, disabled: false },
     { id: 'proxy' as const, label: 'Proxy (beta)', icon: Globe, disabled: false },
     { id: 'bugs' as const, label: 'Bugs', icon: Bug, disabled: false },
@@ -617,8 +619,13 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
         </div>
       )}
 
+      {/* Emulator - fullscreen */}
+      {activeSection === 'emulator' && (
+        <RetroArchPlayer onClose={() => setActiveSection('home')} />
+      )}
+
       {/* Main content - only show for non-fullscreen sections */}
-      {!['chatroom', 'music', 'youtube', 'proxy'].includes(activeSection) && (
+      {!['chatroom', 'music', 'youtube', 'proxy', 'emulator'].includes(activeSection) && (
         <main className="relative">
           <div key={activeSection} className="animate-fade-in">
             {activeSection === 'home' && (
