@@ -342,6 +342,7 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
     { id: 'chatroom' as const, label: 'Chat', icon: MessageSquare, disabled: false },
     { id: 'uno' as const, label: 'UNO', icon: Spade, disabled: false },
     { id: 'whiteboard' as const, label: 'Whiteboard', icon: Paintbrush, disabled: false },
+    { id: 'emulator' as const, label: 'Emulator', icon: Joystick, disabled: false },
     { id: 'settings' as const, label: 'Settings', icon: Settings, disabled: false },
     { id: 'proxy' as const, label: 'Proxy (beta)', icon: Globe, disabled: false },
     { id: 'bugs' as const, label: 'Bugs', icon: Bug, disabled: false },
