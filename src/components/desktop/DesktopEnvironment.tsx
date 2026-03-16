@@ -21,6 +21,57 @@ interface DesktopEnvironmentProps {
   onExit: () => void;
 }
 
+const EMULATOR_CORES = [
+  { id: 'nes', label: 'NES' },
+  { id: 'snes', label: 'SNES' },
+  { id: 'gba', label: 'GBA' },
+  { id: 'gb', label: 'Game Boy' },
+  { id: 'n64', label: 'N64' },
+  { id: 'segaMD', label: 'Genesis' },
+  { id: 'psx', label: 'PS1' },
+] as const;
+
+function DesktopEmulatorContent() {
+  const [core, setCore] = useState<string | null>(null);
+  const [romUrl, setRomUrl] = useState<string | null>(null);
+
+  if (core && romUrl) {
+    return (
+      <div className="w-full h-full flex flex-col">
+        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-card shrink-0">
+          <button onClick={() => { setRomUrl(null); setCore(null); }} className="text-xs text-primary hover:underline">← Back</button>
+        </div>
+        <div className="flex-1 min-h-0">
+          <EmulatorJS EJS_core={core} EJS_gameUrl={romUrl} EJS_pathtodata="https://cdn.emulatorjs.org/stable/data/" EJS_startOnLoaded={true} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 space-y-4">
+      <p className="text-sm text-muted-foreground">Select a console, then load a ROM.</p>
+      <div className="flex flex-wrap gap-2">
+        {EMULATOR_CORES.map(c => (
+          <button key={c.id} onClick={() => setCore(c.id)}
+            className={`px-3 py-1.5 rounded text-xs border transition-colors ${core === c.id ? 'border-primary bg-primary/10 text-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}>
+            {c.label}
+          </button>
+        ))}
+      </div>
+      {core && (
+        <label className="flex flex-col items-center gap-2 p-6 rounded-lg border-2 border-dashed border-border cursor-pointer hover:border-primary/50 transition-colors">
+          <span className="text-sm text-muted-foreground">Click to select ROM</span>
+          <input type="file" className="hidden" onChange={e => {
+            const f = e.target.files?.[0];
+            if (f) setRomUrl(URL.createObjectURL(f));
+          }} />
+        </label>
+      )}
+    </div>
+  );
+}
+
 const DESKTOP_APPS: DesktopApp[] = [
   { id: 'terminal', name: 'Terminal', icon: 'terminal', type: 'terminal' },
   { id: 'code-editor', name: 'SolarCode', icon: 'code', type: 'custom' },
