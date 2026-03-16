@@ -23,6 +23,7 @@ import { StudyHelper } from '@/components/StudyHelper';
 import { SettingsPage } from '@/components/SettingsPage';
 import { ProxyBrowser } from '@/components/proxy/ProxyBrowser';
 import { WhiteboardPage } from '@/components/whiteboard/WhiteboardPage';
+import { RetroArchPlayer } from '@/components/RetroArchPlayer';
 import { ProxyProvider } from '@/contexts/ProxyContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginPage } from '@/components/LoginPage';
