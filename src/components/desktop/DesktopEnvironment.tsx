@@ -42,7 +42,7 @@ function DesktopEmulatorContent() {
           <button onClick={() => { setRomUrl(null); setCore(null); }} className="text-xs text-primary hover:underline">← Back</button>
         </div>
         <div className="flex-1 min-h-0">
-          <EmulatorJS EJS_core={core} EJS_gameUrl={romUrl} EJS_pathtodata="https://cdn.emulatorjs.org/stable/data/" EJS_startOnLoaded={true} />
+          <EmulatorJS EJS_core={core as any} EJS_gameUrl={romUrl} EJS_pathtodata="https://cdn.emulatorjs.org/stable/data/" EJS_startOnLoaded={true} />
         </div>
       </div>
     );
