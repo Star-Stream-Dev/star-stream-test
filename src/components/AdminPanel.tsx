@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Trash2, Key, X, Shield, Gamepad2 } from 'lucide-react';
+import { Users, Plus, Trash2, Key, X, Shield, Gamepad2, Joystick } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { GameManagement } from './GameManagement';
+import { RomManagement } from './RomManagement';
 
 interface AppUser {
   id: string;
