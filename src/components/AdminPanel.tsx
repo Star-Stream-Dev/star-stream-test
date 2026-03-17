@@ -152,6 +152,17 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
               <Gamepad2 className="w-4 h-4" />
               Games
             </button>
+            <button
+              onClick={() => setActiveTab('roms')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === 'roms' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              <Joystick className="w-4 h-4" />
+              ROMs
+            </button>
           </div>
 
           {activeTab === 'games' ? (
