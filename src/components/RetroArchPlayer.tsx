@@ -29,6 +29,7 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
   const [romUrl, setRomUrl] = useState<string | null>(null);
   const [romName, setRomName] = useState<string>('');
   const [showInfo, setShowInfo] = useState(false);
+  const [activeTab, setActiveTab] = useState<'play' | 'library'>('library');
 
   const handleFileSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
