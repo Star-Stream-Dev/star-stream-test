@@ -679,6 +679,50 @@ export type Database = {
           },
         ]
       }
+      rom_library: {
+        Row: {
+          console: string
+          created_at: string
+          file_path: string
+          file_size: number | null
+          id: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          console: string
+          created_at?: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          console?: string
+          created_at?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rom_library_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       uno_games: {
         Row: {
           allow_stacking: boolean
@@ -1362,6 +1406,17 @@ export type Database = {
         }
         Returns: string
       }
+      create_rom: {
+        Args: {
+          p_console: string
+          p_file_path: string
+          p_file_size?: number
+          p_session_token: string
+          p_thumbnail_url: string
+          p_title: string
+        }
+        Returns: string
+      }
       delete_announcement: {
         Args: { p_announcement_id: string; p_session_token: string }
         Returns: boolean
@@ -1388,6 +1443,10 @@ export type Database = {
       }
       delete_my_reaction: {
         Args: { p_reaction_id: string; p_session_token: string }
+        Returns: boolean
+      }
+      delete_rom: {
+        Args: { p_rom_id: string; p_session_token: string }
         Returns: boolean
       }
       delete_uploaded_music: {

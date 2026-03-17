@@ -1,7 +1,8 @@
 import { useState, useCallback, ChangeEvent } from 'react';
 import { EmulatorJS } from 'react-emulatorjs';
-import { ArrowLeft, Upload, Gamepad2, Info } from 'lucide-react';
+import { ArrowLeft, Upload, Gamepad2, Info, Library } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RomLibrary } from '@/components/RomLibrary';
 
 interface RetroArchPlayerProps {
   onClose: () => void;
@@ -28,6 +29,7 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
   const [romUrl, setRomUrl] = useState<string | null>(null);
   const [romName, setRomName] = useState<string>('');
   const [showInfo, setShowInfo] = useState(false);
+  const [activeTab, setActiveTab] = useState<'play' | 'library'>('library');
 
   const handleFileSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,62 +86,89 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
         </Button>
         <Gamepad2 className="w-6 h-6 text-primary" />
         <h1 className="text-lg font-bold text-foreground">Emulator</h1>
-        <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setShowInfo(!showInfo)}>
+        <div className="flex-1" />
+        <div className="flex gap-1 bg-muted rounded-lg p-1">
+          <button
+            onClick={() => setActiveTab('library')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              activeTab === 'library' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Library className="w-4 h-4" />
+            ROM Library
+          </button>
+          <button
+            onClick={() => setActiveTab('play')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              activeTab === 'play' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            Load ROM
+          </button>
+        </div>
+        <Button variant="ghost" size="icon" onClick={() => setShowInfo(!showInfo)}>
           <Info className="w-5 h-5" />
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full space-y-8">
+      <div className="flex-1 overflow-y-auto p-6 max-w-4xl mx-auto w-full space-y-8">
         {showInfo && (
           <div className="rounded-lg bg-muted/50 border border-border p-4 text-sm text-muted-foreground space-y-2">
             <p className="font-medium text-foreground">How it works</p>
-            <p>Select a console, then load a ROM file from your device. The emulator runs entirely in your browser — no files are uploaded anywhere.</p>
+            <p>Browse the ROM Library to download games, or use "Load ROM" to play a ROM file from your device directly in the browser.</p>
             <p>Save states and settings are stored locally in your browser via IndexedDB.</p>
             <p className="text-xs">Powered by EmulatorJS. Only use ROM files you legally own.</p>
           </div>
         )}
 
-        {/* Step 1: Select Console */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">1. Select Console</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {CORES.map(core => (
-              <button
-                key={core.id}
-                onClick={() => setSelectedCore(core.id)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all text-left ${
-                  selectedCore === core.id
-                    ? 'border-primary bg-primary/10 text-foreground ring-1 ring-primary'
-                    : 'border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground'
-                }`}
-              >
-                <Gamepad2 className="w-4 h-4 shrink-0" />
-                <span className="text-sm font-medium">{core.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {activeTab === 'library' ? (
+          <RomLibrary />
+        ) : (
+          <>
+            {/* Step 1: Select Console */}
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">1. Select Console</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {CORES.map(core => (
+                  <button
+                    key={core.id}
+                    onClick={() => setSelectedCore(core.id)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all text-left ${
+                      selectedCore === core.id
+                        ? 'border-primary bg-primary/10 text-foreground ring-1 ring-primary'
+                        : 'border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground'
+                    }`}
+                  >
+                    <Gamepad2 className="w-4 h-4 shrink-0" />
+                    <span className="text-sm font-medium">{core.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {/* Step 2: Load ROM */}
-        {selectedCore && (
-          <div className="space-y-3 animate-fade-in">
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">2. Load ROM File</h2>
-            <label className="flex flex-col items-center justify-center gap-3 p-8 rounded-lg border-2 border-dashed border-border bg-card hover:border-primary/50 transition-colors cursor-pointer">
-              <Upload className="w-8 h-8 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                Click to select a ROM file
-              </span>
-              <span className="text-xs text-muted-foreground/60">
-                Supported: {CORES.find(c => c.id === selectedCore)?.extensions.join(', ')}
-              </span>
-              <input
-                type="file"
-                className="hidden"
-                accept={CORES.find(c => c.id === selectedCore)?.extensions.join(',')}
-                onChange={handleFileSelect}
-              />
-            </label>
-          </div>
+            {/* Step 2: Load ROM */}
+            {selectedCore && (
+              <div className="space-y-3 animate-fade-in">
+                <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">2. Load ROM File</h2>
+                <label className="flex flex-col items-center justify-center gap-3 p-8 rounded-lg border-2 border-dashed border-border bg-card hover:border-primary/50 transition-colors cursor-pointer">
+                  <Upload className="w-8 h-8 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    Click to select a ROM file
+                  </span>
+                  <span className="text-xs text-muted-foreground/60">
+                    Supported: {CORES.find(c => c.id === selectedCore)?.extensions.join(', ')}
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept={CORES.find(c => c.id === selectedCore)?.extensions.join(',')}
+                    onChange={handleFileSelect}
+                  />
+                </label>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

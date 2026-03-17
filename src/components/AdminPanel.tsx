@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Trash2, Key, X, Shield, Gamepad2 } from 'lucide-react';
+import { Users, Plus, Trash2, Key, X, Shield, Gamepad2, Joystick } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { GameManagement } from './GameManagement';
+import { RomManagement } from './RomManagement';
 
 interface AppUser {
   id: string;
@@ -11,7 +12,7 @@ interface AppUser {
   created_at: string;
 }
 
-type TabType = 'users' | 'games';
+type TabType = 'users' | 'games' | 'roms';
 
 export function AdminPanel({ onClose }: { onClose: () => void }) {
   const { user, sessionToken } = useAuth();
@@ -151,10 +152,23 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
               <Gamepad2 className="w-4 h-4" />
               Games
             </button>
+            <button
+              onClick={() => setActiveTab('roms')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === 'roms' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              <Joystick className="w-4 h-4" />
+              ROMs
+            </button>
           </div>
 
           {activeTab === 'games' ? (
             <GameManagement />
+          ) : activeTab === 'roms' ? (
+            <RomManagement />
           ) : (
             <>
           {error && (
