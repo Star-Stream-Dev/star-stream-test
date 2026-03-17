@@ -15,7 +15,7 @@ async function hashPasswordPBKDF2(password: string, salt?: Uint8Array): Promise<
     "raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]
   );
   const derived = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt: actualSalt, iterations: 100000, hash: "SHA-256" },
+    { name: "PBKDF2", salt: actualSalt as ArrayBuffer, iterations: 100000, hash: "SHA-256" },
     keyMaterial, 256
   );
   const hashArray = Array.from(new Uint8Array(derived));
