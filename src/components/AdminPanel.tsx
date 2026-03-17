@@ -12,7 +12,7 @@ interface AppUser {
   created_at: string;
 }
 
-type TabType = 'users' | 'games';
+type TabType = 'users' | 'games' | 'roms';
 
 export function AdminPanel({ onClose }: { onClose: () => void }) {
   const { user, sessionToken } = useAuth();
