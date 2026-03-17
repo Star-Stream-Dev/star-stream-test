@@ -86,7 +86,28 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
         </Button>
         <Gamepad2 className="w-6 h-6 text-primary" />
         <h1 className="text-lg font-bold text-foreground">Emulator</h1>
-        <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setShowInfo(!showInfo)}>
+        <div className="flex-1" />
+        <div className="flex gap-1 bg-muted rounded-lg p-1">
+          <button
+            onClick={() => setActiveTab('library')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              activeTab === 'library' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Library className="w-4 h-4" />
+            ROM Library
+          </button>
+          <button
+            onClick={() => setActiveTab('play')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              activeTab === 'play' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            Load ROM
+          </button>
+        </div>
+        <Button variant="ghost" size="icon" onClick={() => setShowInfo(!showInfo)}>
           <Info className="w-5 h-5" />
         </Button>
       </div>
