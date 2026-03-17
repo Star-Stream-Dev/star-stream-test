@@ -167,6 +167,8 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
 
           {activeTab === 'games' ? (
             <GameManagement />
+          ) : activeTab === 'roms' ? (
+            <RomManagement />
           ) : (
             <>
           {error && (
