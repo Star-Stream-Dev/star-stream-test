@@ -394,7 +394,13 @@ export function GamesGrid({ onGameClick }: GamesGridProps) {
                     </div>
                     
                     {/* Category badge */}
-                    <div className="absolute top-2 md:top-3 right-2 md:right-3">
+                    <div className="absolute top-2 md:top-3 right-2 md:right-3 flex items-center gap-1.5">
+                      {game.hostedPath && (
+                        <span className="flex items-center gap-1 text-[9px] md:text-[10px] uppercase tracking-wider bg-primary/90 backdrop-blur-sm px-2 py-1 rounded-full text-primary-foreground font-medium">
+                          <Server className="w-2.5 h-2.5" />
+                          Hosted
+                        </span>
+                      )}
                       <span className="text-[9px] md:text-[10px] uppercase tracking-wider bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full text-foreground font-medium">
                         {game.category}
                       </span>
