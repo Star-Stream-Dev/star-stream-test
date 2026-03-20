@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, Play, Gamepad2, Music, Cpu, Car, Sparkles, Camera, Loader2, Clock, Timer } from 'lucide-react';
+import { Search, Play, Gamepad2, Music, Cpu, Car, Sparkles, Camera, Loader2, Clock, Timer, Server } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
