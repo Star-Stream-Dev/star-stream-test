@@ -190,10 +190,11 @@ export function GamesGrid({ onGameClick }: GamesGridProps) {
           description: g.description,
           url: g.url,
           preview: g.preview,
-          embed: g.embed ?? true, // Default to embed if not specified
+          embed: g.embed ?? true,
           isTab: g.is_tab || undefined,
           category: g.category,
           thumbnail: g.thumbnail_url || undefined,
+          hostedPath: (g as any).hosted_path || undefined,
         }));
         setGames(mappedGames);
       }
