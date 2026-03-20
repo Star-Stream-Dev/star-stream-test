@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Upload, X, Save, Image } from 'lucide-react';
+import { Plus, Edit2, Trash2, Upload, X, Save, Image, Package, Server } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -15,6 +15,7 @@ interface Game {
   category: string;
   thumbnail_url: string | null;
   display_order: number;
+  hosted_path: string | null;
 }
 
 const categories = ['fnf', 'rhythm', 'arcade', 'utility', 'racing'];
@@ -26,6 +27,7 @@ export function GameManagement() {
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+  const [uploadingZip, setUploadingZip] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -37,6 +39,7 @@ export function GameManagement() {
     category: 'arcade',
     thumbnail_url: '',
     display_order: 0,
+    hosted_path: '',
   });
 
   useEffect(() => {
@@ -51,7 +54,7 @@ export function GameManagement() {
         .order('display_order', { ascending: true });
 
       if (error) throw error;
-      setGames(data || []);
+      setGames((data || []) as Game[]);
     } catch (error) {
       console.error('Error fetching games:', error);
       toast.error('Failed to load games');
@@ -94,6 +97,63 @@ export function GameManagement() {
     }
   };
 
+  const handleZipUpload = async (gameId: string, file: File) => {
+    if (!sessionToken) return;
+
+    setUploadingZip(gameId);
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('session_token', sessionToken);
+      formDataObj.append('game_id', gameId);
+      formDataObj.append('zip_file', file);
+
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/extract-game-zip`,
+        {
+          method: 'POST',
+          body: formDataObj,
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Upload failed');
+
+      // Update the game's hosted_path
+      const game = games.find(g => g.id === gameId);
+      if (game) {
+        await supabase.rpc('update_game', {
+          p_session_token: sessionToken,
+          p_game_id: gameId,
+          p_title: game.title,
+          p_description: game.description,
+          p_url: game.url,
+          p_preview: game.preview,
+          p_embed: game.embed,
+          p_is_tab: game.is_tab || '',
+          p_category: game.category,
+          p_thumbnail_url: game.thumbnail_url || '',
+          p_display_order: game.display_order,
+          p_hosted_path: result.hosted_path,
+        });
+      }
+
+      toast.success(`Game files uploaded! ${result.uploaded} files extracted.`);
+      if (result.errors?.length) {
+        toast.warning(`${result.errors.length} files had errors`);
+      }
+      fetchGames();
+    } catch (error: any) {
+      console.error('ZIP upload error:', error);
+      toast.error(error.message || 'Failed to upload game files');
+    } finally {
+      setUploadingZip(null);
+    }
+  };
+
   const handleCreate = async () => {
     if (!user?.id || !formData.title.trim()) {
       toast.error('Title is required');
@@ -112,6 +172,7 @@ export function GameManagement() {
         p_category: formData.category,
         p_thumbnail_url: formData.thumbnail_url || null,
         p_display_order: formData.display_order,
+        p_hosted_path: formData.hosted_path || null,
       });
 
       if (error) throw error;
@@ -142,6 +203,7 @@ export function GameManagement() {
         p_category: formData.category,
         p_thumbnail_url: formData.thumbnail_url || null,
         p_display_order: formData.display_order,
+        p_hosted_path: formData.hosted_path || null,
       });
 
       if (error) throw error;
@@ -188,6 +250,7 @@ export function GameManagement() {
       category: game.category,
       thumbnail_url: game.thumbnail_url || '',
       display_order: game.display_order,
+      hosted_path: game.hosted_path || '',
     });
   };
 
@@ -202,6 +265,7 @@ export function GameManagement() {
       category: 'arcade',
       thumbnail_url: '',
       display_order: games.length,
+      hosted_path: '',
     });
   };
 
@@ -282,13 +346,13 @@ export function GameManagement() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">URL</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">URL (for external games)</label>
               <input
                 type="text"
                 value={formData.url}
                 onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
                 className="w-full bg-background border border-border rounded-lg px-3 py-2 text-foreground"
-                placeholder="https://..."
+                placeholder="https://... (leave empty for hosted games)"
               />
             </div>
 
@@ -377,6 +441,23 @@ export function GameManagement() {
                 </div>
               </div>
             </div>
+
+            {/* Hosted path display */}
+            {formData.hosted_path && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Hosted Path</label>
+                <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
+                  <Server className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-foreground truncate">{formData.hosted_path}</span>
+                  <button
+                    onClick={() => setFormData(prev => ({ ...prev, hosted_path: '' }))}
+                    className="ml-auto p-1 text-destructive hover:bg-destructive/10 rounded"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t border-border">
@@ -423,7 +504,15 @@ export function GameManagement() {
               )}
               
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-foreground truncate">{game.title}</h4>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-medium text-foreground truncate">{game.title}</h4>
+                  {game.hosted_path && (
+                    <span className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-primary/15 text-primary rounded-full font-medium shrink-0">
+                      <Server className="w-2.5 h-2.5" />
+                      Hosted
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground truncate">{game.description}</p>
               </div>
               
@@ -432,6 +521,30 @@ export function GameManagement() {
               </span>
               
               <div className="flex items-center gap-1">
+                {/* ZIP Upload button */}
+                <label
+                  className={`p-2 hover:bg-muted rounded transition-colors cursor-pointer ${
+                    uploadingZip === game.id ? 'opacity-50 pointer-events-none' : ''
+                  }`}
+                  title="Upload game ZIP"
+                >
+                  {uploadingZip === game.id ? (
+                    <Package className="w-4 h-4 animate-pulse text-primary" />
+                  ) : (
+                    <Package className="w-4 h-4" />
+                  )}
+                  <input
+                    type="file"
+                    accept=".zip"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleZipUpload(game.id, file);
+                      e.target.value = '';
+                    }}
+                    className="hidden"
+                    disabled={!!uploadingZip}
+                  />
+                </label>
                 <button
                   onClick={() => startEdit(game)}
                   className="p-2 hover:bg-muted rounded transition-colors"
