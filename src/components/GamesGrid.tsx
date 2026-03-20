@@ -25,6 +25,7 @@ interface Game {
   isTab?: string;
   category: string;
   thumbnail?: string;
+  hostedPath?: string;
 }
 
 interface GamesGridProps {
