@@ -1,8 +1,7 @@
 name: Build and Deploy to S3
 on:
-  workflow_run:
-    workflows: ["Write .env"]
-    types: [completed]
+  push:
+   branches: main
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
