@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, Play, Gamepad2, Music, Cpu, Car, Sparkles, Camera, Loader2, Clock, Timer } from 'lucide-react';
+import { Search, Play, Gamepad2, Music, Cpu, Car, Sparkles, Camera, Loader2, Clock, Timer, Server } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -25,6 +25,7 @@ interface Game {
   isTab?: string;
   category: string;
   thumbnail?: string;
+  hostedPath?: string;
 }
 
 interface GamesGridProps {
@@ -189,10 +190,11 @@ export function GamesGrid({ onGameClick }: GamesGridProps) {
           description: g.description,
           url: g.url,
           preview: g.preview,
-          embed: g.embed ?? true, // Default to embed if not specified
+          embed: g.embed ?? true,
           isTab: g.is_tab || undefined,
           category: g.category,
           thumbnail: g.thumbnail_url || undefined,
+          hostedPath: (g as any).hosted_path || undefined,
         }));
         setGames(mappedGames);
       }
@@ -364,7 +366,7 @@ export function GamesGrid({ onGameClick }: GamesGridProps) {
                         } catch {}
                       }
                     }
-                    onGameClick(game.url, game.title, game.embed, game.isTab);
+                    onGameClick(game.hostedPath || game.url, game.title, game.embed, game.isTab);
                   }}
                   className="group relative w-full bg-card border border-border/40 rounded-xl md:rounded-2xl overflow-hidden text-left hover:border-primary/60 hover:bg-card/80 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 active:scale-[0.98]"
                 >
@@ -392,7 +394,13 @@ export function GamesGrid({ onGameClick }: GamesGridProps) {
                     </div>
                     
                     {/* Category badge */}
-                    <div className="absolute top-2 md:top-3 right-2 md:right-3">
+                    <div className="absolute top-2 md:top-3 right-2 md:right-3 flex items-center gap-1.5">
+                      {game.hostedPath && (
+                        <span className="flex items-center gap-1 text-[9px] md:text-[10px] uppercase tracking-wider bg-primary/90 backdrop-blur-sm px-2 py-1 rounded-full text-primary-foreground font-medium">
+                          <Server className="w-2.5 h-2.5" />
+                          Hosted
+                        </span>
+                      )}
                       <span className="text-[9px] md:text-[10px] uppercase tracking-wider bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full text-foreground font-medium">
                         {game.category}
                       </span>

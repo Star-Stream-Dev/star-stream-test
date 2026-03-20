@@ -508,6 +508,7 @@ export type Database = {
           description: string
           display_order: number
           embed: boolean
+          hosted_path: string | null
           id: string
           is_tab: string | null
           preview: string
@@ -523,6 +524,7 @@ export type Database = {
           description: string
           display_order?: number
           embed?: boolean
+          hosted_path?: string | null
           id?: string
           is_tab?: string | null
           preview?: string
@@ -538,6 +540,7 @@ export type Database = {
           description?: string
           display_order?: number
           embed?: boolean
+          hosted_path?: string | null
           id?: string
           is_tab?: string | null
           preview?: string
@@ -1391,21 +1394,38 @@ export type Database = {
         }
         Returns: string
       }
-      create_game: {
-        Args: {
-          p_category: string
-          p_description: string
-          p_display_order: number
-          p_embed: boolean
-          p_is_tab: string
-          p_preview: string
-          p_session_token: string
-          p_thumbnail_url: string
-          p_title: string
-          p_url: string
-        }
-        Returns: string
-      }
+      create_game:
+        | {
+            Args: {
+              p_category: string
+              p_description: string
+              p_display_order: number
+              p_embed: boolean
+              p_is_tab: string
+              p_preview: string
+              p_session_token: string
+              p_thumbnail_url: string
+              p_title: string
+              p_url: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_category: string
+              p_description: string
+              p_display_order: number
+              p_embed: boolean
+              p_hosted_path?: string
+              p_is_tab: string
+              p_preview: string
+              p_session_token: string
+              p_thumbnail_url: string
+              p_title: string
+              p_url: string
+            }
+            Returns: string
+          }
       create_rom: {
         Args: {
           p_console: string
@@ -1605,22 +1625,40 @@ export type Database = {
         }
         Returns: boolean
       }
-      update_game: {
-        Args: {
-          p_category: string
-          p_description: string
-          p_display_order: number
-          p_embed: boolean
-          p_game_id: string
-          p_is_tab: string
-          p_preview: string
-          p_session_token: string
-          p_thumbnail_url: string
-          p_title: string
-          p_url: string
-        }
-        Returns: boolean
-      }
+      update_game:
+        | {
+            Args: {
+              p_category: string
+              p_description: string
+              p_display_order: number
+              p_embed: boolean
+              p_game_id: string
+              p_is_tab: string
+              p_preview: string
+              p_session_token: string
+              p_thumbnail_url: string
+              p_title: string
+              p_url: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_category: string
+              p_description: string
+              p_display_order: number
+              p_embed: boolean
+              p_game_id: string
+              p_hosted_path?: string
+              p_is_tab: string
+              p_preview: string
+              p_session_token: string
+              p_thumbnail_url: string
+              p_title: string
+              p_url: string
+            }
+            Returns: boolean
+          }
       update_game_play_time: {
         Args: {
           p_additional_seconds: number
