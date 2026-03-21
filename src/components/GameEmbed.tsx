@@ -231,6 +231,7 @@ export function GameEmbed({ url, title, gameId, onClose }: GameEmbedProps) {
         title={title}
         className={`w-full h-full ${isMathepicSite ? 'pt-24' : ''}`}
         allow="fullscreen; autoplay; encrypted-media"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals"
         allowFullScreen
       />
 
