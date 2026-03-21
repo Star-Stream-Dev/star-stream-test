@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import JSZip from 'jszip';
 import { Plus, Edit2, Trash2, Upload, X, Save, Image, Package, Server } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -102,25 +103,79 @@ export function GameManagement() {
 
     setUploadingZip(gameId);
     try {
-      const formDataObj = new FormData();
-      formDataObj.append('session_token', sessionToken);
-      formDataObj.append('game_id', gameId);
-      formDataObj.append('zip_file', file);
+      const arrayBuffer = await file.arrayBuffer();
+      const zip = await JSZip.loadAsync(arrayBuffer);
+      const basePath = `games/${gameId}`;
 
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/extract-game-zip`,
-        {
-          method: 'POST',
-          body: formDataObj,
-          headers: {
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
+      // Find root prefix (if ZIP has single top-level folder with index.html)
+      const entries = Object.keys(zip.files);
+      let prefix = '';
+      const topLevel = new Set<string>();
+      for (const entry of entries) {
+        const parts = entry.split('/');
+        if (parts[0]) topLevel.add(parts[0]);
+      }
+      if (topLevel.size === 1) {
+        const singleDir = Array.from(topLevel)[0];
+        if (entries.some(e => e === `${singleDir}/index.html`)) {
+          prefix = `${singleDir}/`;
         }
-      );
+      }
 
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Upload failed');
+      const contentTypes: Record<string, string> = {
+        'html': 'text/html', 'htm': 'text/html',
+        'js': 'application/javascript', 'mjs': 'application/javascript',
+        'css': 'text/css', 'json': 'application/json',
+        'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+        'gif': 'image/gif', 'svg': 'image/svg+xml', 'webp': 'image/webp',
+        'woff': 'font/woff', 'woff2': 'font/woff2', 'ttf': 'font/ttf',
+        'mp3': 'audio/mpeg', 'ogg': 'audio/ogg', 'wav': 'audio/wav',
+        'mp4': 'video/mp4', 'webm': 'video/webm', 'wasm': 'application/wasm',
+        'data': 'application/octet-stream', 'xml': 'application/xml',
+      };
+
+      let uploadedCount = 0;
+      const errors: string[] = [];
+      const fileEntries = Object.entries(zip.files).filter(([, f]) => !f.dir);
+
+      // Upload files in batches of 5 to avoid overwhelming the browser
+      for (let i = 0; i < fileEntries.length; i += 5) {
+        const batch = fileEntries.slice(i, i + 5);
+        const results = await Promise.allSettled(
+          batch.map(async ([relativePath, zipFile]) => {
+            let cleanPath = relativePath;
+            if (prefix && cleanPath.startsWith(prefix)) {
+              cleanPath = cleanPath.slice(prefix.length);
+            }
+            if (!cleanPath) return;
+
+            const content = await zipFile.async('uint8array');
+            const ext = cleanPath.split('.').pop()?.toLowerCase() || '';
+            const contentType = contentTypes[ext] || 'application/octet-stream';
+            const storagePath = `${basePath}/${cleanPath}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('game-files')
+              .upload(storagePath, content, { contentType, upsert: true });
+
+            if (uploadError) throw new Error(`${cleanPath}: ${uploadError.message}`);
+            return cleanPath;
+          })
+        );
+
+        for (const r of results) {
+          if (r.status === 'fulfilled' && r.value) uploadedCount++;
+          else if (r.status === 'rejected') errors.push(r.reason?.message || 'Unknown error');
+        }
+
+        // Show progress
+        toast.info(`Uploading... ${uploadedCount}/${fileEntries.length} files`, { id: 'zip-progress' });
+      }
+
+      // Get the public URL for the hosted path
+      const { data: { publicUrl } } = supabase.storage
+        .from('game-files')
+        .getPublicUrl(`${basePath}/index.html`);
 
       // Update the game's hosted_path
       const game = games.find(g => g.id === gameId);
@@ -137,13 +192,14 @@ export function GameManagement() {
           p_category: game.category,
           p_thumbnail_url: game.thumbnail_url || '',
           p_display_order: game.display_order,
-          p_hosted_path: result.hosted_path,
+          p_hosted_path: publicUrl,
         });
       }
 
-      toast.success(`Game files uploaded! ${result.uploaded} files extracted.`);
-      if (result.errors?.length) {
-        toast.warning(`${result.errors.length} files had errors`);
+      toast.success(`Game files uploaded! ${uploadedCount} files extracted.`, { id: 'zip-progress' });
+      if (errors.length) {
+        toast.warning(`${errors.length} files had errors`);
+        console.warn('Upload errors:', errors);
       }
       fetchGames();
     } catch (error: any) {
