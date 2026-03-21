@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import JSZip from 'jszip';
 import { Plus, Edit2, Trash2, Upload, X, Save, Image, Package, Server } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
