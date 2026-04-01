@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, Upload, X, Save, Image, Package, Server } from 'lu
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { analyzeBundle, getMimeType } from '@/lib/hostedGameBundle';
 
 interface Game {
   id: string;
@@ -107,51 +108,50 @@ export function GameManagement() {
       const zip = await JSZip.loadAsync(arrayBuffer);
       const basePath = `games/${gameId}`;
 
-      // Find root prefix (if ZIP has single top-level folder with index.html)
-      const entries = Object.keys(zip.files);
-      let prefix = '';
-      const topLevel = new Set<string>();
-      for (const entry of entries) {
-        const parts = entry.split('/');
-        if (parts[0]) topLevel.add(parts[0]);
-      }
-      if (topLevel.size === 1) {
-        const singleDir = Array.from(topLevel)[0];
-        if (entries.some(e => e === `${singleDir}/index.html`)) {
-          prefix = `${singleDir}/`;
-        }
+      // Analyze the bundle to find the entry point
+      const analysis = analyzeBundle(zip);
+      if (!analysis.valid || !analysis.entryFile) {
+        toast.error(analysis.error || 'Invalid game bundle');
+        setUploadingZip(null);
+        return;
       }
 
-      const contentTypes: Record<string, string> = {
-        'html': 'text/html', 'htm': 'text/html',
-        'js': 'application/javascript', 'mjs': 'application/javascript',
-        'css': 'text/css', 'json': 'application/json',
-        'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
-        'gif': 'image/gif', 'svg': 'image/svg+xml', 'webp': 'image/webp',
-        'woff': 'font/woff', 'woff2': 'font/woff2', 'ttf': 'font/ttf',
-        'mp3': 'audio/mpeg', 'ogg': 'audio/ogg', 'wav': 'audio/wav',
-        'mp4': 'video/mp4', 'webm': 'video/webm', 'wasm': 'application/wasm',
-        'data': 'application/octet-stream', 'xml': 'application/xml',
-      };
+      toast.info(`Detected entry: ${analysis.entryFile}`, { duration: 4000 });
+
+      // Delete existing files for this game first to avoid stale assets
+      try {
+        const { data: existingFiles } = await supabase.storage
+          .from('game-files')
+          .list(basePath, { limit: 1000 });
+        if (existingFiles && existingFiles.length > 0) {
+          // Need to recursively list & delete (storage list is flat per folder)
+          const filePaths = existingFiles.map(f => `${basePath}/${f.name}`);
+          await supabase.storage.from('game-files').remove(filePaths);
+        }
+      } catch (e) {
+        console.warn('Could not clear old files:', e);
+      }
+
+      // Upload usable files
+      const usableFiles = Object.entries(zip.files).filter(
+        ([path, f]) => !f.dir && !analysis.files.find(af => af.path === path)?.isJunk
+      );
 
       let uploadedCount = 0;
       const errors: string[] = [];
-      const fileEntries = Object.entries(zip.files).filter(([, f]) => !f.dir);
 
-      // Upload files in batches of 5 to avoid overwhelming the browser
-      for (let i = 0; i < fileEntries.length; i += 5) {
-        const batch = fileEntries.slice(i, i + 5);
+      for (let i = 0; i < usableFiles.length; i += 5) {
+        const batch = usableFiles.slice(i, i + 5);
         const results = await Promise.allSettled(
           batch.map(async ([relativePath, zipFile]) => {
             let cleanPath = relativePath;
-            if (prefix && cleanPath.startsWith(prefix)) {
-              cleanPath = cleanPath.slice(prefix.length);
+            if (analysis.prefix && cleanPath.startsWith(analysis.prefix)) {
+              cleanPath = cleanPath.slice(analysis.prefix.length);
             }
             if (!cleanPath) return;
 
             const content = await zipFile.async('uint8array');
-            const ext = cleanPath.split('.').pop()?.toLowerCase() || '';
-            const contentType = contentTypes[ext] || 'application/octet-stream';
+            const contentType = getMimeType(cleanPath);
             const storagePath = `${basePath}/${cleanPath}`;
 
             const { error: uploadError } = await supabase.storage
@@ -168,14 +168,11 @@ export function GameManagement() {
           else if (r.status === 'rejected') errors.push(r.reason?.message || 'Unknown error');
         }
 
-        // Show progress
-        toast.info(`Uploading... ${uploadedCount}/${fileEntries.length} files`, { id: 'zip-progress' });
+        toast.info(`Uploading... ${uploadedCount}/${usableFiles.length} files`, { id: 'zip-progress' });
       }
 
-      // Get the public URL for the hosted path
-      const { data: { publicUrl } } = supabase.storage
-        .from('game-files')
-        .getPublicUrl(`${basePath}/index.html`);
+      // Save the relative storage path (not a full URL)
+      const hostedStoragePath = `${basePath}/${analysis.entryFile}`;
 
       // Update the game's hosted_path
       const game = games.find(g => g.id === gameId);
@@ -192,11 +189,11 @@ export function GameManagement() {
           p_category: game.category,
           p_thumbnail_url: game.thumbnail_url || '',
           p_display_order: game.display_order,
-          p_hosted_path: publicUrl,
+          p_hosted_path: hostedStoragePath,
         });
       }
 
-      toast.success(`Game files uploaded! ${uploadedCount} files extracted.`, { id: 'zip-progress' });
+      toast.success(`✅ Uploaded ${uploadedCount} files. Entry: ${analysis.entryFile}`, { id: 'zip-progress', duration: 5000 });
       if (errors.length) {
         toast.warning(`${errors.length} files had errors`);
         console.warn('Upload errors:', errors);

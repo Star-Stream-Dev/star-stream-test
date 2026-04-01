@@ -1,4 +1,4 @@
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, ExternalLink } from 'lucide-react';
 import { GameOverlayBar } from './GameOverlayBar';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AgeVerificationModal, useAgeVerification } from './AgeVerificationModal';
@@ -19,6 +19,7 @@ export function GameEmbed({ url, title, gameId, onClose }: GameEmbedProps) {
   const [isVerified, setIsVerified] = useState(false);
   const [violationCount, setViolationCount] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [sessionStartTime] = useState(Date.now());
   const playTimeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -224,6 +225,39 @@ export function GameEmbed({ url, title, gameId, onClose }: GameEmbedProps) {
         </div>
       )}
 
+      {/* Load Error Fallback */}
+      {loadError && (
+        <div className="absolute inset-0 z-30 bg-background/95 backdrop-blur-lg flex items-center justify-center p-4">
+          <div className="max-w-md text-center space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-full bg-destructive/20 flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-destructive" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Failed to Load Game</h2>
+            <p className="text-muted-foreground text-sm">
+              The game could not be loaded. This may happen if the game files are missing or the bundle was not uploaded correctly.
+            </p>
+            <p className="text-xs text-muted-foreground/70 font-mono break-all">{url}</p>
+            <div className="flex gap-3 justify-center">
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-xl text-sm transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Open Directly
+              </a>
+              <button
+                onClick={onClose}
+                className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Iframe */}
       <iframe
         ref={iframeRef}
@@ -233,6 +267,7 @@ export function GameEmbed({ url, title, gameId, onClose }: GameEmbedProps) {
         allow="fullscreen; autoplay; encrypted-media"
         sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals"
         allowFullScreen
+        onError={() => setLoadError(true)}
       />
 
       {/* Overlay bar for music and chat - hidden for Astra Client */}
