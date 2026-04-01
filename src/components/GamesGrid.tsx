@@ -3,6 +3,7 @@ import { Search, Play, Gamepad2, Music, Cpu, Car, Sparkles, Camera, Loader2, Clo
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { resolveHostedUrl } from '@/lib/hostedGameBundle';
 
 const STATS_KEY = 'solarnova_user_stats';
 const GAMES_HISTORY_KEY = 'solarnova_games_history';
