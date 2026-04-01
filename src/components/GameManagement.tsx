@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, Upload, X, Save, Image, Package, Server } from 'lu
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { analyzeBundle, getMimeType } from '@/lib/hostedGameBundle';
 
 interface Game {
   id: string;
