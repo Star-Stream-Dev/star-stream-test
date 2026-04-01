@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Upload, X, Save, Gamepad2, Image } from 'lucide-react';
+import { Plus, Trash2, Upload, X, Save, Gamepad2, Image, Pencil } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
