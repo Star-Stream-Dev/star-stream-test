@@ -326,6 +326,60 @@ export function RomManagement() {
           </div>
         ) : (
           roms.map(rom => (
+            editingRom === rom.id ? (
+              <div key={rom.id} className="bg-card border border-primary/30 rounded-lg p-4 space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Title</label>
+                    <input
+                      type="text"
+                      value={editData.title}
+                      onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-foreground text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Console</label>
+                    <select
+                      value={editData.console}
+                      onChange={(e) => setEditData(prev => ({ ...prev, console: e.target.value }))}
+                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-foreground text-sm"
+                    >
+                      {CONSOLES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Thumbnail</label>
+                  <div className="flex items-center gap-3">
+                    {editData.thumbnail_url && (
+                      <img src={editData.thumbnail_url} alt="Thumb" className="w-16 h-12 object-cover rounded border border-border" />
+                    )}
+                    <label className="flex items-center gap-2 px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-lg cursor-pointer transition-colors text-sm">
+                      <Upload className="w-3 h-3" />
+                      {editUploadingThumb ? 'Uploading...' : 'Upload'}
+                      <input type="file" accept="image/*" className="hidden" onChange={handleEditThumbnailUpload} disabled={editUploadingThumb} />
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.thumbnail_url}
+                      onChange={(e) => setEditData(prev => ({ ...prev, thumbnail_url: e.target.value }))}
+                      className="flex-1 bg-background border border-border rounded-lg px-3 py-1.5 text-foreground text-sm"
+                      placeholder="Or paste URL"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setEditingRom(null)} className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">Cancel</button>
+                  <button
+                    onClick={() => handleUpdate(rom.id)}
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+                  >
+                    <Save className="w-3 h-3" /> Save
+                  </button>
+                </div>
+              </div>
+            ) : (
             <div key={rom.id} className="flex items-center gap-4 bg-card border border-border rounded-lg p-3 hover:border-border/80 transition-colors">
               {rom.thumbnail_url ? (
                 <img src={rom.thumbnail_url} alt={rom.title} className="w-16 h-12 object-cover rounded" />
@@ -339,6 +393,13 @@ export function RomManagement() {
                 <p className="text-sm text-muted-foreground">{rom.console} {rom.file_size ? `• ${formatSize(rom.file_size)}` : ''}</p>
               </div>
               <button
+                onClick={() => startEditing(rom)}
+                className="p-2 hover:bg-muted text-muted-foreground hover:text-foreground rounded transition-colors"
+                title="Edit"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
                 onClick={() => handleDelete(rom.id)}
                 className="p-2 hover:bg-destructive/10 text-destructive rounded transition-colors"
                 title="Delete"
@@ -346,6 +407,7 @@ export function RomManagement() {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
+            )
           ))
         )}
       </div>
