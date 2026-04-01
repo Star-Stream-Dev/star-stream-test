@@ -27,6 +27,9 @@ export function RomManagement() {
   const [isCreating, setIsCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingThumb, setUploadingThumb] = useState(false);
+  const [editingRom, setEditingRom] = useState<string | null>(null);
+  const [editData, setEditData] = useState({ title: '', console: '', thumbnail_url: '' });
+  const [editUploadingThumb, setEditUploadingThumb] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
