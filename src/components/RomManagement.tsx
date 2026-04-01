@@ -155,6 +155,51 @@ export function RomManagement() {
     setFormData({ title: '', console: 'NES', thumbnail_url: '', file_path: '', file_size: 0 });
   };
 
+  const startEditing = (rom: Rom) => {
+    setEditingRom(rom.id);
+    setEditData({ title: rom.title, console: rom.console, thumbnail_url: rom.thumbnail_url || '' });
+  };
+
+  const handleEditThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith('image/')) { toast.error('Please upload an image'); return; }
+    setEditUploadingThumb(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `thumb-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from('game-thumbnails').upload(fileName, file);
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from('game-thumbnails').getPublicUrl(fileName);
+      setEditData(prev => ({ ...prev, thumbnail_url: publicUrl }));
+      toast.success('Thumbnail uploaded!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to upload thumbnail');
+    } finally {
+      setEditUploadingThumb(false);
+    }
+  };
+
+  const handleUpdate = async (romId: string) => {
+    if (!editData.title.trim()) { toast.error('Title is required'); return; }
+    try {
+      const { error } = await supabase.rpc('update_rom', {
+        p_session_token: sessionToken!,
+        p_rom_id: romId,
+        p_title: editData.title,
+        p_console: editData.console,
+        p_thumbnail_url: editData.thumbnail_url || null,
+      });
+      if (error) throw error;
+      toast.success('ROM updated!');
+      setEditingRom(null);
+      fetchRoms();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update ROM');
+    }
+  };
+
   const formatSize = (bytes: number | null) => {
     if (!bytes) return '';
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
