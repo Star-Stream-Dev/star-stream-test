@@ -19,6 +19,7 @@ export function GameEmbed({ url, title, gameId, onClose }: GameEmbedProps) {
   const [isVerified, setIsVerified] = useState(false);
   const [violationCount, setViolationCount] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [sessionStartTime] = useState(Date.now());
   const playTimeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
