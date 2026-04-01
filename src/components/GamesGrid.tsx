@@ -367,7 +367,10 @@ export function GamesGrid({ onGameClick }: GamesGridProps) {
                         } catch {}
                       }
                     }
-                    onGameClick(game.hostedPath || game.url, game.title, game.embed, game.isTab);
+                    const gameUrl = game.hostedPath 
+                      ? resolveHostedUrl(game.hostedPath, import.meta.env.VITE_SUPABASE_URL)
+                      : game.url;
+                    onGameClick(gameUrl, game.title, game.embed, game.isTab);
                   }}
                   className="group relative w-full bg-card border border-border/40 rounded-xl md:rounded-2xl overflow-hidden text-left hover:border-primary/60 hover:bg-card/80 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 active:scale-[0.98]"
                 >

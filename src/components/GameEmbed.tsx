@@ -1,4 +1,4 @@
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, ExternalLink } from 'lucide-react';
 import { GameOverlayBar } from './GameOverlayBar';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AgeVerificationModal, useAgeVerification } from './AgeVerificationModal';
