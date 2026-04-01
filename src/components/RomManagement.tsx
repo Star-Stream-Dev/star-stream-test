@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Upload, X, Save, Gamepad2, Image } from 'lucide-react';
+import { Plus, Trash2, Upload, X, Save, Gamepad2, Image, Pencil } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -27,6 +27,9 @@ export function RomManagement() {
   const [isCreating, setIsCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingThumb, setUploadingThumb] = useState(false);
+  const [editingRom, setEditingRom] = useState<string | null>(null);
+  const [editData, setEditData] = useState({ title: '', console: '', thumbnail_url: '' });
+  const [editUploadingThumb, setEditUploadingThumb] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -150,6 +153,51 @@ export function RomManagement() {
 
   const resetForm = () => {
     setFormData({ title: '', console: 'NES', thumbnail_url: '', file_path: '', file_size: 0 });
+  };
+
+  const startEditing = (rom: Rom) => {
+    setEditingRom(rom.id);
+    setEditData({ title: rom.title, console: rom.console, thumbnail_url: rom.thumbnail_url || '' });
+  };
+
+  const handleEditThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith('image/')) { toast.error('Please upload an image'); return; }
+    setEditUploadingThumb(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `thumb-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from('game-thumbnails').upload(fileName, file);
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from('game-thumbnails').getPublicUrl(fileName);
+      setEditData(prev => ({ ...prev, thumbnail_url: publicUrl }));
+      toast.success('Thumbnail uploaded!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to upload thumbnail');
+    } finally {
+      setEditUploadingThumb(false);
+    }
+  };
+
+  const handleUpdate = async (romId: string) => {
+    if (!editData.title.trim()) { toast.error('Title is required'); return; }
+    try {
+      const { error } = await supabase.rpc('update_rom', {
+        p_session_token: sessionToken!,
+        p_rom_id: romId,
+        p_title: editData.title,
+        p_console: editData.console,
+        p_thumbnail_url: editData.thumbnail_url || null,
+      });
+      if (error) throw error;
+      toast.success('ROM updated!');
+      setEditingRom(null);
+      fetchRoms();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update ROM');
+    }
   };
 
   const formatSize = (bytes: number | null) => {
@@ -278,6 +326,60 @@ export function RomManagement() {
           </div>
         ) : (
           roms.map(rom => (
+            editingRom === rom.id ? (
+              <div key={rom.id} className="bg-card border border-primary/30 rounded-lg p-4 space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Title</label>
+                    <input
+                      type="text"
+                      value={editData.title}
+                      onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-foreground text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Console</label>
+                    <select
+                      value={editData.console}
+                      onChange={(e) => setEditData(prev => ({ ...prev, console: e.target.value }))}
+                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-foreground text-sm"
+                    >
+                      {CONSOLES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Thumbnail</label>
+                  <div className="flex items-center gap-3">
+                    {editData.thumbnail_url && (
+                      <img src={editData.thumbnail_url} alt="Thumb" className="w-16 h-12 object-cover rounded border border-border" />
+                    )}
+                    <label className="flex items-center gap-2 px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-lg cursor-pointer transition-colors text-sm">
+                      <Upload className="w-3 h-3" />
+                      {editUploadingThumb ? 'Uploading...' : 'Upload'}
+                      <input type="file" accept="image/*" className="hidden" onChange={handleEditThumbnailUpload} disabled={editUploadingThumb} />
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.thumbnail_url}
+                      onChange={(e) => setEditData(prev => ({ ...prev, thumbnail_url: e.target.value }))}
+                      className="flex-1 bg-background border border-border rounded-lg px-3 py-1.5 text-foreground text-sm"
+                      placeholder="Or paste URL"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setEditingRom(null)} className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">Cancel</button>
+                  <button
+                    onClick={() => handleUpdate(rom.id)}
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+                  >
+                    <Save className="w-3 h-3" /> Save
+                  </button>
+                </div>
+              </div>
+            ) : (
             <div key={rom.id} className="flex items-center gap-4 bg-card border border-border rounded-lg p-3 hover:border-border/80 transition-colors">
               {rom.thumbnail_url ? (
                 <img src={rom.thumbnail_url} alt={rom.title} className="w-16 h-12 object-cover rounded" />
@@ -291,6 +393,13 @@ export function RomManagement() {
                 <p className="text-sm text-muted-foreground">{rom.console} {rom.file_size ? `• ${formatSize(rom.file_size)}` : ''}</p>
               </div>
               <button
+                onClick={() => startEditing(rom)}
+                className="p-2 hover:bg-muted text-muted-foreground hover:text-foreground rounded transition-colors"
+                title="Edit"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
                 onClick={() => handleDelete(rom.id)}
                 className="p-2 hover:bg-destructive/10 text-destructive rounded transition-colors"
                 title="Delete"
@@ -298,6 +407,7 @@ export function RomManagement() {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
+            )
           ))
         )}
       </div>

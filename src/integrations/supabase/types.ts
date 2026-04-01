@@ -1682,6 +1682,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_rom: {
+        Args: {
+          p_console: string
+          p_rom_id: string
+          p_session_token: string
+          p_thumbnail_url?: string
+          p_title: string
+        }
+        Returns: boolean
+      }
       update_user_password: {
         Args: {
           p_new_password_hash: string
