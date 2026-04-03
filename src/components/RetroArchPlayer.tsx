@@ -1,8 +1,9 @@
 import { useState, useCallback, ChangeEvent } from 'react';
 import { EmulatorJS } from 'react-emulatorjs';
-import { ArrowLeft, Upload, Gamepad2, Info, Library } from 'lucide-react';
+import { ArrowLeft, Upload, Gamepad2, Info, Library, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RomLibrary } from '@/components/RomLibrary';
+import { SaveManager } from '@/components/emulator/SaveManager';
 
 interface RetroArchPlayerProps {
   onClose: () => void;
