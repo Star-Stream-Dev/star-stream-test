@@ -134,6 +134,8 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
 
         {activeTab === 'library' ? (
           <RomLibrary />
+        ) : activeTab === 'saves' ? (
+          <SaveManager />
         ) : (
           <>
             {/* Step 1: Select Console */}
