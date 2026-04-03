@@ -489,21 +489,3 @@ function UploadForm({
   );
 }
 
-interface SaveFile {
-  id: string;
-  save_name: string;
-  game_name: string;
-  console: string;
-  file_path: string;
-  file_size: number | null;
-  thumbnail_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-interface RomOption {
-  id: string;
-  title: string;
-  console: string;
-  thumbnail_url: string | null;
-}
