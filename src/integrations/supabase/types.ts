@@ -346,6 +346,45 @@ export type Database = {
           },
         ]
       }
+      emulator_saves: {
+        Row: {
+          console: string
+          created_at: string
+          file_path: string
+          file_size: number | null
+          game_name: string
+          id: string
+          save_name: string
+          thumbnail_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          console?: string
+          created_at?: string
+          file_path: string
+          file_size?: number | null
+          game_name: string
+          id?: string
+          save_name: string
+          thumbnail_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          console?: string
+          created_at?: string
+          file_path?: string
+          file_size?: number | null
+          game_name?: string
+          id?: string
+          save_name?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       favorite_songs: {
         Row: {
           created_at: string
@@ -1449,6 +1488,10 @@ export type Database = {
         Args: { p_bug_id: string; p_session_token: string }
         Returns: boolean
       }
+      delete_emulator_save: {
+        Args: { p_save_id: string; p_session_token: string }
+        Returns: boolean
+      }
       delete_game: {
         Args: { p_game_id: string; p_session_token: string }
         Returns: boolean
@@ -1513,6 +1556,20 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      get_my_emulator_saves: {
+        Args: { p_session_token: string }
+        Returns: {
+          console: string
+          created_at: string
+          file_path: string
+          file_size: number
+          game_name: string
+          id: string
+          save_name: string
+          thumbnail_url: string
+          updated_at: string
+        }[]
       }
       get_my_unread_dms: {
         Args: { p_session_token: string }
@@ -1699,6 +1756,18 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      upload_emulator_save: {
+        Args: {
+          p_console: string
+          p_file_path: string
+          p_file_size?: number
+          p_game_name: string
+          p_save_name: string
+          p_session_token: string
+          p_thumbnail_url?: string
+        }
+        Returns: string
       }
       upsert_my_desktop_customizations: {
         Args: {

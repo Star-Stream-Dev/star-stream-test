@@ -1,8 +1,9 @@
 import { useState, useCallback, ChangeEvent } from 'react';
 import { EmulatorJS } from 'react-emulatorjs';
-import { ArrowLeft, Upload, Gamepad2, Info, Library } from 'lucide-react';
+import { ArrowLeft, Upload, Gamepad2, Info, Library, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RomLibrary } from '@/components/RomLibrary';
+import { SaveManager } from '@/components/emulator/SaveManager';
 
 interface RetroArchPlayerProps {
   onClose: () => void;
@@ -29,7 +30,7 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
   const [romUrl, setRomUrl] = useState<string | null>(null);
   const [romName, setRomName] = useState<string>('');
   const [showInfo, setShowInfo] = useState(false);
-  const [activeTab, setActiveTab] = useState<'play' | 'library'>('library');
+  const [activeTab, setActiveTab] = useState<'play' | 'library' | 'saves'>('library');
 
   const handleFileSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,6 +107,15 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
             <Upload className="w-4 h-4" />
             Load ROM
           </button>
+          <button
+            onClick={() => setActiveTab('saves')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              activeTab === 'saves' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Save className="w-4 h-4" />
+            Saves
+          </button>
         </div>
         <Button variant="ghost" size="icon" onClick={() => setShowInfo(!showInfo)}>
           <Info className="w-5 h-5" />
@@ -124,6 +134,8 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
 
         {activeTab === 'library' ? (
           <RomLibrary />
+        ) : activeTab === 'saves' ? (
+          <SaveManager />
         ) : (
           <>
             {/* Step 1: Select Console */}
