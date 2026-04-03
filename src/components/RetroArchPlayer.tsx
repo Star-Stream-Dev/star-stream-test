@@ -98,24 +98,24 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
             <Library className="w-4 h-4" />
             ROM Library
           </button>
-           <button
-101:             onClick={() => setActiveTab('play')}
-102:             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-103:               activeTab === 'play' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
-104:             }`}
-105:           >
-106:             <Upload className="w-4 h-4" />
-107:             Load ROM
-108:           </button>
-109:           <button
-110:             onClick={() => setActiveTab('saves')}
-111:             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-112:               activeTab === 'saves' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
-113:             }`}
-114:           >
-115:             <Save className="w-4 h-4" />
-116:             Saves
-117:           </button>
+          <button
+            onClick={() => setActiveTab('play')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              activeTab === 'play' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            Load ROM
+          </button>
+          <button
+            onClick={() => setActiveTab('saves')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              activeTab === 'saves' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Save className="w-4 h-4" />
+            Saves
+          </button>
         </div>
         <Button variant="ghost" size="icon" onClick={() => setShowInfo(!showInfo)}>
           <Info className="w-5 h-5" />
