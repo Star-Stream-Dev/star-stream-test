@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, ChangeEvent } from 'react';
-import { Upload, Download, Trash2, Gamepad2, Save, Clock, HardDrive, Search, X } from 'lucide-react';
+import { useState, useEffect, ChangeEvent } from 'react';
+import { Upload, Download, Trash2, Gamepad2, Save, Clock, HardDrive, Search, X, ChevronRight, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,7 +33,6 @@ export function SaveManager() {
   const [showUpload, setShowUpload] = useState(false);
   const [search, setSearch] = useState('');
 
-  // Upload form state
   const [saveName, setSaveName] = useState('');
   const [selectedRom, setSelectedRom] = useState<RomOption | null>(null);
   const [customGameName, setCustomGameName] = useState('');
@@ -81,17 +80,12 @@ export function SaveManager() {
       toast.error('Please enter a save name and select/enter a game');
       return;
     }
-
     setUploading(true);
     try {
       const ext = selectedFile.name.split('.').pop() || 'sav';
       const path = `${user.id}/${Date.now()}_${saveName.replace(/\s+/g, '_')}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('emulator-saves')
-        .upload(path, selectedFile);
+      const { error: uploadError } = await supabase.storage.from('emulator-saves').upload(path, selectedFile);
       if (uploadError) throw uploadError;
-
       const { error: rpcError } = await supabase.rpc('upload_emulator_save', {
         p_session_token: sessionToken,
         p_save_name: saveName,
@@ -102,7 +96,6 @@ export function SaveManager() {
         p_thumbnail_url: selectedRom?.thumbnail_url || null,
       });
       if (rpcError) throw rpcError;
-
       toast.success('Save file uploaded!');
       resetUploadForm();
       fetchSaves();
@@ -123,7 +116,7 @@ export function SaveManager() {
       a.download = `${save.save_name}.${save.file_path.split('.').pop()}`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err: any) {
+    } catch {
       toast.error('Download failed');
     }
   };
@@ -139,7 +132,7 @@ export function SaveManager() {
       if (error) throw error;
       toast.success('Save deleted');
       fetchSaves();
-    } catch (err: any) {
+    } catch {
       toast.error('Delete failed');
     }
   };
@@ -163,8 +156,8 @@ export function SaveManager() {
     s.game_name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const latestSaves = filteredSaves.slice(0, 3);
-  const olderSaves = filteredSaves.slice(3);
+  const latestSave = filteredSaves[0] || null;
+  const otherSaves = filteredSaves.slice(1);
 
   const formatSize = (bytes: number | null) => {
     if (!bytes) return '—';
@@ -175,7 +168,12 @@ export function SaveManager() {
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const formatTime = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
   if (!user) {
@@ -188,142 +186,112 @@ export function SaveManager() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header bar */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <HardDrive className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-bold text-foreground">My Saves</h2>
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{saves.length}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search saves..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-8 pr-3 py-1.5 text-sm rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground w-40 focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-          <Button size="sm" onClick={() => setShowUpload(!showUpload)} className="gap-1.5">
-            <Upload className="w-4 h-4" />
-            Upload Save
-          </Button>
-        </div>
-      </div>
-
-      {/* Upload form */}
-      {showUpload && (
-        <div className="rounded-xl border border-border bg-card p-5 space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground">Upload Save File</h3>
-            <button onClick={resetUploadForm} className="text-muted-foreground hover:text-foreground">
-              <X className="w-4 h-4" />
-            </button>
+    <div className="space-y-5">
+      {/* Hero / Latest Save */}
+      {!loading && latestSave && (
+        <div className="relative rounded-2xl overflow-hidden border border-border bg-card">
+          {/* Background image blur */}
+          <div className="absolute inset-0 overflow-hidden">
+            {latestSave.thumbnail_url ? (
+              <img src={latestSave.thumbnail_url} alt="" className="w-full h-full object-cover opacity-20 blur-2xl scale-125" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-card/40" />
           </div>
 
-          {/* Save name */}
-          <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Save Name</label>
-            <input
-              type="text"
-              placeholder="e.g. Final Boss Save, 100% Complete"
-              value={saveName}
-              onChange={e => setSaveName(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-
-          {/* Game selector */}
-          <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Game</label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search ROM library or type game name..."
-                value={selectedRom ? selectedRom.title : romSearch || customGameName}
-                onChange={e => {
-                  setSelectedRom(null);
-                  setRomSearch(e.target.value);
-                  setCustomGameName(e.target.value);
-                  setShowRomDropdown(true);
-                }}
-                onFocus={() => setShowRomDropdown(true)}
-                className="w-full px-3 py-2 rounded-lg bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-              {selectedRom && (
-                <button
-                  onClick={() => { setSelectedRom(null); setRomSearch(''); setCustomGameName(''); }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-              {showRomDropdown && !selectedRom && filteredRoms.length > 0 && (
-                <div className="absolute z-20 top-full mt-1 left-0 right-0 max-h-48 overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
-                  {filteredRoms.slice(0, 20).map(rom => (
-                    <button
-                      key={rom.id}
-                      onClick={() => {
-                        setSelectedRom(rom);
-                        setRomSearch('');
-                        setCustomGameName('');
-                        setShowRomDropdown(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors"
-                    >
-                      {rom.thumbnail_url ? (
-                        <img src={rom.thumbnail_url} alt="" className="w-8 h-8 rounded object-cover" />
-                      ) : (
-                        <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
-                          <Gamepad2 className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{rom.title}</p>
-                        <p className="text-xs text-muted-foreground">{rom.console}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+          <div className="relative p-5">
+            <div className="flex items-start gap-1 mb-3">
+              <Clock className="w-3.5 h-3.5 text-primary mt-0.5" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Latest Save</span>
             </div>
-            {selectedRom?.thumbnail_url && (
-              <div className="mt-2 flex items-center gap-3">
-                <img src={selectedRom.thumbnail_url} alt="" className="w-12 h-12 rounded-lg object-cover border border-border" />
+
+            <div className="flex gap-4">
+              {/* Thumbnail */}
+              <div className="shrink-0 w-28 h-28 sm:w-36 sm:h-36 rounded-xl overflow-hidden border border-border/50 shadow-lg">
+                {latestSave.thumbnail_url ? (
+                  <img src={latestSave.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <Gamepad2 className="w-10 h-10 text-muted-foreground/40" />
+                  </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0 flex flex-col justify-between">
                 <div>
-                  <p className="text-sm font-medium text-foreground">{selectedRom.title}</p>
-                  <p className="text-xs text-muted-foreground">{selectedRom.console}</p>
+                  <h3 className="text-lg font-bold text-foreground truncate">{latestSave.save_name}</h3>
+                  <p className="text-sm text-muted-foreground truncate mt-0.5">{latestSave.game_name}</p>
+                  {latestSave.console && (
+                    <span className="inline-block mt-2 text-[10px] font-semibold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
+                      {latestSave.console}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-4 mt-3">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="w-3 h-3" />
+                    <span>{formatDate(latestSave.created_at)}</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{formatSize(latestSave.file_size)}</span>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* File picker */}
-          <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Save File</label>
-            <label className="flex items-center gap-3 px-4 py-3 rounded-lg border border-dashed border-border bg-muted/30 hover:border-primary/50 cursor-pointer transition-colors">
-              <Upload className="w-5 h-5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {selectedFile ? selectedFile.name : 'Click to select a save file (.sav, .srm, .state, etc.)'}
-              </span>
-              <input
-                type="file"
-                className="hidden"
-                accept=".sav,.srm,.state,.sn1,.sn2,.sn3,.sn4,.sn5,.sn6,.sn7,.sn8,.sn9,.ss0,.ss1,.ss2,.ss3,.ss4,.ss5,.ss6,.ss7,.ss8,.ss9,.oops,.cht,.mcr,.fla,.eep,.mpk,.dat,.dsv"
-                onChange={handleFileSelect}
-              />
-            </label>
+            {/* Action buttons */}
+            <div className="flex gap-2 mt-4">
+              <Button size="sm" className="gap-1.5 flex-1" onClick={() => handleDownload(latestSave)}>
+                <Download className="w-4 h-4" />
+                Download
+              </Button>
+              <Button size="sm" variant="outline" className="gap-1.5 px-3" onClick={() => handleDelete(latestSave)}>
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-
-          <Button onClick={handleUpload} disabled={uploading || !selectedFile || (!selectedRom && !customGameName.trim()) || !saveName.trim()} className="w-full gap-2">
-            {uploading ? 'Uploading...' : 'Upload Save'}
-          </Button>
         </div>
       )}
 
+      {/* Action bar */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search saves..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-xl bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
+        <Button size="sm" onClick={() => setShowUpload(!showUpload)} className="gap-1.5 rounded-xl shrink-0">
+          <Upload className="w-4 h-4" />
+          Upload
+        </Button>
+      </div>
+
+      {/* Upload form */}
+      {showUpload && <UploadForm
+        saveName={saveName}
+        setSaveName={setSaveName}
+        selectedRom={selectedRom}
+        setSelectedRom={setSelectedRom}
+        customGameName={customGameName}
+        setCustomGameName={setCustomGameName}
+        romSearch={romSearch}
+        setRomSearch={setRomSearch}
+        showRomDropdown={showRomDropdown}
+        setShowRomDropdown={setShowRomDropdown}
+        selectedFile={selectedFile}
+        handleFileSelect={handleFileSelect}
+        filteredRoms={filteredRoms}
+        uploading={uploading}
+        handleUpload={handleUpload}
+        resetUploadForm={resetUploadForm}
+      />}
+
+      {/* Saves list */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
           <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -334,110 +302,190 @@ export function SaveManager() {
           <p className="text-sm font-medium">No saves yet</p>
           <p className="text-xs mt-1">Upload your first save file to get started</p>
         </div>
-      ) : (
-        <>
-          {/* Latest saves */}
-          {latestSaves.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Latest Saves</h3>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {latestSaves.map(save => (
-                  <SaveCard key={save.id} save={save} onDownload={handleDownload} onDelete={handleDelete} formatSize={formatSize} formatDate={formatDate} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Older saves */}
-          {olderSaves.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">All Saves</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {olderSaves.map(save => (
-                  <SaveCard key={save.id} save={save} onDownload={handleDownload} onDelete={handleDelete} formatSize={formatSize} formatDate={formatDate} />
-                ))}
-              </div>
-            </div>
-          )}
-        </>
-      )}
+      ) : otherSaves.length > 0 ? (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <HardDrive className="w-3.5 h-3.5 text-muted-foreground" />
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">All Saves</h3>
+            <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full ml-auto">{filteredSaves.length}</span>
+          </div>
+          <div className="space-y-1.5">
+            {otherSaves.map(save => (
+              <SaveRow key={save.id} save={save} onDownload={handleDownload} onDelete={handleDelete} formatSize={formatSize} formatDate={formatDate} formatTime={formatTime} />
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function SaveCard({
-  save,
-  onDownload,
-  onDelete,
-  formatSize,
-  formatDate,
+/* ─── Compact save row ─── */
+function SaveRow({
+  save, onDownload, onDelete, formatSize, formatDate, formatTime,
 }: {
   save: SaveFile;
   onDownload: (s: SaveFile) => void;
   onDelete: (s: SaveFile) => void;
   formatSize: (n: number | null) => string;
   formatDate: (s: string) => string;
+  formatTime: (s: string) => string;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
-    <div className="group relative rounded-xl border border-border bg-card overflow-hidden hover:border-primary/40 transition-all">
-      {/* Thumbnail header */}
-      <div className="relative h-24 bg-muted/50 overflow-hidden">
+    <div className="flex items-center gap-3 p-2.5 rounded-xl border border-border/50 bg-card/50 hover:bg-card hover:border-border transition-all group">
+      {/* Thumbnail */}
+      <div className="shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-border/30">
         {save.thumbnail_url ? (
-          <img src={save.thumbnail_url} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+          <img src={save.thumbnail_url} alt="" className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Gamepad2 className="w-10 h-10 text-muted-foreground/30" />
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <Gamepad2 className="w-5 h-5 text-muted-foreground/30" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
-        <div className="absolute bottom-2 left-3 right-3">
-          <p className="text-sm font-bold text-foreground truncate">{save.save_name}</p>
-        </div>
       </div>
 
       {/* Info */}
-      <div className="p-3 space-y-2">
-        <div className="flex items-center gap-2">
-          <Gamepad2 className="w-3.5 h-3.5 text-primary shrink-0" />
-          <p className="text-xs font-medium text-foreground truncate">{save.game_name}</p>
-        </div>
-        {save.console && (
-          <span className="inline-block text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-            {save.console}
-          </span>
-        )}
-        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-          <span>{formatDate(save.created_at)}</span>
-          <span>{formatSize(save.file_size)}</span>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-2 pt-1">
-          <Button size="sm" variant="outline" className="flex-1 gap-1.5 h-8 text-xs" onClick={() => onDownload(save)}>
-            <Download className="w-3.5 h-3.5" />
-            Download
-          </Button>
-          {confirmDelete ? (
-            <div className="flex gap-1">
-              <Button size="sm" variant="destructive" className="h-8 text-xs px-2" onClick={() => { onDelete(save); setConfirmDelete(false); }}>
-                Yes
-              </Button>
-              <Button size="sm" variant="outline" className="h-8 text-xs px-2" onClick={() => setConfirmDelete(false)}>
-                No
-              </Button>
-            </div>
-          ) : (
-            <Button size="sm" variant="ghost" className="h-8 px-2 text-muted-foreground hover:text-destructive" onClick={() => setConfirmDelete(true)}>
-              <Trash2 className="w-3.5 h-3.5" />
-            </Button>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-foreground truncate">{save.save_name}</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-xs text-muted-foreground truncate">{save.game_name}</span>
+          {save.console && (
+            <span className="text-[9px] font-medium text-primary bg-primary/10 px-1.5 py-px rounded shrink-0">
+              {save.console}
+            </span>
           )}
         </div>
+      </div>
+
+      {/* Meta */}
+      <div className="hidden sm:flex flex-col items-end text-[10px] text-muted-foreground shrink-0">
+        <span>{formatDate(save.created_at)}</span>
+        <span>{formatSize(save.file_size)}</span>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-1 shrink-0">
+        {confirmDelete ? (
+          <>
+            <Button size="sm" variant="destructive" className="h-7 text-[10px] px-2" onClick={() => { onDelete(save); setConfirmDelete(false); }}>
+              Delete
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 text-[10px] px-2" onClick={() => setConfirmDelete(false)}>
+              Cancel
+            </Button>
+          </>
+        ) : (
+          <>
+            <button onClick={() => onDownload(save)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+              <Download className="w-4 h-4" />
+            </button>
+            <button onClick={() => setConfirmDelete(true)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
 }
+
+/* ─── Upload form ─── */
+function UploadForm({
+  saveName, setSaveName, selectedRom, setSelectedRom, customGameName, setCustomGameName,
+  romSearch, setRomSearch, showRomDropdown, setShowRomDropdown, selectedFile, handleFileSelect,
+  filteredRoms, uploading, handleUpload, resetUploadForm,
+}: {
+  saveName: string; setSaveName: (v: string) => void;
+  selectedRom: RomOption | null; setSelectedRom: (v: RomOption | null) => void;
+  customGameName: string; setCustomGameName: (v: string) => void;
+  romSearch: string; setRomSearch: (v: string) => void;
+  showRomDropdown: boolean; setShowRomDropdown: (v: boolean) => void;
+  selectedFile: File | null; handleFileSelect: (e: ChangeEvent<HTMLInputElement>) => void;
+  filteredRoms: RomOption[]; uploading: boolean;
+  handleUpload: () => void; resetUploadForm: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 space-y-4 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-bold text-foreground">Upload Save File</h3>
+        <button onClick={resetUploadForm} className="text-muted-foreground hover:text-foreground transition-colors">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Selected game preview */}
+      {selectedRom?.thumbnail_url && (
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
+          <img src={selectedRom.thumbnail_url} alt="" className="w-14 h-14 rounded-lg object-cover border border-border/30" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">{selectedRom.title}</p>
+            <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">{selectedRom.console}</span>
+          </div>
+          <button onClick={() => { setSelectedRom(null); setRomSearch(''); setCustomGameName(''); }} className="ml-auto text-muted-foreground hover:text-foreground">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Save Name</label>
+        <input type="text" placeholder="e.g. Final Boss Save, 100% Complete" value={saveName} onChange={e => setSaveName(e.target.value)}
+          className="w-full px-3 py-2.5 rounded-xl bg-muted/50 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary" />
+      </div>
+
+      {!selectedRom && (
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Game</label>
+          <div className="relative">
+            <input type="text" placeholder="Search ROM library or type game name..."
+              value={romSearch || customGameName}
+              onChange={e => { setSelectedRom(null); setRomSearch(e.target.value); setCustomGameName(e.target.value); setShowRomDropdown(true); }}
+              onFocus={() => setShowRomDropdown(true)}
+              className="w-full px-3 py-2.5 rounded-xl bg-muted/50 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary" />
+            {showRomDropdown && filteredRoms.length > 0 && (
+              <div className="absolute z-20 top-full mt-1 left-0 right-0 max-h-48 overflow-y-auto rounded-xl border border-border bg-card shadow-xl">
+                {filteredRoms.slice(0, 20).map(rom => (
+                  <button key={rom.id}
+                    onClick={() => { setSelectedRom(rom); setRomSearch(''); setCustomGameName(''); setShowRomDropdown(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors">
+                    {rom.thumbnail_url ? (
+                      <img src={rom.thumbnail_url} alt="" className="w-8 h-8 rounded object-cover" />
+                    ) : (
+                      <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                        <Gamepad2 className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{rom.title}</p>
+                      <p className="text-xs text-muted-foreground">{rom.console}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Save File</label>
+        <label className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-dashed border-border bg-muted/20 hover:border-primary/40 cursor-pointer transition-colors">
+          <Upload className="w-5 h-5 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">
+            {selectedFile ? selectedFile.name : 'Click to select a save file (.sav, .srm, .state, etc.)'}
+          </span>
+          <input type="file" className="hidden"
+            accept=".sav,.srm,.state,.sn1,.sn2,.sn3,.sn4,.sn5,.sn6,.sn7,.sn8,.sn9,.ss0,.ss1,.ss2,.ss3,.ss4,.ss5,.ss6,.ss7,.ss8,.ss9,.oops,.cht,.mcr,.fla,.eep,.mpk,.dat,.dsv"
+            onChange={handleFileSelect} />
+        </label>
+      </div>
+
+      <Button onClick={handleUpload} disabled={uploading || !selectedFile || (!selectedRom && !customGameName.trim()) || !saveName.trim()} className="w-full gap-2 rounded-xl">
+        {uploading ? 'Uploading...' : 'Upload Save'}
+      </Button>
+    </div>
+  );
+}
+
