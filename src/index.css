@@ -42,6 +42,15 @@
     
     --shadow-glow: 0 0 40px hsl(270, 70%, 50%, 0.4);
     --shadow-card: 0 25px 50px -12px hsl(270, 70%, 50%, 0.5);
+
+    --theme-swatch-purple: 270 70% 50%;
+    --theme-swatch-blue: 220 70% 50%;
+    --theme-swatch-green: 150 70% 40%;
+    --theme-swatch-red: 0 70% 50%;
+    --theme-swatch-orange: 25 95% 53%;
+    --theme-swatch-pink: 330 70% 55%;
+    --theme-swatch-cyan: 185 70% 45%;
+    --theme-swatch-midnight: 240 50% 45%;
   }
 
   .dark {
