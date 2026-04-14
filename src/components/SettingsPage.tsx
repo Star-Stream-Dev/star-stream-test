@@ -49,14 +49,14 @@ const AVATAR_OPTIONS = [
 ];
 
 const THEME_OPTIONS: { id: ThemePreset; name: string; color: string }[] = [
-  { id: 'purple', name: 'Purple', color: 'hsl(270, 70%, 50%)' },
-  { id: 'blue', name: 'Blue', color: 'hsl(220, 70%, 50%)' },
-  { id: 'green', name: 'Green', color: 'hsl(150, 70%, 40%)' },
-  { id: 'red', name: 'Red', color: 'hsl(0, 70%, 50%)' },
-  { id: 'orange', name: 'Orange', color: 'hsl(25, 95%, 53%)' },
-  { id: 'pink', name: 'Pink', color: 'hsl(330, 70%, 55%)' },
-  { id: 'cyan', name: 'Cyan', color: 'hsl(185, 70%, 45%)' },
-  { id: 'midnight', name: 'Midnight', color: 'hsl(240, 50%, 45%)' },
+  { id: 'purple', name: 'Purple', color: 'hsl(var(--theme-swatch-purple))' },
+  { id: 'blue', name: 'Blue', color: 'hsl(var(--theme-swatch-blue))' },
+  { id: 'green', name: 'Green', color: 'hsl(var(--theme-swatch-green))' },
+  { id: 'red', name: 'Red', color: 'hsl(var(--theme-swatch-red))' },
+  { id: 'orange', name: 'Orange', color: 'hsl(var(--theme-swatch-orange))' },
+  { id: 'pink', name: 'Pink', color: 'hsl(var(--theme-swatch-pink))' },
+  { id: 'cyan', name: 'Cyan', color: 'hsl(var(--theme-swatch-cyan))' },
+  { id: 'midnight', name: 'Midnight', color: 'hsl(var(--theme-swatch-midnight))' },
 ];
 
 export function SettingsPage({ friends: propFriends, nicknames: propNicknames, onNicknamesChange, onProfileChange }: SettingsPageProps) {
