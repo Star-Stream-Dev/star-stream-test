@@ -15,7 +15,7 @@ interface Rom {
 const CONSOLE_LIST = [
   'All', 'NES', 'SNES', 'Game Boy', 'Game Boy Advance', 'Nintendo 64',
   'Nintendo DS', 'Sega Genesis', 'Sega Master System', 'PlayStation',
-  'Atari 2600', 'Arcade',
+  'Atari 2600', 'Arcade', 'DOS',
 ];
 
 export function RomLibrary() {
