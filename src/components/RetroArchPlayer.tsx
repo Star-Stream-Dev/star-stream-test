@@ -21,6 +21,7 @@ const CORES = [
   { id: 'psx', label: 'PlayStation', extensions: ['.bin', '.cue', '.iso', '.pbp', '.chd', '.zip'] },
   { id: 'atari2600', label: 'Atari 2600', extensions: ['.a26', '.zip'] },
   { id: 'arcade', label: 'Arcade (MAME)', extensions: ['.zip'] },
+  { id: 'dos', label: 'DOS-Box', extensions: ['.exe', '.com', '.zip', '.iso'] },
 ] as const;
 
 type CoreId = typeof CORES[number]['id'];
