@@ -72,6 +72,7 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
             EJS_gameUrl={romUrl}
             EJS_pathtodata="https://cdn.emulatorjs.org/stable/data/"
             EJS_startOnLoaded={true}
+            EJS_thread={true as any}
           />
         </div>
       </div>
