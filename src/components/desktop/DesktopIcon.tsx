@@ -24,6 +24,7 @@ export const ICON_MAP: Record<string, any> = {
   settings: Settings,
   folder: FolderOpen,
   globe: Globe,
+  browser: Globe,
   music: Music,
   chat: MessageSquare,
   sparkles: Sparkles,
