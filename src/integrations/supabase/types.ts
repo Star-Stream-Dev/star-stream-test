@@ -234,6 +234,8 @@ export type Database = {
         Row: {
           custom_icons: Json
           custom_names: Json
+          desktop_theme: string | null
+          folders: Json
           hidden_apps: Json
           icon_positions: Json
           id: string
@@ -243,6 +245,8 @@ export type Database = {
         Insert: {
           custom_icons?: Json
           custom_names?: Json
+          desktop_theme?: string | null
+          folders?: Json
           hidden_apps?: Json
           icon_positions?: Json
           id?: string
@@ -252,6 +256,8 @@ export type Database = {
         Update: {
           custom_icons?: Json
           custom_names?: Json
+          desktop_theme?: string | null
+          folders?: Json
           hidden_apps?: Json
           icon_positions?: Json
           id?: string
@@ -1789,16 +1795,29 @@ export type Database = {
         }
         Returns: string
       }
-      upsert_my_desktop_customizations: {
-        Args: {
-          p_custom_icons?: Json
-          p_custom_names?: Json
-          p_hidden_apps?: Json
-          p_icon_positions?: Json
-          p_session_token: string
-        }
-        Returns: boolean
-      }
+      upsert_my_desktop_customizations:
+        | {
+            Args: {
+              p_custom_icons?: Json
+              p_custom_names?: Json
+              p_hidden_apps?: Json
+              p_icon_positions?: Json
+              p_session_token: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_custom_icons?: Json
+              p_custom_names?: Json
+              p_desktop_theme?: string
+              p_folders?: Json
+              p_hidden_apps?: Json
+              p_icon_positions?: Json
+              p_session_token: string
+            }
+            Returns: boolean
+          }
       upsert_my_file_system: {
         Args: { p_file_system: Json; p_session_token: string }
         Returns: boolean
