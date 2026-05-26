@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Gamepad2, Terminal, Settings, FolderOpen, Globe, Music, MessageSquare, Sparkles, Youtube, Paintbrush, Monitor, Pin, PinOff, EyeOff, Palette, Pencil } from 'lucide-react';
+import { Gamepad2, Terminal, Settings, FolderOpen, Globe, Music, MessageSquare, Sparkles, Youtube, Paintbrush, Monitor, Pin, PinOff, EyeOff, Palette, Pencil, FolderPlus, FolderMinus } from 'lucide-react';
 import type { DesktopTheme } from './types';
 
 interface DesktopIconProps {
@@ -16,6 +16,11 @@ interface DesktopIconProps {
   customName?: string;
   position?: { x: number; y: number };
   onPositionChange?: (x: number, y: number) => void;
+  folders?: Array<{ id: string; name: string }>;
+  currentFolderId?: string | null;
+  onMoveToFolder?: (folderId: string) => void;
+  onRemoveFromFolder?: () => void;
+  onCreateFolderHere?: () => void;
 }
 
 export const ICON_MAP: Record<string, any> = {
