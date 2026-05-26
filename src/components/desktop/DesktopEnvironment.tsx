@@ -359,7 +359,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   // Build all icon entries
   const allIcons = [
     ...DESKTOP_APPS.map(app => ({ id: app.id, name: app.name, icon: app.icon })),
-    ...games.slice(0, 12).map(g => ({ id: g.id, name: g.title, icon: 'gamepad' })),
+    ...games.map(g => ({ id: g.id, name: g.title, icon: 'gamepad' })),
   ];
   const visibleIcons = allIcons.filter(app => !hiddenApps.includes(app.id));
 
