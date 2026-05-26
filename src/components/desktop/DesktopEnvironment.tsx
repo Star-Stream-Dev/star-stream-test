@@ -391,62 +391,67 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   }, [rawPositions, viewportSize]);
 
   return (
-    <div className={`fixed inset-0 z-[300] overflow-hidden select-none ${!hasCustomBg ? wallpaper : 'bg-black'}`}>
-      {hasCustomBg && customBackground.type === 'video' && (
-        <video src={customBackground.url} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover z-0" />
-      )}
-      {hasCustomBg && customBackground.type === 'image' && (
-        <img src={customBackground.url} alt="" className="absolute inset-0 w-full h-full object-cover z-0" />
-      )}
+    <YouTubeMusicProvider>
+      <ProxyProvider>
+        <div className={`fixed inset-0 z-[300] overflow-hidden select-none ${!hasCustomBg ? wallpaper : 'bg-black'}`}>
+          {hasCustomBg && customBackground.type === 'video' && (
+            <video src={customBackground.url} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover z-0" />
+          )}
+          {hasCustomBg && customBackground.type === 'image' && (
+            <img src={customBackground.url} alt="" className="absolute inset-0 w-full h-full object-cover z-0" />
+          )}
 
-      {/* Desktop Icons - absolute positioned freely */}
-      {visibleIcons.map(app => {
-        const pos = effectivePositions[app.id] || { x: 20, y: 20 };
-        return (
-          <div key={app.id} className="absolute z-10" style={{ left: pos.x, top: pos.y }}>
-            <DesktopIcon
-              name={app.name}
-              icon={app.icon}
-              theme={theme}
-              customIcon={customIcons[app.id]}
-              customName={customNames[app.id]}
-              position={pos}
-              onPositionChange={(x, y) => updateIconPosition(app.id, x, y)}
-              onDoubleClick={() => openWindow(app.id, customNames[app.id] || app.name)}
-              onPin={() => togglePin(app.id)}
-              isPinned={pinnedApps.includes(app.id)}
-              onHide={() => hideApp(app.id)}
-              onChangeIcon={(newIcon) => changeIcon(app.id, newIcon)}
-              onRename={(newName) => renameApp(app.id, newName)}
-            />
-          </div>
-        );
-      })}
+          {/* Desktop Icons - absolute positioned freely */}
+          {visibleIcons.map(app => {
+            const pos = effectivePositions[app.id] || { x: 20, y: 20 };
+            return (
+              <div key={app.id} className="absolute z-10" style={{ left: pos.x, top: pos.y }}>
+                <DesktopIcon
+                  name={app.name}
+                  icon={app.icon}
+                  theme={theme}
+                  customIcon={customIcons[app.id]}
+                  customName={customNames[app.id]}
+                  position={pos}
+                  onPositionChange={(x, y) => updateIconPosition(app.id, x, y)}
+                  onDoubleClick={() => openWindow(app.id, customNames[app.id] || app.name)}
+                  onPin={() => togglePin(app.id)}
+                  isPinned={pinnedApps.includes(app.id)}
+                  onHide={() => hideApp(app.id)}
+                  onChangeIcon={(newIcon) => changeIcon(app.id, newIcon)}
+                  onRename={(newName) => renameApp(app.id, newName)}
+                />
+              </div>
+            );
+          })}
 
-      {/* Windows */}
-      {windows.map(win => (
-        <DesktopWindowComponent key={win.id} window={win} theme={theme}
-          onClose={closeWindow} onMinimize={minimizeWindow} onMaximize={maximizeWindow}
-          onFocus={focusWindow} onMove={moveWindow} onResize={resizeWindow}>
-          {renderWindowContent(win)}
-        </DesktopWindowComponent>
-      ))}
+          {/* Windows */}
+          {windows.map(win => (
+            <DesktopWindowComponent key={win.id} window={win} theme={theme}
+              onClose={closeWindow} onMinimize={minimizeWindow} onMaximize={maximizeWindow}
+              onFocus={focusWindow} onMove={moveWindow} onResize={resizeWindow}>
+              {renderWindowContent(win)}
+            </DesktopWindowComponent>
+          ))}
 
-      {musicActivated && (
-        <div className="hidden">
-          <YouTubeMusicProvider><YouTubeMusicPlayer /></YouTubeMusicProvider>
+          {/* Hidden background music player keeps playback alive when window is closed */}
+          {musicActivated && (
+            <div className="hidden">
+              <YouTubeMusicPlayer />
+            </div>
+          )}
+
+          <Taskbar
+            theme={theme} windows={windows} pinnedApps={pinnedApps} hiddenApps={hiddenApps}
+            allApps={[...DESKTOP_APPS, ...games.map(g => ({ id: g.id, name: g.title, icon: 'gamepad', type: 'game' as const }))]}
+            onWindowClick={handleWindowClick}
+            onAppLaunch={(id, name) => openWindow(id, name)}
+            onUnpin={(id) => togglePin(id)}
+            onExitDesktop={onExit}
+            onUnhideApp={unhideApp}
+          />
         </div>
-      )}
-
-      <Taskbar
-        theme={theme} windows={windows} pinnedApps={pinnedApps} hiddenApps={hiddenApps}
-        allApps={[...DESKTOP_APPS, ...games.slice(0, 12).map(g => ({ id: g.id, name: g.title, icon: 'gamepad', type: 'game' as const }))]}
-        onWindowClick={handleWindowClick}
-        onAppLaunch={(id, name) => openWindow(id, name)}
-        onUnpin={(id) => togglePin(id)}
-        onExitDesktop={onExit}
-        onUnhideApp={unhideApp}
-      />
-    </div>
+      </ProxyProvider>
+    </YouTubeMusicProvider>
   );
 }
