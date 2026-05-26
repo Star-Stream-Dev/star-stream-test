@@ -60,7 +60,7 @@ export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned,
     e.stopPropagation();
     setMenuPos({ x: e.clientX, y: e.clientY });
     setShowMenu(true);
-    const close = () => { setShowMenu(false); setShowIconPicker(false); window.removeEventListener('click', close); };
+    const close = () => { setShowMenu(false); setShowIconPicker(false); setShowFolderPicker(false); window.removeEventListener('click', close); };
     setTimeout(() => window.addEventListener('click', close), 0);
   };
 
