@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Music2, Sparkles } from 'lucide-react';
 import { YouTubeMusicPlayer } from '@/components/music/YouTubeMusicPlayer';
-import { YouTubeMusicProvider } from '@/contexts/YouTubeMusicContext';
 import solarnovaIcon from '@/assets/solarnova-icon.png';
 
 let hasLoadedOnce = false;
@@ -89,10 +88,8 @@ export function DesktopMusic() {
   }
 
   return (
-    <YouTubeMusicProvider>
-      <div className="h-full overflow-auto bg-[hsl(var(--background))]">
-        <YouTubeMusicPlayer />
-      </div>
-    </YouTubeMusicProvider>
+    <div className="h-full overflow-auto bg-[hsl(var(--background))]">
+      <YouTubeMusicPlayer />
+    </div>
   );
 }
