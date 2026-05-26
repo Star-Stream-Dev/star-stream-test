@@ -216,7 +216,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   }, [user]);
 
   useEffect(() => {
-    supabase.from('games').select('id, title, url, embed, category').order('display_order').then(({ data }) => {
+    supabase.from('games').select('id, title, url, embed, category, hosted_path').order('display_order').limit(500).then(({ data }) => {
       if (data) setGames(data);
     });
   }, []);
