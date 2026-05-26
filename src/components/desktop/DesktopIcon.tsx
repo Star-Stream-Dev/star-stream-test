@@ -40,7 +40,7 @@ export const ICON_MAP: Record<string, any> = {
 
 export const AVAILABLE_ICONS = Object.keys(ICON_MAP);
 
-export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned, onHide, onChangeIcon, onRename, customIcon, customName, position, onPositionChange }: DesktopIconProps) {
+export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned, onHide, onChangeIcon, onRename, customIcon, customName, position, onPositionChange, folders, currentFolderId, onMoveToFolder, onRemoveFromFolder, onCreateFolderHere }: DesktopIconProps) {
   const displayIcon = customIcon || icon;
   const displayName = customName || name;
   const IconComponent = ICON_MAP[displayIcon] || Monitor;
