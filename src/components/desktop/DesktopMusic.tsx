@@ -88,10 +88,8 @@ export function DesktopMusic() {
   }
 
   return (
-    <YouTubeMusicProvider>
-      <div className="h-full overflow-auto bg-[hsl(var(--background))]">
-        <YouTubeMusicPlayer />
-      </div>
-    </YouTubeMusicProvider>
+    <div className="h-full overflow-auto bg-[hsl(var(--background))]">
+      <YouTubeMusicPlayer />
+    </div>
   );
 }
