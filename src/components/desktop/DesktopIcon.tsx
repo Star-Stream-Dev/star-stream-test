@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Gamepad2, Terminal, Settings, FolderOpen, Globe, Music, MessageSquare, Sparkles, Youtube, Paintbrush, Monitor, Pin, PinOff, EyeOff, Palette, Pencil } from 'lucide-react';
+import { Gamepad2, Terminal, Settings, FolderOpen, Globe, Music, MessageSquare, Sparkles, Youtube, Paintbrush, Monitor, Pin, PinOff, EyeOff, Palette, Pencil, FolderPlus, FolderMinus } from 'lucide-react';
 import type { DesktopTheme } from './types';
 
 interface DesktopIconProps {
@@ -16,6 +16,11 @@ interface DesktopIconProps {
   customName?: string;
   position?: { x: number; y: number };
   onPositionChange?: (x: number, y: number) => void;
+  folders?: Array<{ id: string; name: string }>;
+  currentFolderId?: string | null;
+  onMoveToFolder?: (folderId: string) => void;
+  onRemoveFromFolder?: () => void;
+  onCreateFolderHere?: () => void;
 }
 
 export const ICON_MAP: Record<string, any> = {
@@ -35,13 +40,14 @@ export const ICON_MAP: Record<string, any> = {
 
 export const AVAILABLE_ICONS = Object.keys(ICON_MAP);
 
-export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned, onHide, onChangeIcon, onRename, customIcon, customName, position, onPositionChange }: DesktopIconProps) {
+export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned, onHide, onChangeIcon, onRename, customIcon, customName, position, onPositionChange, folders, currentFolderId, onMoveToFolder, onRemoveFromFolder, onCreateFolderHere }: DesktopIconProps) {
   const displayIcon = customIcon || icon;
   const displayName = customName || name;
   const IconComponent = ICON_MAP[displayIcon] || Monitor;
   const [showMenu, setShowMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState(displayName);
   const renameRef = useRef<HTMLInputElement>(null);
@@ -54,7 +60,7 @@ export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned,
     e.stopPropagation();
     setMenuPos({ x: e.clientX, y: e.clientY });
     setShowMenu(true);
-    const close = () => { setShowMenu(false); setShowIconPicker(false); window.removeEventListener('click', close); };
+    const close = () => { setShowMenu(false); setShowIconPicker(false); setShowFolderPicker(false); window.removeEventListener('click', close); };
     setTimeout(() => window.addEventListener('click', close), 0);
   };
 
@@ -227,6 +233,55 @@ export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned,
           )}
 
           <div className="h-px bg-white/10 mx-2 my-1" />
+
+          {onMoveToFolder && folders && folders.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowFolderPicker(!showFolderPicker); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-white/10 flex items-center gap-2"
+              >
+                <FolderPlus className="w-3.5 h-3.5" />
+                Move to Folder
+              </button>
+              {showFolderPicker && (
+                <div
+                  className="absolute left-full top-0 ml-1 bg-[hsl(220,20%,12%)] border border-white/10 rounded-lg shadow-2xl py-1 min-w-[160px] max-h-64 overflow-y-auto"
+                  onClick={e => e.stopPropagation()}
+                >
+                  {folders.map(f => (
+                    <button
+                      key={f.id}
+                      onClick={() => { onMoveToFolder(f.id); setShowMenu(false); setShowFolderPicker(false); }}
+                      className={`w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-white/10 flex items-center gap-2 ${currentFolderId === f.id ? 'bg-primary/20' : ''}`}
+                    >
+                      <FolderOpen className="w-3.5 h-3.5" />
+                      <span className="truncate">{f.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {onCreateFolderHere && (
+            <button
+              onClick={() => { onCreateFolderHere(); setShowMenu(false); }}
+              className="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-white/10 flex items-center gap-2"
+            >
+              <FolderPlus className="w-3.5 h-3.5" />
+              New Folder with This
+            </button>
+          )}
+
+          {onRemoveFromFolder && (
+            <button
+              onClick={() => { onRemoveFromFolder(); setShowMenu(false); }}
+              className="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-white/10 flex items-center gap-2"
+            >
+              <FolderMinus className="w-3.5 h-3.5" />
+              Remove from Folder
+            </button>
+          )}
 
           {onHide && (
             <button
