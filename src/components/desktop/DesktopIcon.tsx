@@ -234,6 +234,55 @@ export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned,
 
           <div className="h-px bg-white/10 mx-2 my-1" />
 
+          {onMoveToFolder && folders && folders.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowFolderPicker(!showFolderPicker); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-white/10 flex items-center gap-2"
+              >
+                <FolderPlus className="w-3.5 h-3.5" />
+                Move to Folder
+              </button>
+              {showFolderPicker && (
+                <div
+                  className="absolute left-full top-0 ml-1 bg-[hsl(220,20%,12%)] border border-white/10 rounded-lg shadow-2xl py-1 min-w-[160px] max-h-64 overflow-y-auto"
+                  onClick={e => e.stopPropagation()}
+                >
+                  {folders.map(f => (
+                    <button
+                      key={f.id}
+                      onClick={() => { onMoveToFolder(f.id); setShowMenu(false); setShowFolderPicker(false); }}
+                      className={`w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-white/10 flex items-center gap-2 ${currentFolderId === f.id ? 'bg-primary/20' : ''}`}
+                    >
+                      <FolderOpen className="w-3.5 h-3.5" />
+                      <span className="truncate">{f.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {onCreateFolderHere && (
+            <button
+              onClick={() => { onCreateFolderHere(); setShowMenu(false); }}
+              className="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-white/10 flex items-center gap-2"
+            >
+              <FolderPlus className="w-3.5 h-3.5" />
+              New Folder with This
+            </button>
+          )}
+
+          {onRemoveFromFolder && (
+            <button
+              onClick={() => { onRemoveFromFolder(); setShowMenu(false); }}
+              className="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-white/10 flex items-center gap-2"
+            >
+              <FolderMinus className="w-3.5 h-3.5" />
+              Remove from Folder
+            </button>
+          )}
+
           {onHide && (
             <button
               onClick={() => { onHide(); setShowMenu(false); }}
