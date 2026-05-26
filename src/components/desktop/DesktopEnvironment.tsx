@@ -14,6 +14,8 @@ import { DesktopMusic } from './DesktopMusic';
 import { CodeEditor } from './CodeEditor';
 import { YouTubeMusicProvider } from '@/contexts/YouTubeMusicContext';
 import { YouTubeMusicPlayer } from '@/components/music/YouTubeMusicPlayer';
+import { ProxyProvider } from '@/contexts/ProxyContext';
+import { ProxyBrowser } from '@/components/proxy/ProxyBrowser';
 import type { DesktopTheme, DesktopApp, DesktopWindow, FileSystemNode } from './types';
 import { DEFAULT_FILE_SYSTEM } from './types';
 
