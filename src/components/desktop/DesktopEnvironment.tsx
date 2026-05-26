@@ -80,6 +80,7 @@ const DESKTOP_APPS: DesktopApp[] = [
   { id: 'files', name: 'Files', icon: 'folder', type: 'filemanager' },
   { id: 'chat', name: 'Chat', icon: 'chat', type: 'custom' },
   { id: 'music', name: 'Music', icon: 'music', type: 'custom' },
+  { id: 'proxy', name: 'Proxy', icon: 'browser', type: 'browser' },
   { id: 'emulator', name: 'Emulator', icon: 'gamepad', type: 'custom' },
   { id: 'settings', name: 'Settings', icon: 'settings', type: 'settings' },
 ];
