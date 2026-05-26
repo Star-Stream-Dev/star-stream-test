@@ -47,6 +47,7 @@ export function DesktopIcon({ name, icon, theme, onDoubleClick, onPin, isPinned,
   const [showMenu, setShowMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState(displayName);
   const renameRef = useRef<HTMLInputElement>(null);
