@@ -131,6 +131,9 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   const [iconPositions, setIconPositions] = useState<Record<string, { x: number; y: number }>>(() => {
     try { return JSON.parse(localStorage.getItem('solarnova-desktop-positions') || '{}'); } catch { return {}; }
   });
+  const [folders, setFolders] = useState<Record<string, { name: string; appIds: string[] }>>(() => {
+    try { return JSON.parse(localStorage.getItem('solarnova-desktop-folders') || '{}'); } catch { return {}; }
+  });
 
   const fsSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pinSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
