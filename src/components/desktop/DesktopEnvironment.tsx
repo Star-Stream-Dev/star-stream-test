@@ -177,19 +177,32 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
     });
   }, [user]);
 
-  const saveCustomizations = useCallback((updates: { hidden_apps?: string[]; custom_icons?: Record<string, string>; custom_names?: Record<string, string>; icon_positions?: Record<string, { x: number; y: number }> }) => {
+  const saveCustomizations = useCallback((next: { hidden_apps: string[]; custom_icons: Record<string, string>; custom_names: Record<string, string>; icon_positions: Record<string, { x: number; y: number }>; folders: Record<string, { name: string; appIds: string[] }>; desktop_theme: DesktopTheme }) => {
     if (!user) return;
     if (customSaveTimeout.current) clearTimeout(customSaveTimeout.current);
     customSaveTimeout.current = setTimeout(() => {
       supabase.rpc('upsert_my_desktop_customizations', {
         p_session_token: sessionToken!,
-        p_hidden_apps: (updates.hidden_apps || []) as any,
-        p_custom_icons: (updates.custom_icons || {}) as any,
-        p_custom_names: (updates.custom_names || {}) as any,
-        p_icon_positions: (updates.icon_positions || {}) as any,
-      }).then(() => {});
-    }, 1000);
-  }, [user]);
+        p_hidden_apps: next.hidden_apps as any,
+        p_custom_icons: next.custom_icons as any,
+        p_custom_names: next.custom_names as any,
+        p_icon_positions: next.icon_positions as any,
+        p_folders: next.folders as any,
+        p_desktop_theme: next.desktop_theme,
+      } as any).then(() => {});
+    }, 800);
+  }, [user, sessionToken]);
+
+  const saveAll = useCallback((overrides: Partial<{ hidden_apps: string[]; custom_icons: Record<string, string>; custom_names: Record<string, string>; icon_positions: Record<string, { x: number; y: number }>; folders: Record<string, { name: string; appIds: string[] }>; desktop_theme: DesktopTheme }> = {}) => {
+    saveCustomizations({
+      hidden_apps: overrides.hidden_apps ?? hiddenApps,
+      custom_icons: overrides.custom_icons ?? customIcons,
+      custom_names: overrides.custom_names ?? customNames,
+      icon_positions: overrides.icon_positions ?? iconPositions,
+      folders: overrides.folders ?? folders,
+      desktop_theme: overrides.desktop_theme ?? theme,
+    });
+  }, [saveCustomizations, hiddenApps, customIcons, customNames, iconPositions, folders, theme]);
 
   useEffect(() => {
     if (!user) return;
