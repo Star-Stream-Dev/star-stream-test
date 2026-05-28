@@ -177,8 +177,16 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
     });
   }, [user]);
 
-  const saveCustomizations = useCallback((next: { hidden_apps: string[]; custom_icons: Record<string, string>; custom_names: Record<string, string>; icon_positions: Record<string, { x: number; y: number }>; folders: Record<string, { name: string; appIds: string[] }>; desktop_theme: DesktopTheme }) => {
+  const saveCustomizations = useCallback((overrides: Partial<{ hidden_apps: string[]; custom_icons: Record<string, string>; custom_names: Record<string, string>; icon_positions: Record<string, { x: number; y: number }>; folders: Record<string, { name: string; appIds: string[] }>; desktop_theme: DesktopTheme }>) => {
     if (!user) return;
+    const next = {
+      hidden_apps: overrides.hidden_apps ?? hiddenApps,
+      custom_icons: overrides.custom_icons ?? customIcons,
+      custom_names: overrides.custom_names ?? customNames,
+      icon_positions: overrides.icon_positions ?? iconPositions,
+      folders: overrides.folders ?? folders,
+      desktop_theme: overrides.desktop_theme ?? theme,
+    };
     if (customSaveTimeout.current) clearTimeout(customSaveTimeout.current);
     customSaveTimeout.current = setTimeout(() => {
       supabase.rpc('upsert_my_desktop_customizations', {
@@ -191,7 +199,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
         p_desktop_theme: next.desktop_theme,
       } as any).then(() => {});
     }, 800);
-  }, [user, sessionToken]);
+  }, [user, sessionToken, hiddenApps, customIcons, customNames, iconPositions, folders, theme]);
 
   const saveAll = useCallback((overrides: Partial<{ hidden_apps: string[]; custom_icons: Record<string, string>; custom_names: Record<string, string>; icon_positions: Record<string, { x: number; y: number }>; folders: Record<string, { name: string; appIds: string[] }>; desktop_theme: DesktopTheme }> = {}) => {
     saveCustomizations({
