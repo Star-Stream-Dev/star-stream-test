@@ -12,6 +12,7 @@ import { SettingsApp } from './SettingsApp';
 import { DesktopChat } from './DesktopChat';
 import { DesktopMusic } from './DesktopMusic';
 import { CodeEditor } from './CodeEditor';
+import { YouTubeApp } from '@/components/youtube/YouTubeApp';
 import { YouTubeMusicProvider } from '@/contexts/YouTubeMusicContext';
 import { YouTubeMusicPlayer } from '@/components/music/YouTubeMusicPlayer';
 import { ProxyProvider } from '@/contexts/ProxyContext';
@@ -81,6 +82,7 @@ const DESKTOP_APPS: DesktopApp[] = [
   { id: 'chat', name: 'Chat', icon: 'chat', type: 'custom' },
   { id: 'music', name: 'Music', icon: 'music', type: 'custom' },
   { id: 'proxy', name: 'Proxy', icon: 'browser', type: 'browser' },
+  { id: 'youtube', name: 'YouTube', icon: 'youtube', type: 'custom' },
   { id: 'emulator', name: 'Emulator', icon: 'gamepad', type: 'custom' },
   { id: 'settings', name: 'Settings', icon: 'settings', type: 'settings' },
 ];
@@ -358,6 +360,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
     if (win.appId === 'chat') return <DesktopChat />;
     if (win.appId === 'music') return <DesktopMusic />;
     if (win.appId === 'proxy') return <ProxyBrowser onClose={() => closeWindow(win.id)} />;
+    if (win.appId === 'youtube') return <YouTubeApp onClose={() => closeWindow(win.id)} />;
     if (win.appId === 'emulator') return <DesktopEmulatorContent />;
     const game = games.find(g => g.id === win.appId);
     if (game && game.embed) {
