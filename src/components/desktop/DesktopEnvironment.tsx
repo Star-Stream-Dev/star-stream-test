@@ -230,11 +230,16 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
         localStorage.setItem('solarnova-desktop-pinned', JSON.stringify(dbPins));
       }
       if (customResult.data) {
-        const c = customResult.data;
+        const c = customResult.data as any;
         if (c.hidden_apps) { const h = c.hidden_apps as string[]; setHiddenApps(h); localStorage.setItem('solarnova-desktop-hidden', JSON.stringify(h)); }
         if (c.custom_icons) { const i = c.custom_icons as Record<string, string>; setCustomIcons(i); localStorage.setItem('solarnova-desktop-icons', JSON.stringify(i)); }
         if (c.custom_names) { const n = c.custom_names as Record<string, string>; setCustomNames(n); localStorage.setItem('solarnova-desktop-names', JSON.stringify(n)); }
         if (c.icon_positions) { const p = c.icon_positions as Record<string, { x: number; y: number }>; setIconPositions(p); localStorage.setItem('solarnova-desktop-positions', JSON.stringify(p)); }
+        if (c.folders) { const f = c.folders as Record<string, { name: string; appIds: string[] }>; setFolders(f); localStorage.setItem('solarnova-desktop-folders', JSON.stringify(f)); }
+        if (c.desktop_theme === 'windows' || c.desktop_theme === 'macos') {
+          setTheme(c.desktop_theme);
+          localStorage.setItem('solarnova-desktop-theme', c.desktop_theme);
+        }
       }
     });
   }, [user]);
@@ -245,9 +250,11 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
     });
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('solarnova-desktop-theme', theme);
-  }, [theme]);
+  const setThemePersistent = useCallback((next: DesktopTheme) => {
+    setTheme(next);
+    localStorage.setItem('solarnova-desktop-theme', next);
+    saveCustomizations({ desktop_theme: next });
+  }, [saveCustomizations]);
 
   const updateIconPosition = useCallback((appId: string, x: number, y: number) => {
     setIconPositions(prev => {
