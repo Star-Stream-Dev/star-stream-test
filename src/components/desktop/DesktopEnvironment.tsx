@@ -12,6 +12,7 @@ import { SettingsApp } from './SettingsApp';
 import { DesktopChat } from './DesktopChat';
 import { DesktopMusic } from './DesktopMusic';
 import { CodeEditor } from './CodeEditor';
+import { YouTubeApp } from '@/components/youtube/YouTubeApp';
 import { YouTubeMusicProvider } from '@/contexts/YouTubeMusicContext';
 import { YouTubeMusicPlayer } from '@/components/music/YouTubeMusicPlayer';
 import { ProxyProvider } from '@/contexts/ProxyContext';
