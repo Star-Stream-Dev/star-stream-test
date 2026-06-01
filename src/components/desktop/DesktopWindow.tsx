@@ -128,7 +128,7 @@ export function DesktopWindowComponent({
     : minimizeAnim === 'restoring'
     ? { animation: 'window-restore 0.25s ease-out forwards' }
     : isHidden
-    ? { display: 'none' }
+    ? { opacity: 0, pointerEvents: 'none', transform: 'translate(-99999px, -99999px)', transition: 'none' }
     : {};
 
   const style: React.CSSProperties = win.isMaximized
