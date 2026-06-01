@@ -354,7 +354,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
     if (win.appId === 'terminal') return <DesktopTerminal fileSystem={fileSystem} onFileSystemChange={setFileSystem} />;
     if (win.appId === 'code-editor') return <CodeEditor fileSystem={fileSystem} onFileSystemChange={setFileSystem} onOpenTerminal={() => openWindow('terminal', 'Terminal')} onClose={() => closeWindow(win.id)} onMinimize={() => minimizeWindow(win.id)} onMaximize={() => maximizeWindow(win.id)} isMaximized={win.isMaximized} />;
     if (win.appId === 'files') return <FileManager fileSystem={fileSystem} onFileSystemChange={setFileSystem} />;
-    if (win.appId === 'settings') return <SettingsApp theme={theme} onThemeChange={setTheme} />;
+    if (win.appId === 'settings') return <SettingsApp theme={theme} onThemeChange={setThemePersistent} />;
     if (win.appId === 'chat') return <DesktopChat />;
     if (win.appId === 'music') return <DesktopMusic />;
     if (win.appId === 'proxy') return <ProxyBrowser onClose={() => closeWindow(win.id)} />;
