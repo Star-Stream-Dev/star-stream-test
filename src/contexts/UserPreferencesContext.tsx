@@ -12,14 +12,32 @@ interface UserPreferencesContextType {
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
 
 export function UserPreferencesProvider({ children }: { children: ReactNode }) {
-  const { user, sessionToken } = useAuth();
+  const { user, sessionToken, isLoading: authLoading } = useAuth();
   const [popupsDisabled, setPopupsDisabledState] = useState(false);
   const [transitionsDisabled, setTransitionsDisabledState] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
+  const applyStoredPreferences = useCallback((key: string) => {
+    try {
+      const stored = localStorage.getItem(key);
+      if (!stored) return false;
+      const prefs = JSON.parse(stored);
+      if (typeof prefs.popupsDisabled === 'boolean') setPopupsDisabledState(prefs.popupsDisabled);
+      if (typeof prefs.transitionsDisabled === 'boolean') setTransitionsDisabledState(prefs.transitionsDisabled);
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
   // Load preferences from DB if logged in, else localStorage
   useEffect(() => {
+    if (authLoading) return;
+
     const load = async () => {
+      const key = user ? `solarnova_prefs_${user.id}` : 'solarnova_prefs';
+      applyStoredPreferences(key);
+
       if (user) {
         try {
           const { data } = await supabase
@@ -31,6 +49,10 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
           if (data) {
             setPopupsDisabledState(data.popups_disabled ?? false);
             setTransitionsDisabledState(data.transitions_disabled ?? false);
+            localStorage.setItem(key, JSON.stringify({
+              popupsDisabled: data.popups_disabled ?? false,
+              transitionsDisabled: data.transitions_disabled ?? false,
+            }));
             setLoaded(true);
             return;
           }
@@ -38,21 +60,13 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
       }
 
       // Fallback to localStorage
-      const key = user ? `solarnova_prefs_${user.id}` : 'solarnova_prefs';
-      try {
-        const stored = localStorage.getItem(key);
-        if (stored) {
-          const prefs = JSON.parse(stored);
-          if (prefs.popupsDisabled) setPopupsDisabledState(true);
-          if (prefs.transitionsDisabled) setTransitionsDisabledState(true);
-        }
-      } catch {}
+      applyStoredPreferences(key);
       setLoaded(true);
     };
     
     setLoaded(false);
     load();
-  }, [user]);
+  }, [applyStoredPreferences, authLoading, user]);
 
   // Apply/remove transitions class on body
   useEffect(() => {
@@ -64,16 +78,16 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   }, [transitionsDisabled]);
 
   const saveToDb = useCallback(async (popups: boolean, transitions: boolean) => {
+    const key = user ? `solarnova_prefs_${user.id}` : 'solarnova_prefs';
+    localStorage.setItem(key, JSON.stringify({ popupsDisabled: popups, transitionsDisabled: transitions }));
+
     if (user && sessionToken) {
-      await supabase.rpc('update_my_profile', {
+      await supabase.rpc('upsert_my_profile', {
         p_session_token: sessionToken,
         p_popups_disabled: popups,
         p_transitions_disabled: transitions,
       });
     }
-    // Also save to localStorage as fallback
-    const key = user ? `solarnova_prefs_${user.id}` : 'solarnova_prefs';
-    localStorage.setItem(key, JSON.stringify({ popupsDisabled: popups, transitionsDisabled: transitions }));
   }, [user, sessionToken]);
 
   const setPopupsDisabled = useCallback((disabled: boolean) => {
@@ -88,7 +102,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
 
   return (
     <UserPreferencesContext.Provider value={{ popupsDisabled, setPopupsDisabled, transitionsDisabled, setTransitionsDisabled }}>
-      {children}
+      {authLoading || !loaded ? null : children}
     </UserPreferencesContext.Provider>
   );
 }
