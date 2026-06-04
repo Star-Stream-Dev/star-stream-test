@@ -1853,38 +1853,22 @@ export type Database = {
         Args: { p_pinned_apps: Json; p_session_token: string }
         Returns: boolean
       }
-      upsert_my_profile:
-        | {
-            Args: {
-              p_avatar_url?: string
-              p_custom_bg_type?: string
-              p_custom_bg_url?: string
-              p_display_name?: string
-              p_glass_enabled?: boolean
-              p_layout_mode?: string
-              p_popups_disabled?: boolean
-              p_session_token: string
-              p_theme_preset?: string
-              p_transitions_disabled?: boolean
-            }
-            Returns: boolean
-          }
-        | {
-            Args: {
-              p_avatar_url?: string
-              p_custom_bg_type?: string
-              p_custom_bg_url?: string
-              p_display_name?: string
-              p_glass_enabled?: boolean
-              p_layout_mode?: string
-              p_popups_disabled?: boolean
-              p_session_token: string
-              p_snowfall_enabled?: boolean
-              p_theme_preset?: string
-              p_transitions_disabled?: boolean
-            }
-            Returns: boolean
-          }
+      upsert_my_profile: {
+        Args: {
+          p_avatar_url?: string
+          p_custom_bg_type?: string
+          p_custom_bg_url?: string
+          p_display_name?: string
+          p_glass_enabled?: boolean
+          p_layout_mode?: string
+          p_popups_disabled?: boolean
+          p_session_token: string
+          p_snowfall_enabled?: boolean
+          p_theme_preset?: string
+          p_transitions_disabled?: boolean
+        }
+        Returns: boolean
+      }
       upsert_my_status: {
         Args: { p_is_online: boolean; p_session_token: string }
         Returns: boolean
