@@ -174,8 +174,8 @@ const Index = () => {
     );
   }
 
-  // Show login if not authenticated
-  if (!user) {
+  // Show login if not authenticated (bypassed for AdSense crawler)
+  if (!user && !BYPASS_AUTH) {
     return <LoginPage />;
   }
 
