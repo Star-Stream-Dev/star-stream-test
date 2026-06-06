@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+
+// TEMP: Bypass login gate for AdSense crawler verification
+const BYPASS_AUTH = true;
 import { Home, Gamepad2, MessageSquare, Bug, Music, LogOut, Shield, Megaphone, Youtube, Eye, EyeOff, Globe, Spade, Tv, Sparkles, Settings, Mic2, Paintbrush, Joystick } from 'lucide-react';
 import { DiscordChat } from '@/components/DiscordChat';
 import { BootScreen } from '@/components/BootScreen';
@@ -171,8 +174,8 @@ const Index = () => {
     );
   }
 
-  // Show login if not authenticated
-  if (!user) {
+  // Show login if not authenticated (bypassed for AdSense crawler)
+  if (!user && !BYPASS_AUTH) {
     return <LoginPage />;
   }
 
@@ -395,8 +398,8 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
     );
   }
 
-  // Show login if not authenticated
-  if (!user) {
+  // Show login if not authenticated (bypassed for AdSense crawler)
+  if (!user && !BYPASS_AUTH) {
     return <LoginPage />;
   }
 
