@@ -431,93 +431,159 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
       {!popupsDisabled && <TutorialOverlay />}
       {/* Changelog Modal */}
       {!popupsDisabled && <ChangelogModal />}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-border/30 safe-area-pb">
-        <div className="flex items-center justify-around px-1 py-2">
-          {navItems.slice(0, 6).map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id, item.disabled)}
-              disabled={item.disabled}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-all ${
-                item.disabled
-                  ? 'text-muted-foreground/40 cursor-not-allowed'
-                  : activeSection === item.id || (item.id === 'tv' && showTVPlayer)
-                    ? 'text-primary'
-                    : 'text-muted-foreground'
-              }`}
-            >
-              <item.icon className="w-4 h-4" />
-              <span className="text-[9px] font-medium">{item.label}</span>
-            </button>
-          ))}
+      {/* Mobile bottom tab bar - native app style, 5 fixed tabs */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/40"
+        style={{
+          background: 'hsl(var(--background) / 0.85)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+      >
+        <div className="grid grid-cols-5 items-end h-16 px-1">
+          {[
+            navItems[0], // Home
+            navItems[1], // Games
+            navItems[8], // Chat
+            navItems[5], // Music
+          ].map((item) => {
+            const isActive = activeSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id, item.disabled)}
+                className="relative flex flex-col items-center justify-center gap-1 h-full transition-colors active:scale-95"
+              >
+                {isActive && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 rounded-full bg-primary" />
+                )}
+                <item.icon
+                  className={`w-[22px] h-[22px] transition-colors ${
+                    isActive ? 'text-primary' : 'text-muted-foreground'
+                  }`}
+                  strokeWidth={isActive ? 2.4 : 2}
+                />
+                <span
+                  className={`text-[10px] font-medium leading-none ${
+                    isActive ? 'text-primary' : 'text-muted-foreground'
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
           <button
             onClick={() => setShowNav(!showNav)}
-            className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-all ${
-              showNav ? 'text-primary' : 'text-muted-foreground'
-            }`}
+            className="relative flex flex-col items-center justify-center gap-1 h-full transition-colors active:scale-95"
           >
-            <Bug className="w-4 h-4" />
-            <span className="text-[9px] font-medium">More</span>
+            {showNav && (
+              <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 rounded-full bg-primary" />
+            )}
+            <div className={`flex flex-col gap-[3px] ${showNav ? 'text-primary' : 'text-muted-foreground'}`}>
+              <span className="block w-[18px] h-[2px] rounded-full bg-current" />
+              <span className="block w-[18px] h-[2px] rounded-full bg-current" />
+              <span className="block w-[18px] h-[2px] rounded-full bg-current" />
+            </div>
+            <span className={`text-[10px] font-medium leading-none ${showNav ? 'text-primary' : 'text-muted-foreground'}`}>
+              More
+            </span>
           </button>
         </div>
       </nav>
 
-      {/* Mobile "More" menu overlay */}
+      {/* Mobile "More" sheet - slides up from bottom */}
       {showNav && (
-        <div className="md:hidden fixed inset-0 z-50 bg-background/95 backdrop-blur-lg flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b border-border/30">
-            <div className="flex items-center gap-3">
-              <img src={solarnovaIcon} alt="Solarnova" className="w-8 h-8" />
-              <span className="text-lg font-bold text-gradient">SOLARNOVA V3</span>
+        <div
+          className="md:hidden fixed inset-0 z-[60] flex flex-col animate-in fade-in duration-200"
+          style={{ background: 'hsl(var(--background) / 0.6)', backdropFilter: 'blur(8px)' }}
+          onClick={() => setShowNav(false)}
+        >
+          <div className="flex-1" />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="rounded-t-3xl border-t border-border/40 animate-in slide-in-from-bottom duration-300 flex flex-col max-h-[85vh]"
+            style={{
+              background: 'hsl(var(--card))',
+              paddingBottom: 'env(safe-area-inset-bottom)',
+            }}
+          >
+            {/* Grabber */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
             </div>
-            <button onClick={() => setShowNav(false)} className="p-2 text-muted-foreground">
-              <LogOut className="w-5 h-5 rotate-180" />
-            </button>
-          </div>
-          
-          <div className="flex-1 p-4 space-y-2">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id, item.disabled)}
-                disabled={item.disabled}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  item.disabled
-                    ? 'text-muted-foreground/40 cursor-not-allowed'
-                    : activeSection === item.id
-                      ? 'bg-gradient-primary text-foreground'
-                      : 'text-muted-foreground hover:bg-muted/30'
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                <span>{item.label}</span>
-              </button>
-            ))}
 
-            
-            {isAdmin && (
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-2 pb-4">
+              <div className="flex items-center gap-3">
+                <img src={solarnovaIcon} alt="Solarnova" className="w-9 h-9" />
+                <div className="flex flex-col">
+                  <span className="text-base font-bold text-gradient leading-tight">SOLARNOVA V3</span>
+                  <span className="text-[11px] text-muted-foreground leading-tight">@{user.username}</span>
+                </div>
+              </div>
               <button
-                onClick={() => {
-                  setShowAdminPanel(true);
-                  setShowNav(false);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-primary hover:bg-muted/30"
+                onClick={() => setShowNav(false)}
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-muted/40 text-foreground active:scale-90 transition-transform"
+                aria-label="Close menu"
               >
-                <Shield className="w-4 h-4" />
-                <span>Admin Panel</span>
+                <span className="text-xl leading-none">×</span>
               </button>
-            )}
-          </div>
-          
-          <div className="p-4 border-t border-border/30">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{user.username}</span>
+            </div>
+
+            {/* App grid - scrollable */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
+              <div className="grid grid-cols-4 gap-2">
+                {navItems.map((item) => {
+                  const isActive = activeSection === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item.id, item.disabled)}
+                      disabled={item.disabled}
+                      className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-2xl transition-all active:scale-95 ${
+                        item.disabled ? 'opacity-40' : ''
+                      }`}
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                          isActive
+                            ? 'bg-gradient-primary text-primary-foreground shadow-glow'
+                            : 'bg-muted/50 text-foreground'
+                        }`}
+                      >
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-medium text-center text-muted-foreground line-clamp-1">
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                })}
+                {isAdmin && (
+                  <button
+                    onClick={() => {
+                      setShowAdminPanel(true);
+                      setShowNav(false);
+                    }}
+                    className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-2xl active:scale-95"
+                  >
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-primary/15 text-primary">
+                      <Shield className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-medium text-center text-muted-foreground">Admin</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Logout row */}
               <button
                 onClick={logout}
-                className="flex items-center gap-2 text-destructive text-sm"
+                className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium active:scale-[0.98] transition-transform"
               >
                 <LogOut className="w-4 h-4" />
-                Logout
+                Log out
               </button>
             </div>
           </div>
