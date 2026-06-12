@@ -187,26 +187,28 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
       </div>
 
       {/* Widget Grid */}
-      <div className="rounded-3xl p-6 md:p-8" style={glassStyle}>
-        <div className="grid grid-cols-4 gap-4">
-          {visibleWidgets.map(widget => (
-            <div
-              key={widget.id}
-              className={`col-span-${widget.colSpan || 1}`}
-              style={{ gridColumn: `span ${widget.colSpan || 1}` }}
-            >
-              <WidgetRenderer
-                widget={widget}
-                onNavigate={onNavigate}
-                sessionTime={sessionTime}
-                userStats={userStats}
-                recentGames={recentGames}
-                currentTime={currentTime}
-                unreadAnnouncements={unreadAnnouncements}
-                unreadMessage={unreadMessage}
-              />
-            </div>
-          ))}
+      <div className="rounded-3xl p-4 md:p-8" style={glassStyle}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {visibleWidgets.map(widget => {
+            const span = widget.colSpan || 1;
+            return (
+              <div
+                key={widget.id}
+                style={{ gridColumn: `span ${span}` }}
+              >
+                <WidgetRenderer
+                  widget={widget}
+                  onNavigate={onNavigate}
+                  sessionTime={sessionTime}
+                  userStats={userStats}
+                  recentGames={recentGames}
+                  currentTime={currentTime}
+                  unreadAnnouncements={unreadAnnouncements}
+                  unreadMessage={unreadMessage}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
