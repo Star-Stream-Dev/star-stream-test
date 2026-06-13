@@ -187,15 +187,16 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
       </div>
 
       {/* Widget Grid */}
-      <div className="rounded-3xl p-4 md:p-8" style={glassStyle}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="rounded-3xl p-3 md:p-8" style={glassStyle}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-min">
           {visibleWidgets.map(widget => {
-            const span = widget.colSpan || 1;
+            const desktopSpan = widget.colSpan || 1;
+            const mobileSpan = Math.min(desktopSpan, 2);
+            const spanClass =
+              `${mobileSpan === 2 ? 'col-span-2' : 'col-span-1'} ` +
+              `${desktopSpan === 4 ? 'md:col-span-4' : desktopSpan === 3 ? 'md:col-span-3' : desktopSpan === 2 ? 'md:col-span-2' : 'md:col-span-1'}`;
             return (
-              <div
-                key={widget.id}
-                style={{ gridColumn: `span ${span}` }}
-              >
+              <div key={widget.id} className={`${spanClass} min-w-0`}>
                 <WidgetRenderer
                   widget={widget}
                   onNavigate={onNavigate}
