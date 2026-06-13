@@ -272,7 +272,7 @@ export function WidgetRenderer({
       );
 
     case 'spacer':
-      return <div className="h-full min-h-[80px]" />;
+      return <div className="min-h-[80px]" />;
 
     default:
       return <div className={baseClass}><p className="text-muted-foreground">Unknown widget</p></div>;
