@@ -359,7 +359,7 @@ export function Chatroom() {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} className="border-t border-border/30 p-4 shrink-0">
+      <form onSubmit={handleSendMessage} className="border-t border-border/30 p-2 sm:p-4 shrink-0">
         <div className="relative">
           {/* Emoji Autocomplete */}
           {showEmojiAutocomplete && (
