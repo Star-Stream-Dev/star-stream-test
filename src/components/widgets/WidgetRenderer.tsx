@@ -88,7 +88,7 @@ export function WidgetRenderer({
 
     case 'stats':
       return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 h-full">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="rounded-2xl p-4 bg-primary/5 border border-primary/10">
             <div className="flex items-center gap-2 mb-2">
               <Timer className="w-4 h-4 text-primary" />
