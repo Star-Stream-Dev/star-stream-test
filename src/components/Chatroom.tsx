@@ -288,16 +288,16 @@ export function Chatroom() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-border/30 px-6 py-4 shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Users className="w-6 h-6 text-primary" />
-            <div>
-              <h3 className="text-xl font-bold text-foreground">Global Chat</h3>
-              <p className="text-sm text-muted-foreground">Logged in as {user?.username}</p>
+      <div className="bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-border/30 px-3 sm:px-6 py-3 sm:py-4 shrink-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+            <div className="min-w-0">
+              <h3 className="text-base sm:text-xl font-bold text-foreground truncate">Global Chat</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">as {user?.username}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {user?.role === 'admin' && (
               <button
                 onClick={async () => {
@@ -305,11 +305,11 @@ export function Chatroom() {
                   const { error } = await supabase.rpc('clear_chat_messages', { p_session_token: sessionToken! });
                   if (!error) setMessages([]);
                 }}
-                className="text-sm text-destructive hover:text-destructive/80 transition-colors flex items-center gap-1"
+                className="text-xs sm:text-sm text-destructive hover:text-destructive/80 transition-colors flex items-center gap-1"
                 title="Clear all messages"
               >
                 <Trash2 className="w-4 h-4" />
-                Clear
+                <span className="hidden sm:inline">Clear</span>
               </button>
             )}
             <button
@@ -318,7 +318,7 @@ export function Chatroom() {
                 setPassword('');
                 setMessages([]);
               }}
-              className="text-sm text-primary hover:text-secondary transition-colors"
+              className="text-xs sm:text-sm text-primary hover:text-secondary transition-colors"
             >
               Leave
             </button>
@@ -326,7 +326,7 @@ export function Chatroom() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4 min-h-0">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             <div className="text-center">
