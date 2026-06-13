@@ -493,6 +493,8 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
           </button>
         </div>
       </nav>
+      )}
+
 
       {/* Mobile "More" sheet - slides up from bottom */}
       {showNav && (
