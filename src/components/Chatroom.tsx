@@ -288,16 +288,16 @@ export function Chatroom() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-border/30 px-6 py-4 shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Users className="w-6 h-6 text-primary" />
-            <div>
-              <h3 className="text-xl font-bold text-foreground">Global Chat</h3>
-              <p className="text-sm text-muted-foreground">Logged in as {user?.username}</p>
+      <div className="bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-border/30 px-3 sm:px-6 py-3 sm:py-4 shrink-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+            <div className="min-w-0">
+              <h3 className="text-base sm:text-xl font-bold text-foreground truncate">Global Chat</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">as {user?.username}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {user?.role === 'admin' && (
               <button
                 onClick={async () => {
@@ -305,11 +305,11 @@ export function Chatroom() {
                   const { error } = await supabase.rpc('clear_chat_messages', { p_session_token: sessionToken! });
                   if (!error) setMessages([]);
                 }}
-                className="text-sm text-destructive hover:text-destructive/80 transition-colors flex items-center gap-1"
+                className="text-xs sm:text-sm text-destructive hover:text-destructive/80 transition-colors flex items-center gap-1"
                 title="Clear all messages"
               >
                 <Trash2 className="w-4 h-4" />
-                Clear
+                <span className="hidden sm:inline">Clear</span>
               </button>
             )}
             <button
@@ -318,7 +318,7 @@ export function Chatroom() {
                 setPassword('');
                 setMessages([]);
               }}
-              className="text-sm text-primary hover:text-secondary transition-colors"
+              className="text-xs sm:text-sm text-primary hover:text-secondary transition-colors"
             >
               Leave
             </button>
@@ -326,7 +326,7 @@ export function Chatroom() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4 min-h-0">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             <div className="text-center">
@@ -341,7 +341,7 @@ export function Chatroom() {
               className={`flex ${msg.username === user?.username ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                className={`max-w-[80%] sm:max-w-md px-3 sm:px-4 py-2 rounded-2xl ${
                   msg.username === user?.username
                     ? 'bg-gradient-primary'
                     : 'bg-muted'
@@ -359,7 +359,7 @@ export function Chatroom() {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} className="border-t border-border/30 p-4 shrink-0">
+      <form onSubmit={handleSendMessage} className="border-t border-border/30 p-2 sm:p-4 shrink-0">
         <div className="relative">
           {/* Emoji Autocomplete */}
           {showEmojiAutocomplete && (
@@ -385,11 +385,11 @@ export function Chatroom() {
             />
           )}
 
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-1.5 sm:gap-2 items-center">
             <button
               type="button"
               onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowGifPicker(false); }}
-              className="p-2.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              className="p-2 sm:p-2.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0"
               title="Emojis"
             >
               <Smile className="w-5 h-5" />
@@ -397,7 +397,7 @@ export function Chatroom() {
             <button
               type="button"
               onClick={() => { setShowGifPicker(!showGifPicker); setShowEmojiPicker(false); }}
-              className="p-2.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              className="p-2 sm:p-2.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0"
               title="GIFs"
             >
               <ImageIcon className="w-5 h-5" />
@@ -407,14 +407,14 @@ export function Chatroom() {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-1 bg-background/50 border border-border/30 rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
-              placeholder="Type a message... (use :emoji: for shortcuts)"
+              className="flex-1 min-w-0 bg-background/50 border border-border/30 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors text-base"
+              placeholder="Message..."
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-gradient-primary hover:opacity-90 p-3 rounded-lg transition-all duration-300 shadow-glow disabled:opacity-50"
+              className="bg-gradient-primary hover:opacity-90 p-2.5 sm:p-3 rounded-lg transition-all duration-300 shadow-glow disabled:opacity-50 shrink-0"
             >
               <Send className="w-5 h-5 text-foreground" />
             </button>

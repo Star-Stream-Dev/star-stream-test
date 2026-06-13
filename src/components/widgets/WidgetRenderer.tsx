@@ -24,7 +24,7 @@ export function WidgetRenderer({
   const { user, isAdmin } = useAuth();
   const { glassEnabled } = useTheme();
 
-  const baseClass = `rounded-2xl p-4 bg-primary/5 border border-primary/10 h-full ${isEditing ? 'pointer-events-none opacity-80' : ''}`;
+  const baseClass = `rounded-2xl p-4 bg-primary/5 border border-primary/10 ${isEditing ? 'pointer-events-none opacity-80' : ''}`;
 
   const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   const formatDuration = (seconds: number) => {
@@ -46,7 +46,8 @@ export function WidgetRenderer({
     case 'clock':
       return (
         <div className={baseClass}>
-          <div className="flex items-center gap-4 h-full">
+          <div className="flex items-center gap-4">
+
             <div className="flex-1">
               <p className="text-3xl font-bold text-foreground font-mono tracking-tight">{formatTime(currentTime)}</p>
               <p className="text-sm text-muted-foreground">
@@ -63,7 +64,7 @@ export function WidgetRenderer({
     case 'welcome':
       return (
         <div className={baseClass}>
-          <div className="flex items-center gap-4 h-full">
+          <div className="flex items-center gap-4">
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
               style={{
@@ -87,7 +88,7 @@ export function WidgetRenderer({
 
     case 'stats':
       return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 h-full">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="rounded-2xl p-4 bg-primary/5 border border-primary/10">
             <div className="flex items-center gap-2 mb-2">
               <Timer className="w-4 h-4 text-primary" />
@@ -179,7 +180,7 @@ export function WidgetRenderer({
       return (
         <button
           onClick={() => onNavigate('chatroom')}
-          className="rounded-2xl p-4 text-left transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] w-full h-full"
+          className="rounded-2xl p-4 text-left transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] w-full"
           style={{
             background: unreadMessage
               ? 'linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(139, 92, 246, 0.08) 100%)'
@@ -271,7 +272,7 @@ export function WidgetRenderer({
       );
 
     case 'spacer':
-      return <div className="h-full min-h-[80px]" />;
+      return <div className="min-h-[80px]" />;
 
     default:
       return <div className={baseClass}><p className="text-muted-foreground">Unknown widget</p></div>;
