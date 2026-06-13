@@ -432,6 +432,7 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
       {/* Changelog Modal */}
       {!popupsDisabled && <ChangelogModal />}
       {/* Mobile bottom tab bar - native app style, 5 fixed tabs */}
+      {!['chatroom', 'music', 'youtube', 'proxy', 'emulator'].includes(activeSection) && (
       <nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/40"
         style={{
