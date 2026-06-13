@@ -24,7 +24,7 @@ export function WidgetRenderer({
   const { user, isAdmin } = useAuth();
   const { glassEnabled } = useTheme();
 
-  const baseClass = `rounded-2xl p-4 bg-primary/5 border border-primary/10 h-full ${isEditing ? 'pointer-events-none opacity-80' : ''}`;
+  const baseClass = `rounded-2xl p-4 bg-primary/5 border border-primary/10 ${isEditing ? 'pointer-events-none opacity-80' : ''}`;
 
   const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   const formatDuration = (seconds: number) => {
