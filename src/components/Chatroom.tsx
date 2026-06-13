@@ -385,11 +385,11 @@ export function Chatroom() {
             />
           )}
 
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-1.5 sm:gap-2 items-center">
             <button
               type="button"
               onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowGifPicker(false); }}
-              className="p-2.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              className="p-2 sm:p-2.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0"
               title="Emojis"
             >
               <Smile className="w-5 h-5" />
@@ -397,7 +397,7 @@ export function Chatroom() {
             <button
               type="button"
               onClick={() => { setShowGifPicker(!showGifPicker); setShowEmojiPicker(false); }}
-              className="p-2.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              className="p-2 sm:p-2.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0"
               title="GIFs"
             >
               <ImageIcon className="w-5 h-5" />
@@ -407,14 +407,14 @@ export function Chatroom() {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-1 bg-background/50 border border-border/30 rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
-              placeholder="Type a message... (use :emoji: for shortcuts)"
+              className="flex-1 min-w-0 bg-background/50 border border-border/30 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors text-base"
+              placeholder="Message..."
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-gradient-primary hover:opacity-90 p-3 rounded-lg transition-all duration-300 shadow-glow disabled:opacity-50"
+              className="bg-gradient-primary hover:opacity-90 p-2.5 sm:p-3 rounded-lg transition-all duration-300 shadow-glow disabled:opacity-50 shrink-0"
             >
               <Send className="w-5 h-5 text-foreground" />
             </button>
