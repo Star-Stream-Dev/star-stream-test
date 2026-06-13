@@ -180,7 +180,7 @@ export function WidgetRenderer({
       return (
         <button
           onClick={() => onNavigate('chatroom')}
-          className="rounded-2xl p-4 text-left transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] w-full h-full"
+          className="rounded-2xl p-4 text-left transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] w-full"
           style={{
             background: unreadMessage
               ? 'linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(139, 92, 246, 0.08) 100%)'
