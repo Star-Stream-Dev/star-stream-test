@@ -46,7 +46,8 @@ export function WidgetRenderer({
     case 'clock':
       return (
         <div className={baseClass}>
-          <div className="flex items-center gap-4 h-full">
+          <div className="flex items-center gap-4">
+
             <div className="flex-1">
               <p className="text-3xl font-bold text-foreground font-mono tracking-tight">{formatTime(currentTime)}</p>
               <p className="text-sm text-muted-foreground">
