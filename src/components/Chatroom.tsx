@@ -341,7 +341,7 @@ export function Chatroom() {
               className={`flex ${msg.username === user?.username ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                className={`max-w-[80%] sm:max-w-md px-3 sm:px-4 py-2 rounded-2xl ${
                   msg.username === user?.username
                     ? 'bg-gradient-primary'
                     : 'bg-muted'
