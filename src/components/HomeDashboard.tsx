@@ -22,8 +22,8 @@ interface UserStats {
   streak: number;
 }
 
-const STATS_KEY = 'solarnova_user_stats';
-const GAMES_HISTORY_KEY = 'solarnova_games_history';
+const STATS_KEY = 'starstream_user_stats';
+const GAMES_HISTORY_KEY = 'starstream_games_history';
 
 export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDashboardProps) => {
   const { user, isAdmin, sessionToken } = useAuth();

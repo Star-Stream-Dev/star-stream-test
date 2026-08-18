@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Sparkles } from 'lucide-react';
 import { DiscordChat } from '@/components/DiscordChat';
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 let hasLoadedOnce = false;
 
@@ -38,11 +38,11 @@ export function DesktopChat() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full bg-[hsl(var(--background))] gap-6">
-        {/* Solarnova logo with pulse */}
+        {/* Star Stream logo with pulse */}
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-primary/30 animate-ping" style={{ animationDuration: '1.5s' }} />
           <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/30">
-            <img src={solarnovaIcon} alt="" className="w-10 h-10" />
+            <img src={starstreamIcon} alt="" className="w-10 h-10" />
           </div>
         </div>
 
@@ -63,7 +63,7 @@ export function DesktopChat() {
         </div>
 
         <p className="text-[10px] text-muted-foreground/50 uppercase tracking-widest">
-          Solarnova Chat
+          Star Stream Chat
         </p>
       </div>
     );

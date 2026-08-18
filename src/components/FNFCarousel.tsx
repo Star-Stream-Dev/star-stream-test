@@ -4,8 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
-const STATS_KEY = 'solarnova_user_stats';
-const GAMES_HISTORY_KEY = 'solarnova_games_history';
+const STATS_KEY = 'starstream_user_stats';
+const GAMES_HISTORY_KEY = 'starstream_games_history';
 
 interface Game {
   id?: string;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AlertTriangle, Globe, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const PROXY_DISCLAIMER_KEY = 'solarnova_proxy_disclaimer_accepted';
+const PROXY_DISCLAIMER_KEY = 'starstream_proxy_disclaimer_accepted';
 
 interface ProxyDisclaimerModalProps {
   onAccept: () => void;
@@ -51,7 +51,7 @@ export function ProxyDisclaimerModal({ onAccept, onDeny }: ProxyDisclaimerModalP
         {/* Disclaimer text */}
         <div className="space-y-4 mb-6 text-muted-foreground">
           <p>
-            The proxy browser allows you to browse websites through Solarnova. By using this feature, you acknowledge:
+            The proxy browser allows you to browse websites through Star Stream. By using this feature, you acknowledge:
           </p>
           
           <ul className="space-y-2 text-sm">

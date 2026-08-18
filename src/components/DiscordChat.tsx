@@ -10,7 +10,7 @@ import { GifPicker } from '@/components/chat/GifPicker';
 import { EmojiAutocomplete } from '@/components/chat/EmojiAutocomplete';
 import { MessageReactions } from '@/components/chat/MessageReactions';
 import { UserSettings } from '@/components/chat/UserSettings';
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 interface DiscordChatProps {
   onClose?: () => void;
@@ -757,7 +757,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
             view === 'server' ? 'bg-primary rounded-xl' : 'bg-muted hover:bg-muted/80 hover:rounded-xl'
           }`}
         >
-          <img src={solarnovaIcon} alt="Server" className="w-6 h-6 md:w-8 md:h-8" />
+          <img src={starstreamIcon} alt="Server" className="w-6 h-6 md:w-8 md:h-8" />
         </button>
         <div className="w-6 md:w-8 h-0.5 bg-border rounded-full my-2" />
         <button
@@ -777,7 +777,7 @@ export function DiscordChat({ onClose }: DiscordChatProps) {
       {view === 'server' ? (
           <>
             <div className="p-4 border-b border-border/30">
-              <h2 className="font-bold text-foreground">Solarnova Server</h2>
+              <h2 className="font-bold text-foreground">Star Stream Server</h2>
             </div>
             <div className="p-2 flex-1">
               <button 

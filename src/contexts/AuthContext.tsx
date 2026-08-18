@@ -24,8 +24,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('solarnova_user');
-    const storedToken = localStorage.getItem('solarnova_session_token');
+    const storedUser = localStorage.getItem('starstream_user');
+    const storedToken = localStorage.getItem('starstream_session_token');
     if (storedUser && storedToken) {
       try {
         const parsed = JSON.parse(storedUser);
@@ -34,17 +34,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (verified) {
             setUser(verified);
             setSessionToken(storedToken);
-            localStorage.setItem('solarnova_user', JSON.stringify(verified));
+            localStorage.setItem('starstream_user', JSON.stringify(verified));
           } else {
-            localStorage.removeItem('solarnova_user');
-            localStorage.removeItem('solarnova_session_token');
+            localStorage.removeItem('starstream_user');
+            localStorage.removeItem('starstream_session_token');
           }
           setIsLoading(false);
         });
         return;
       } catch {
-        localStorage.removeItem('solarnova_user');
-        localStorage.removeItem('solarnova_session_token');
+        localStorage.removeItem('starstream_user');
+        localStorage.removeItem('starstream_session_token');
       }
     }
     setIsLoading(false);
@@ -81,8 +81,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(userData);
       setSessionToken(data.session_token);
-      localStorage.setItem('solarnova_user', JSON.stringify(userData));
-      localStorage.setItem('solarnova_session_token', data.session_token);
+      localStorage.setItem('starstream_user', JSON.stringify(userData));
+      localStorage.setItem('starstream_session_token', data.session_token);
       return { error: null };
     } catch (err) {
       console.error('Login error:', err);
@@ -99,8 +99,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setUser(null);
     setSessionToken(null);
-    localStorage.removeItem('solarnova_user');
-    localStorage.removeItem('solarnova_session_token');
+    localStorage.removeItem('starstream_user');
+    localStorage.removeItem('starstream_session_token');
   };
 
   return (

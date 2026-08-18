@@ -35,7 +35,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     if (authLoading) return;
 
     const load = async () => {
-      const key = user ? `solarnova_prefs_${user.id}` : 'solarnova_prefs';
+      const key = user ? `starstream_prefs_${user.id}` : 'starstream_prefs';
       applyStoredPreferences(key);
 
       if (user) {
@@ -78,7 +78,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   }, [transitionsDisabled]);
 
   const saveToDb = useCallback(async (popups: boolean, transitions: boolean) => {
-    const key = user ? `solarnova_prefs_${user.id}` : 'solarnova_prefs';
+    const key = user ? `starstream_prefs_${user.id}` : 'starstream_prefs';
     localStorage.setItem(key, JSON.stringify({ popupsDisabled: popups, transitionsDisabled: transitions }));
 
     if (user && sessionToken) {

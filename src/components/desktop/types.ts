@@ -46,7 +46,7 @@ export const DEFAULT_FILE_SYSTEM: Record<string, FileSystemNode> = {
           'readme.txt': {
             name: 'readme.txt',
             type: 'file',
-            content: 'Welcome to SolarnovaOS!\nThis is your home directory.\nUse "help" to see available commands.',
+            content: 'Welcome to Star Stream!\nThis is your home directory.\nUse "help" to see available commands.',
             createdAt: new Date().toISOString(),
           },
           documents: {
@@ -80,13 +80,13 @@ export const DEFAULT_FILE_SYSTEM: Record<string, FileSystemNode> = {
       'hostname': {
         name: 'hostname',
         type: 'file',
-        content: 'solarnova',
+        content: 'starstream',
         createdAt: new Date().toISOString(),
       },
       'os-release': {
         name: 'os-release',
         type: 'file',
-        content: 'NAME="SolarnovaOS"\nVERSION="2.0"\nID=solarnova\nPRETTY_NAME="SolarnovaOS 2.0"',
+        content: 'NAME="Star Stream"\nVERSION="2.0"\nID=starstream\nPRETTY_NAME="Star Stream 2.0"',
         createdAt: new Date().toISOString(),
       },
     },
@@ -104,7 +104,7 @@ export const DEFAULT_FILE_SYSTEM: Record<string, FileSystemNode> = {
           'system.log': {
             name: 'system.log',
             type: 'file',
-            content: '[INFO] SolarnovaOS booted successfully\n[INFO] All services running\n[INFO] Network connected',
+            content: '[INFO] Star Stream booted successfully\n[INFO] All services running\n[INFO] Network connected',
             createdAt: new Date().toISOString(),
           },
         },

@@ -15,12 +15,12 @@ const CHANGELOG: ChangelogEntry[] = [
   {
     version: '3.0',
     date: 'March 8, 2026',
-    highlights: ['Solarnova V3 — Major Release 🎉'],
+    highlights: ['Star Stream V3 — Major Release 🎉'],
     features: [
-      'Real GitHub integration in SolarnovaOS terminal (clone, pull, push)',
+      'Real GitHub integration in Star Stream terminal (clone, pull, push)',
       'Resizable desktop windows with edge & corner drag',
       'Admin "Clear Chat" button in global chatroom',
-      'SolarnovaOS desktop environment with dual-theme (Windows/macOS)',
+      'Star Stream desktop environment with dual-theme (Windows/macOS)',
       'Persistent music playback across desktop windows',
       'Cross-device file system & pinned apps sync',
     ],
@@ -212,7 +212,7 @@ export function ChangelogModal() {
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">✨ Solarnova V3 Changelog ✨</h2>
+                <h2 className="text-xl font-bold text-white">✨ Star Stream V3 Changelog ✨</h2>
                 <p className="text-sm text-white/80">See what's new</p>
               </div>
             </div>

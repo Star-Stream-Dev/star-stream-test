@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 export function TypewriterEffect() {
   const [text, setText] = useState('');
-  const fullText = 'SOLARNOVA';
+  const fullText = 'STAR STREAM';
 
   useEffect(() => {
     let index = 0;

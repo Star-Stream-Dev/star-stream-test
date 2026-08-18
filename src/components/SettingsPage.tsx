@@ -321,7 +321,7 @@ export function SettingsPage({ friends: propFriends, nicknames: propNicknames, o
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gradient">Settings</h1>
-            <p className="text-muted-foreground">Customize your Solarnova experience</p>
+            <p className="text-muted-foreground">Customize your Star Stream experience</p>
           </div>
         </div>
 

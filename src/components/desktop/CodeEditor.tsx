@@ -308,7 +308,7 @@ export function CodeEditor({ fileSystem, onFileSystemChange, onOpenTerminal, onC
   const handleTerminalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const cmd = terminalInput.trim();
-    const prompt = 'user@solarnova:~$ ';
+    const prompt = 'user@starstream:~$ ';
     setTerminalOutput(prev => [...prev, `${prompt}${cmd}`]);
     
     if (cmd === 'clear') {
@@ -527,7 +527,7 @@ export function CodeEditor({ fileSystem, onFileSystemChange, onOpenTerminal, onC
                 </div>
                 <div className="px-4 py-1 text-[11px] font-semibold tracking-wider text-[#cccccc] uppercase flex items-center gap-1">
                   <ChevronDown className="w-3 h-3" />
-                  SOLARNOVA-FS
+                  STAR STREAM-FS
                   <div className="ml-auto flex gap-0.5">
                     <button
                       className="p-0.5 hover:bg-[#3c3c3c] rounded"
@@ -597,7 +597,7 @@ export function CodeEditor({ fileSystem, onFileSystemChange, onOpenTerminal, onC
                 <div className="flex-1 flex items-center justify-center text-[13px] text-[#858585] px-4 text-center">
                   <div>
                     <GitBranch className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                    <p>Connected to SolarnovaOS Terminal Git</p>
+                    <p>Connected to Star Stream Terminal Git</p>
                     <p className="text-[11px] mt-1 opacity-60">Open the full terminal for git commands</p>
                   </div>
                 </div>
@@ -820,7 +820,7 @@ export function CodeEditor({ fileSystem, onFileSystemChange, onOpenTerminal, onC
                         <div key={i} className="leading-[20px] text-[#cccccc]">{line}</div>
                       ))}
                       <form onSubmit={handleTerminalSubmit} className="flex items-center">
-                        <span className="text-[#6a9955]">user@solarnova</span>
+                        <span className="text-[#6a9955]">user@starstream</span>
                         <span className="text-[#cccccc]">:</span>
                         <span className="text-[#569cd6]">~</span>
                         <span className="text-[#cccccc]">$ </span>

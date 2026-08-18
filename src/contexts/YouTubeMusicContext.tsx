@@ -50,8 +50,8 @@ interface YouTubeMusicContextType {
 
 const YouTubeMusicContext = createContext<YouTubeMusicContextType | null>(null);
 
-const STORAGE_KEY_REPEAT = 'solarnova_yt_repeat_mode';
-const STORAGE_KEY_SHUFFLE = 'solarnova_yt_shuffle';
+const STORAGE_KEY_REPEAT = 'starstream_yt_repeat_mode';
+const STORAGE_KEY_SHUFFLE = 'starstream_yt_shuffle';
 
 export function useYouTubeMusic() {
   const context = useContext(YouTubeMusicContext);

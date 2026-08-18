@@ -44,7 +44,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { user, sessionToken } = useAuth();
-  const [currentTheme, setCurrentThemeState] = useState<ThemePreset>('purple');
+  const [currentTheme, setCurrentThemeState] = useState<ThemePreset>('blue');
   const [customBackground, setCustomBackgroundState] = useState<CustomBackground>({ type: 'none', url: '' });
   const [glassEnabled, setGlassEnabledState] = useState(true);
   const [isLoading, setIsLoading] = useState(true);

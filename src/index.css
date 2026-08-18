@@ -7,41 +7,41 @@
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
 
-    --card: 270 50% 8%;
+    --card: 220 50% 8%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 270 50% 8%;
+    --popover: 220 50% 8%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 270 70% 50%;
+    --primary: 220 70% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 330 70% 50%;
+    --secondary: 260 70% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 270 30% 20%;
-    --muted-foreground: 270 10% 60%;
+    --muted: 220 30% 20%;
+    --muted-foreground: 220 10% 60%;
 
-    --accent: 330 70% 50%;
+    --accent: 260 70% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 50% 30%;
-    --input: 270 50% 20%;
-    --ring: 270 70% 50%;
+    --border: 220 50% 30%;
+    --input: 220 50% 20%;
+    --ring: 220 70% 50%;
 
     --radius: 0.75rem;
 
-    /* Custom tokens for Solarnova */
-    --gradient-primary: linear-gradient(135deg, hsl(270, 70%, 50%), hsl(330, 70%, 50%));
-    --gradient-hero: linear-gradient(to right, hsl(270, 70%, 60%), hsl(330, 70%, 55%), hsl(270, 70%, 55%));
-    --gradient-card: linear-gradient(to bottom right, hsl(270, 50%, 15%, 0.5), hsl(0, 0%, 0%));
-    --gradient-bg: linear-gradient(to bottom right, hsl(270, 50%, 15%, 0.2), hsl(0, 0%, 0%), hsl(330, 50%, 15%, 0.2));
-    
-    --shadow-glow: 0 0 40px hsl(270, 70%, 50%, 0.4);
-    --shadow-card: 0 25px 50px -12px hsl(270, 70%, 50%, 0.5);
+    /* Custom tokens for Star Stream */
+    --gradient-primary: linear-gradient(135deg, hsl(220, 70%, 50%), hsl(260, 70%, 50%));
+    --gradient-hero: linear-gradient(to right, hsl(220, 70%, 60%), hsl(260, 70%, 55%), hsl(220, 70%, 55%));
+    --gradient-card: linear-gradient(to bottom right, hsl(220, 50%, 15%, 0.5), hsl(0, 0%, 0%));
+    --gradient-bg: linear-gradient(to bottom right, hsl(220, 50%, 15%, 0.2), hsl(0, 0%, 0%), hsl(260, 50%, 15%, 0.2));
+
+    --shadow-glow: 0 0 40px hsl(220, 70%, 50%, 0.4);
+    --shadow-card: 0 25px 50px -12px hsl(220, 70%, 50%, 0.5);
 
     --theme-swatch-purple: 270 70% 50%;
     --theme-swatch-blue: 220 70% 50%;

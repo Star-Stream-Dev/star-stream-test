@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AlertTriangle, Shield } from 'lucide-react';
 
-const DISCLAIMER_KEY = 'solarnova_disclaimer_accepted';
+const DISCLAIMER_KEY = 'starstream_disclaimer_accepted';
 
 interface DisclaimerModalProps {
   onAccept: () => void;
@@ -30,14 +30,14 @@ export function DisclaimerModal({ onAccept, onDeny }: DisclaimerModalProps) {
       <div className="relative z-10 max-w-2xl w-full text-center">
         {/* Logo */}
         <h1 className="text-5xl md:text-6xl font-bold italic text-primary mb-8 tracking-wide">
-          Solarnova
+          Star Stream
         </h1>
 
         {/* Disclaimer text */}
         <div className="space-y-6 mb-10">
           <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
             This website was not created for the purpose of use during{' '}
-            <span className="italic">instructional time</span>, please refrain from using Solarnova during{' '}
+            <span className="italic">instructional time</span>, please refrain from using Star Stream during{' '}
             <span className="italic">instructional periods</span>. By clicking accept, you agree to this.
           </p>
 

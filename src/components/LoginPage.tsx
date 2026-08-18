@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Lock, User, Shield, Info } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -177,7 +177,7 @@ export function LoginPage() {
             <div className="space-y-3 text-sm font-mono">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">OS</span>
-                <span className="text-foreground">SolarnovaOS</span>
+                <span className="text-foreground">Star Stream</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Version</span>
@@ -201,7 +201,7 @@ export function LoginPage() {
             {/* Avatar */}
             <div className="flex flex-col items-center mb-6">
               <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-4">
-                <img src={solarnovaIcon} alt="Solarnova" className="w-10 h-10" />
+                <img src={starstreamIcon} alt="Star Stream" className="w-10 h-10" />
               </div>
               <h2 className="text-xl font-bold text-foreground font-mono">
                 {username ? `${getGreeting()}, ${username}` : getGreeting()}

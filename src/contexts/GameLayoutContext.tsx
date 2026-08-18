@@ -33,7 +33,7 @@ export function GameLayoutProvider({ children }: { children: ReactNode }) {
           }
         } catch {}
       }
-      const key = user ? `solarnova_game_layout_${user.id}` : 'solarnova_game_layout';
+      const key = user ? `starstream_game_layout_${user.id}` : 'starstream_game_layout';
       const stored = localStorage.getItem(key);
       if (stored === 'carousel' || stored === 'grid') { setLayoutModeState(stored); }
       setIsLoading(false);
@@ -43,7 +43,7 @@ export function GameLayoutProvider({ children }: { children: ReactNode }) {
 
   const setLayoutMode = useCallback((mode: GameLayoutMode) => {
     setLayoutModeState(mode);
-    const key = user ? `solarnova_game_layout_${user.id}` : 'solarnova_game_layout';
+    const key = user ? `starstream_game_layout_${user.id}` : 'starstream_game_layout';
     localStorage.setItem(key, mode);
     if (user && sessionToken) {
       supabase.rpc('update_my_profile', {

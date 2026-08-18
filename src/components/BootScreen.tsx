@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 interface BootScreenProps {
   onComplete: () => void;
@@ -7,7 +7,7 @@ interface BootScreenProps {
 }
 
 const BOOT_MESSAGES = [
-  { prefix: '[OK]', text: 'Starting boot sequence for Solarnova...' },
+  { prefix: '[OK]', text: 'Starting boot sequence for Star Stream...' },
   { prefix: '[OK]', text: 'Initializing kernel modules...' },
   { prefix: '[OK]', text: 'Loading system configuration...' },
   { prefix: '[OK]', text: 'Running startup functions...' },
@@ -23,7 +23,7 @@ const BOOT_MESSAGES = [
   { prefix: '[OK]', text: '- initializeRealtime()' },
   { prefix: '[OK]', text: '- updateLoginGreeting()' },
   { prefix: '[OK]', text: 'All systems operational.' },
-  { prefix: '[OK]', text: 'Launching Solarnova...' },
+  { prefix: '[OK]', text: 'Launching Star Stream...' },
 ];
 
 export function BootScreen({ onComplete, onDevMode }: BootScreenProps) {
@@ -74,10 +74,10 @@ export function BootScreen({ onComplete, onDevMode }: BootScreenProps) {
     <div className={`fixed inset-0 z-[400] bg-[hsl(220,20%,10%)] flex flex-col items-center justify-center transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
       {/* Logo */}
       <div className="mb-2">
-        <img src={solarnovaIcon} alt="Solarnova" className="w-16 h-16 mx-auto" />
+        <img src={starstreamIcon} alt="Star Stream" className="w-16 h-16 mx-auto" />
       </div>
       <h1 className="text-2xl font-mono font-bold tracking-[0.3em] text-foreground mb-1">
-        SOLARNOVA
+        STAR STREAM
       </h1>
       <p className="text-sm text-muted-foreground font-mono mb-8">Version 3.0</p>
 

@@ -50,8 +50,8 @@ export interface AlgorithmState {
   commentedVideos: string[];
 }
 
-const STORAGE_KEY_PREFIX = 'solarnova_yt_algo';
-const LEGACY_KEY = 'solarnova_shorts_algo';
+const STORAGE_KEY_PREFIX = 'starstream_yt_algo';
+const LEGACY_KEY = 'starstream_shorts_algo';
 const MAX_HISTORY = 300;
 const DIVERSITY_WINDOW = 5;
 
