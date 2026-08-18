@@ -1,1 +1,0 @@
-DROP FUNCTION IF EXISTS public.upsert_my_profile(text, text, text, text, text, text, boolean, text, boolean, boolean);
