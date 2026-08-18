@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ExternalLink, Monitor, AlertTriangle, Terminal } from 'lucide-react';
+import { EyeOff, Scan, AlertTriangle, SquareTerminal } from 'lucide-react';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 interface CloakLauncherProps {
   onContinue: () => void;
