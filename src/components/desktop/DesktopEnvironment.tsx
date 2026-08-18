@@ -107,13 +107,13 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   const { user, sessionToken } = useAuth();
   const { customBackground } = useTheme();
   const [theme, setTheme] = useState<DesktopTheme>(() => {
-    return (localStorage.getItem('solarnova-desktop-theme') as DesktopTheme) || 'windows';
+    return (localStorage.getItem('starstream-desktop-theme') as DesktopTheme) || 'windows';
   });
   const [windows, setWindows] = useState<DesktopWindow[]>([]);
   const [nextZIndex, setNextZIndex] = useState(100);
   const [fileSystem, setFileSystemState] = useState<Record<string, FileSystemNode>>(() => {
     try {
-      const saved = localStorage.getItem('solarnova-desktop-fs');
+      const saved = localStorage.getItem('starstream-desktop-fs');
       return saved ? JSON.parse(saved) : DEFAULT_FILE_SYSTEM;
     } catch { return DEFAULT_FILE_SYSTEM; }
   });
@@ -122,19 +122,19 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
 
   // Desktop customization state
   const [hiddenApps, setHiddenApps] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem('solarnova-desktop-hidden') || '[]'); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem('starstream-desktop-hidden') || '[]'); } catch { return []; }
   });
   const [customIcons, setCustomIcons] = useState<Record<string, string>>(() => {
-    try { return JSON.parse(localStorage.getItem('solarnova-desktop-icons') || '{}'); } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem('starstream-desktop-icons') || '{}'); } catch { return {}; }
   });
   const [customNames, setCustomNames] = useState<Record<string, string>>(() => {
-    try { return JSON.parse(localStorage.getItem('solarnova-desktop-names') || '{}'); } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem('starstream-desktop-names') || '{}'); } catch { return {}; }
   });
   const [iconPositions, setIconPositions] = useState<Record<string, { x: number; y: number }>>(() => {
-    try { return JSON.parse(localStorage.getItem('solarnova-desktop-positions') || '{}'); } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem('starstream-desktop-positions') || '{}'); } catch { return {}; }
   });
   const [folders, setFolders] = useState<Record<string, { name: string; appIds: string[] }>>(() => {
-    try { return JSON.parse(localStorage.getItem('solarnova-desktop-folders') || '{}'); } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem('starstream-desktop-folders') || '{}'); } catch { return {}; }
   });
 
   const fsSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -143,7 +143,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
 
   const setFileSystem = useCallback((fs: Record<string, FileSystemNode>) => {
     setFileSystemState(fs);
-    try { localStorage.setItem('solarnova-desktop-fs', JSON.stringify(fs)); } catch {}
+    try { localStorage.setItem('starstream-desktop-fs', JSON.stringify(fs)); } catch {}
     if (user) {
       if (fsSaveTimeout.current) clearTimeout(fsSaveTimeout.current);
       fsSaveTimeout.current = setTimeout(() => {
@@ -158,14 +158,14 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   const [games, setGames] = useState<any[]>([]);
   const [pinnedApps, setPinnedAppsState] = useState<string[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem('solarnova-desktop-pinned') || '[]');
+      return JSON.parse(localStorage.getItem('starstream-desktop-pinned') || '[]');
     } catch { return []; }
   });
 
   const setPinnedApps = useCallback((updater: (prev: string[]) => string[]) => {
     setPinnedAppsState(prev => {
       const next = updater(prev);
-      localStorage.setItem('solarnova-desktop-pinned', JSON.stringify(next));
+      localStorage.setItem('starstream-desktop-pinned', JSON.stringify(next));
       if (user) {
         if (pinSaveTimeout.current) clearTimeout(pinSaveTimeout.current);
         pinSaveTimeout.current = setTimeout(() => {
@@ -224,23 +224,23 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
       if (fsResult.data?.file_system) {
         const dbFs = fsResult.data.file_system as unknown as Record<string, FileSystemNode>;
         setFileSystemState(dbFs);
-        try { localStorage.setItem('solarnova-desktop-fs', JSON.stringify(dbFs)); } catch {}
+        try { localStorage.setItem('starstream-desktop-fs', JSON.stringify(dbFs)); } catch {}
       }
       if (pinsResult.data?.pinned_apps) {
         const dbPins = pinsResult.data.pinned_apps as string[];
         setPinnedAppsState(dbPins);
-        localStorage.setItem('solarnova-desktop-pinned', JSON.stringify(dbPins));
+        localStorage.setItem('starstream-desktop-pinned', JSON.stringify(dbPins));
       }
       if (customResult.data) {
         const c = customResult.data as any;
-        if (c.hidden_apps) { const h = c.hidden_apps as string[]; setHiddenApps(h); localStorage.setItem('solarnova-desktop-hidden', JSON.stringify(h)); }
-        if (c.custom_icons) { const i = c.custom_icons as Record<string, string>; setCustomIcons(i); localStorage.setItem('solarnova-desktop-icons', JSON.stringify(i)); }
-        if (c.custom_names) { const n = c.custom_names as Record<string, string>; setCustomNames(n); localStorage.setItem('solarnova-desktop-names', JSON.stringify(n)); }
-        if (c.icon_positions) { const p = c.icon_positions as Record<string, { x: number; y: number }>; setIconPositions(p); localStorage.setItem('solarnova-desktop-positions', JSON.stringify(p)); }
-        if (c.folders) { const f = c.folders as Record<string, { name: string; appIds: string[] }>; setFolders(f); localStorage.setItem('solarnova-desktop-folders', JSON.stringify(f)); }
+        if (c.hidden_apps) { const h = c.hidden_apps as string[]; setHiddenApps(h); localStorage.setItem('starstream-desktop-hidden', JSON.stringify(h)); }
+        if (c.custom_icons) { const i = c.custom_icons as Record<string, string>; setCustomIcons(i); localStorage.setItem('starstream-desktop-icons', JSON.stringify(i)); }
+        if (c.custom_names) { const n = c.custom_names as Record<string, string>; setCustomNames(n); localStorage.setItem('starstream-desktop-names', JSON.stringify(n)); }
+        if (c.icon_positions) { const p = c.icon_positions as Record<string, { x: number; y: number }>; setIconPositions(p); localStorage.setItem('starstream-desktop-positions', JSON.stringify(p)); }
+        if (c.folders) { const f = c.folders as Record<string, { name: string; appIds: string[] }>; setFolders(f); localStorage.setItem('starstream-desktop-folders', JSON.stringify(f)); }
         if (c.desktop_theme === 'windows' || c.desktop_theme === 'macos') {
           setTheme(c.desktop_theme);
-          localStorage.setItem('solarnova-desktop-theme', c.desktop_theme);
+          localStorage.setItem('starstream-desktop-theme', c.desktop_theme);
         }
       }
     });
@@ -254,14 +254,14 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
 
   const setThemePersistent = useCallback((next: DesktopTheme) => {
     setTheme(next);
-    localStorage.setItem('solarnova-desktop-theme', next);
+    localStorage.setItem('starstream-desktop-theme', next);
     saveCustomizations({ desktop_theme: next });
   }, [saveCustomizations]);
 
   const updateIconPosition = useCallback((appId: string, x: number, y: number) => {
     setIconPositions(prev => {
       const next = { ...prev, [appId]: { x, y } };
-      localStorage.setItem('solarnova-desktop-positions', JSON.stringify(next));
+      localStorage.setItem('starstream-desktop-positions', JSON.stringify(next));
       saveCustomizations({ icon_positions: next });
       return next;
     });
@@ -276,7 +276,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   const hideApp = useCallback((appId: string) => {
     setHiddenApps(prev => {
       const next = [...prev, appId];
-      localStorage.setItem('solarnova-desktop-hidden', JSON.stringify(next));
+      localStorage.setItem('starstream-desktop-hidden', JSON.stringify(next));
       saveCustomizations({ hidden_apps: next });
       return next;
     });
@@ -285,7 +285,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   const unhideApp = useCallback((appId: string) => {
     setHiddenApps(prev => {
       const next = prev.filter(id => id !== appId);
-      localStorage.setItem('solarnova-desktop-hidden', JSON.stringify(next));
+      localStorage.setItem('starstream-desktop-hidden', JSON.stringify(next));
       saveCustomizations({ hidden_apps: next });
       return next;
     });
@@ -294,7 +294,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   const changeIcon = useCallback((appId: string, newIcon: string) => {
     setCustomIcons(prev => {
       const next = { ...prev, [appId]: newIcon };
-      localStorage.setItem('solarnova-desktop-icons', JSON.stringify(next));
+      localStorage.setItem('starstream-desktop-icons', JSON.stringify(next));
       saveCustomizations({ custom_icons: next });
       return next;
     });
@@ -303,7 +303,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
   const renameApp = useCallback((appId: string, newName: string) => {
     setCustomNames(prev => {
       const next = { ...prev, [appId]: newName };
-      localStorage.setItem('solarnova-desktop-names', JSON.stringify(next));
+      localStorage.setItem('starstream-desktop-names', JSON.stringify(next));
       saveCustomizations({ custom_names: next });
       return next;
     });

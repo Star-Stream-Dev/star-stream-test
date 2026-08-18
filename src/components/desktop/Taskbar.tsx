@@ -3,7 +3,7 @@ import { Search, Wifi, Volume2, BatteryFull, ChevronUp, LogOut, Pin, PinOff, Gam
 import type { DesktopTheme, DesktopWindow, DesktopApp } from './types';
 import { ICON_MAP } from './DesktopIcon';
 
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 interface TaskbarProps {
   theme: DesktopTheme;
@@ -226,7 +226,7 @@ export function Taskbar({ theme, windows, pinnedApps, allApps, hiddenApps, onWin
       <>
         <div className="fixed top-0 left-0 right-0 h-7 z-[500] bg-black/50 backdrop-blur-xl flex items-center justify-between px-4 text-[13px] text-white/90 font-medium">
           <div className="flex items-center gap-4">
-            <span className="font-bold">☀ SolarnovaOS</span>
+            <span className="font-bold">☀ Star Stream</span>
             <span className="text-white/60">File</span>
             <span className="text-white/60">Edit</span>
             <span className="text-white/60">View</span>
@@ -268,7 +268,7 @@ export function Taskbar({ theme, windows, pinnedApps, allApps, hiddenApps, onWin
           <div className="w-px h-8 bg-white/20 mx-1" />
           <button onClick={onExitDesktop}
             className="w-12 h-12 rounded-xl bg-gradient-to-b from-red-500/30 to-red-600/20 border border-red-400/20 flex items-center justify-center hover:scale-110 transition-transform"
-            title="Exit to Solarnova">
+            title="Exit to Star Stream">
             <LogOut className="w-5 h-5 text-red-300" />
           </button>
         </div>
@@ -308,7 +308,7 @@ export function Taskbar({ theme, windows, pinnedApps, allApps, hiddenApps, onWin
 
       <div className="fixed bottom-0 left-0 right-0 h-12 z-[500] bg-[hsl(220,20%,10%)]/90 backdrop-blur-xl border-t border-white/10 flex items-center px-3">
         <button onClick={() => setSearchOpen(!searchOpen)} className="p-2 rounded-md hover:bg-white/10 transition-colors">
-          <img src={solarnovaIcon} alt="" className="w-5 h-5" />
+          <img src={starstreamIcon} alt="" className="w-5 h-5" />
         </button>
 
         <button onClick={() => setSearchOpen(!searchOpen)}
@@ -349,7 +349,7 @@ export function Taskbar({ theme, windows, pinnedApps, allApps, hiddenApps, onWin
             <div className="text-[11px]">{formatTime(time)}</div>
             <div className="text-[10px] text-muted-foreground/70">{formatDate(time)}</div>
           </div>
-          <button onClick={onExitDesktop} className="ml-2 p-1.5 hover:bg-destructive/20 rounded transition-colors" title="Exit to Solarnova">
+          <button onClick={onExitDesktop} className="ml-2 p-1.5 hover:bg-destructive/20 rounded transition-colors" title="Exit to Star Stream">
             <LogOut className="w-3.5 h-3.5 text-destructive" />
           </button>
         </div>

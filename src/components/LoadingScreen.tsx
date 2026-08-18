@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -80,8 +80,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
           <div className="relative">
             <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
             <img
-              src={solarnovaIcon}
-              alt="Solarnova"
+              src={starstreamIcon}
+              alt="Star Stream"
               className="w-20 h-20 relative z-10 animate-pulse"
               style={{ animationDuration: '2s' }}
             />
@@ -109,7 +109,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
       {/* Title with glow */}
       <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-8 tracking-wider">
-        SOLARNOVA
+        STAR STREAM
       </h1>
 
       {/* Progress bar container */}

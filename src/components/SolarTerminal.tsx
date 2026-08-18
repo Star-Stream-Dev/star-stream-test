@@ -19,7 +19,7 @@ Available Commands:
   whoami        Display current user info
   users         List all registered users
   uptime        Show session uptime
-  version       Show SolarnovaOS version
+  version       Show Star Stream version
   sysinfo       Display system information
   games         List available games
   announce      Show latest announcements
@@ -36,7 +36,7 @@ export function SolarTerminal({ onExit }: TerminalProps) {
   const { user, isAdmin } = useAuth();
   const [lines, setLines] = useState<TerminalLine[]>([
     { type: 'system', text: '╔══════════════════════════════════════════╗' },
-    { type: 'system', text: '║       SolarnovaOS Developer Terminal     ║' },
+    { type: 'system', text: '║       Star Stream Developer Terminal     ║' },
     { type: 'system', text: '║            Version 3.0                   ║' },
     { type: 'system', text: '╚══════════════════════════════════════════╝' },
     { type: 'output', text: '' },
@@ -81,7 +81,7 @@ export function SolarTerminal({ onExit }: TerminalProps) {
     setCommandHistory(prev => [...prev, trimmed]);
     setHistoryIndex(-1);
 
-    addLines([{ type: 'input', text: `${user?.username || 'user'}@solarnova:~$ ${trimmed}` }]);
+    addLines([{ type: 'input', text: `${user?.username || 'user'}@starstream:~$ ${trimmed}` }]);
 
     const [command, ...args] = trimmed.toLowerCase().split(' ');
 
@@ -128,7 +128,7 @@ export function SolarTerminal({ onExit }: TerminalProps) {
 
       case 'version':
         addLines([
-          { type: 'output', text: 'SolarnovaOS v2.0' },
+          { type: 'output', text: 'Star Stream v2.0' },
           { type: 'output', text: 'Built with React + TypeScript + Vite' },
           { type: 'output', text: 'Created by p0tato and Dannygo' },
         ]);
@@ -137,7 +137,7 @@ export function SolarTerminal({ onExit }: TerminalProps) {
       case 'sysinfo':
         addLines([
           { type: 'output', text: '┌─ System Information ─────────────────┐' },
-          { type: 'output', text: `│  OS:        SolarnovaOS              │` },
+          { type: 'output', text: `│  OS:        Star Stream              │` },
           { type: 'output', text: `│  Version:   2.0                      │` },
           { type: 'output', text: `│  Browser:   ${navigator.userAgent.includes('Chrome') ? 'Chrome' : navigator.userAgent.includes('Firefox') ? 'Firefox' : 'Unknown'}` },
           { type: 'output', text: `│  Platform:  ${navigator.platform}` },
@@ -199,19 +199,19 @@ export function SolarTerminal({ onExit }: TerminalProps) {
         break;
 
       case 'ping':
-        addLines([{ type: 'output', text: 'Pinging solarnova servers...' }]);
+        addLines([{ type: 'output', text: 'Pinging starstream servers...' }]);
         setTimeout(() => {
           const latency = Math.floor(Math.random() * 50 + 10);
-          addLines([{ type: 'output', text: `Reply from solarnova: time=${latency}ms` }]);
+          addLines([{ type: 'output', text: `Reply from starstream: time=${latency}ms` }]);
         }, 500);
         break;
 
       case 'neofetch':
         addLines([
           { type: 'output', text: '' },
-          { type: 'output', text: '    ╭──────────╮     ' + `${user?.username}@solarnova` },
+          { type: 'output', text: '    ╭──────────╮     ' + `${user?.username}@starstream` },
           { type: 'output', text: '    │  ☀  ☀  ☀ │     ─────────────────' },
-          { type: 'output', text: '    │    ☀☀    │     OS:      SolarnovaOS v2.0' },
+          { type: 'output', text: '    │    ☀☀    │     OS:      Star Stream v2.0' },
           { type: 'output', text: '    │  ☀    ☀  │     Host:    Web Browser' },
           { type: 'output', text: '    │    ☀☀    │     Kernel:  React 18.3' },
           { type: 'output', text: '    │  ☀  ☀  ☀ │     Shell:   SolarTerminal' },
@@ -276,7 +276,7 @@ export function SolarTerminal({ onExit }: TerminalProps) {
           <div className="w-3 h-3 rounded-full bg-yellow-500" />
           <div className="w-3 h-3 rounded-full bg-green-500" />
         </div>
-        <span className="text-xs text-muted-foreground">SolarnovaOS Terminal — Developer Mode</span>
+        <span className="text-xs text-muted-foreground">Star Stream Terminal — Developer Mode</span>
         <button onClick={onExit} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
           [EXIT]
         </button>
@@ -301,7 +301,7 @@ export function SolarTerminal({ onExit }: TerminalProps) {
 
         {/* Input line */}
         <div className="flex items-center gap-0">
-          <span className="text-primary shrink-0">{user?.username || 'user'}@solarnova:~$ </span>
+          <span className="text-primary shrink-0">{user?.username || 'user'}@starstream:~$ </span>
           <input
             ref={inputRef}
             type="text"

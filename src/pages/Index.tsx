@@ -43,7 +43,7 @@ import { ChangelogModal } from '@/components/ChangelogModal';
 import { TutorialProvider, useTutorial } from '@/contexts/TutorialContext';
 import { TutorialOverlay } from '@/components/TutorialOverlay';
 import { useAutoFriendAdmin } from '@/hooks/useAutoFriendAdmin';
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 import { useGameLayout } from '@/contexts/GameLayoutContext';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 
@@ -62,7 +62,7 @@ const Index = () => {
   const [showNav, setShowNav] = useState(false);
   const [typewriterText, setTypewriterText] = useState('');
 
-  const fullText = 'SOLARNOVA V3';
+  const fullText = 'STAR STREAM V3';
 
   // Typewriter effect for home
   useEffect(() => {
@@ -287,7 +287,7 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
 
   // Effective admin status (false when in user view mode)
   const effectiveIsAdmin = isAdmin && !userViewMode;
-  const fullText = 'SOLARNOVA';
+  const fullText = 'STAR STREAM';
 
   // Typewriter effect for home
   useEffect(() => {
@@ -520,9 +520,9 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
             {/* Header */}
             <div className="flex items-center justify-between px-5 pt-2 pb-4">
               <div className="flex items-center gap-3">
-                <img src={solarnovaIcon} alt="Solarnova" className="w-9 h-9" />
+                <img src={starstreamIcon} alt="Star Stream" className="w-9 h-9" />
                 <div className="flex flex-col">
-                  <span className="text-base font-bold text-gradient leading-tight">SOLARNOVA V3</span>
+                  <span className="text-base font-bold text-gradient leading-tight">STAR STREAM V3</span>
                   <span className="text-[11px] text-muted-foreground leading-tight">@{user.username}</span>
                 </div>
               </div>
@@ -608,8 +608,8 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
       >
         <div className="h-full border-r border-border/30 bg-background/95 backdrop-blur-lg flex flex-col">
           <div className="p-6 flex items-center gap-3">
-            <img src={solarnovaIcon} alt="Solarnova" className="w-10 h-10" />
-            <span className="text-xl font-bold text-gradient">SOLARNOVA V3</span>
+            <img src={starstreamIcon} alt="Star Stream" className="w-10 h-10" />
+            <span className="text-xl font-bold text-gradient">STAR STREAM V3</span>
           </div>
 
           <div className="border-t border-border/30 mx-4" />

@@ -149,7 +149,7 @@ export function CloakLauncher({ onContinue, onDevMode }: CloakLauncherProps) {
                 <div className="flex-1 space-y-1">
                   <h3 className="text-lg font-semibold text-foreground">Developer Mode</h3>
                   <p className="text-sm text-muted-foreground">
-                    Launch the SolarnovaOS desktop environment with command-line access.
+                    Launch the Star Stream desktop environment with command-line access.
                   </p>
                   <p className="text-[11px] text-muted-foreground/60 mt-1 italic">
                     Thank you for the inspiration — source: NautilusOS

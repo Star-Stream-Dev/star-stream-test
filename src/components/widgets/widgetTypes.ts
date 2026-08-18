@@ -46,7 +46,7 @@ export const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'w-activity', type: 'activity', visible: true, colSpan: 2 },
 ];
 
-const LAYOUT_STORAGE_KEY = 'solarnova_widget_layout';
+const LAYOUT_STORAGE_KEY = 'starstream_widget_layout';
 
 export function loadLayout(userId: string): WidgetConfig[] {
   try {

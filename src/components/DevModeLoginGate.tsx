@@ -36,7 +36,7 @@ export function DevModeLoginGate({ onBack }: DevModeLoginGateProps) {
           <h2 className="text-xl font-bold text-foreground">Developer Mode</h2>
         </div>
         <p className="text-sm text-muted-foreground text-center mb-6">
-          Login required to access SolarnovaOS
+          Login required to access Star Stream
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

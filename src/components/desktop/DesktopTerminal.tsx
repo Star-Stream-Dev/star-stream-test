@@ -33,7 +33,7 @@ const HELP_TEXT = `Available Commands:
   whoami            Display current user info
   users             List all registered users
   uptime            Show session uptime
-  version           Show SolarnovaOS version
+  version           Show Star Stream version
   sysinfo           Display system information
   neofetch          Display system info (styled)
   games             List available games
@@ -101,7 +101,7 @@ export function DesktopTerminal({ fileSystem, onFileSystemChange }: DesktopTermi
     { type: 'ascii', text: '|  $$$$$$/|  $$$$$$/| $$$$$$$$| $$  | $$| $$  | $$| $$ \\  $$|  $$$$$$/   \\  /    |  $$$$$$$' },
     { type: 'ascii', text: ' \\______/  \\______/ |________/|__/  |__/|__/  |__/|__/  \\__/ \\______/     \\/      \\_______/' },
     { type: 'system', text: '' },
-    { type: 'system', text: 'SolarnovaOS Terminal v3.0' },
+    { type: 'system', text: 'Star Stream Terminal v3.0' },
     { type: 'output', text: `Welcome, ${user?.username || 'user'}! Type "help" for commands.` },
     { type: 'output', text: '' },
   ]);
@@ -173,7 +173,7 @@ export function DesktopTerminal({ fileSystem, onFileSystemChange }: DesktopTermi
     if (!trimmed) return;
     setCommandHistory(prev => [...prev, trimmed]);
     setHistoryIndex(-1);
-    addLines([{ type: 'input', text: `${user?.username || 'user'}@solarnova:${currentPath.length ? '/' + currentPath.join('/') : '/'}$ ${trimmed}` }]);
+    addLines([{ type: 'input', text: `${user?.username || 'user'}@starstream:${currentPath.length ? '/' + currentPath.join('/') : '/'}$ ${trimmed}` }]);
 
     const parts = trimmed.split(' ');
     const command = parts[0].toLowerCase();
@@ -218,7 +218,7 @@ export function DesktopTerminal({ fileSystem, onFileSystemChange }: DesktopTermi
 
       case 'version':
         addLines([
-          { type: 'output', text: 'SolarnovaOS v2.0' },
+          { type: 'output', text: 'Star Stream v2.0' },
           { type: 'output', text: 'Built with React + TypeScript + Vite' },
           { type: 'output', text: 'Inspired by NautilusOS' },
         ]);
@@ -226,7 +226,7 @@ export function DesktopTerminal({ fileSystem, onFileSystemChange }: DesktopTermi
 
       case 'sysinfo':
         addLines([
-          { type: 'output', text: `OS:       SolarnovaOS 2.0` },
+          { type: 'output', text: `OS:       Star Stream 2.0` },
           { type: 'output', text: `Browser:  ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Other'}` },
           { type: 'output', text: `Platform: ${navigator.platform}` },
           { type: 'output', text: `Language: ${navigator.language}` },
@@ -237,9 +237,9 @@ export function DesktopTerminal({ fileSystem, onFileSystemChange }: DesktopTermi
 
       case 'neofetch':
         addLines([
-          { type: 'ascii', text: '    ╭──────────╮     ' + `${user?.username}@solarnova` },
+          { type: 'ascii', text: '    ╭──────────╮     ' + `${user?.username}@starstream` },
           { type: 'ascii', text: '    │  ☀  ☀  ☀ │     ─────────────────' },
-          { type: 'ascii', text: '    │    ☀☀    │     OS:      SolarnovaOS v2.0' },
+          { type: 'ascii', text: '    │    ☀☀    │     OS:      Star Stream v2.0' },
           { type: 'ascii', text: '    │  ☀    ☀  │     Host:    Web Browser' },
           { type: 'ascii', text: '    │    ☀☀    │     Kernel:  React 18' },
           { type: 'ascii', text: '    │  ☀  ☀  ☀ │     Shell:   SolarTerminal' },
@@ -285,7 +285,7 @@ export function DesktopTerminal({ fileSystem, onFileSystemChange }: DesktopTermi
         break;
 
       case 'ping': {
-        const host = args[0] || 'solarnova';
+        const host = args[0] || 'starstream';
         addLines([{ type: 'output', text: `PING ${host}...` }]);
         setTimeout(() => {
           for (let i = 0; i < 4; i++) {
@@ -489,7 +489,7 @@ export function DesktopTerminal({ fileSystem, onFileSystemChange }: DesktopTermi
     }
   };
 
-  const prompt = `${user?.username || 'user'}@solarnova:${currentPath.length ? '/' + currentPath.join('/') : '/'}$ `;
+  const prompt = `${user?.username || 'user'}@starstream:${currentPath.length ? '/' + currentPath.join('/') : '/'}$ `;
 
   return (
     <div

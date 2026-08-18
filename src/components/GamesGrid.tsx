@@ -5,9 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { resolveHostedUrl } from '@/lib/hostedGameBundle';
 
-const STATS_KEY = 'solarnova_user_stats';
-const GAMES_HISTORY_KEY = 'solarnova_games_history';
-const GAME_SESSION_KEY = 'solarnova_game_sessions';
+const STATS_KEY = 'starstream_user_stats';
+const GAMES_HISTORY_KEY = 'starstream_games_history';
+const GAME_SESSION_KEY = 'starstream_game_sessions';
 
 interface GameSession {
   gameTitle: string;
@@ -66,7 +66,7 @@ const defaultGames: Game[] = [
     thumbnail: '/thumbnails/petezah-games.png',
   },
   {
-    title: 'Solarnova Music',
+    title: 'Star Stream Music',
     description: 'Stream your favorite music with our sleek, feature-rich player.',
     url: '',
     preview: 'Music streaming',

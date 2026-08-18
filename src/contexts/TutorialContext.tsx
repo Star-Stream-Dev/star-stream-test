@@ -31,12 +31,12 @@ interface TutorialContextType {
 
 const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
 
-const TUTORIAL_STORAGE_KEY = 'solarnova_tutorial_completed';
+const TUTORIAL_STORAGE_KEY = 'starstream_tutorial_completed';
 
 export const tutorialSteps: TutorialStep[] = [
   {
     id: 'welcome',
-    title: 'Welcome to Solarnova! 🌟',
+    title: 'Welcome to Star Stream! 🌟',
     description: 'Let\'s take a quick tour of the app. Follow the instructions to learn how everything works!',
     action: 'Click "Next" to begin',
     position: 'center',

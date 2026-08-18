@@ -9,7 +9,7 @@ interface SettingsAppProps {
 export function SettingsApp({ theme, onThemeChange }: SettingsAppProps) {
   return (
     <div className="p-6 space-y-6">
-      <h2 className="text-lg font-semibold text-foreground">SolarnovaOS Settings</h2>
+      <h2 className="text-lg font-semibold text-foreground">Star Stream Settings</h2>
 
       <div className="space-y-3">
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Appearance</h3>
@@ -81,7 +81,7 @@ export function SettingsApp({ theme, onThemeChange }: SettingsAppProps) {
       <div className="border-t border-white/10 pt-4">
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">About</h3>
         <div className="text-xs text-muted-foreground space-y-1">
-          <p>SolarnovaOS v2.0</p>
+          <p>Star Stream v2.0</p>
           <p>Desktop Environment powered by React</p>
           <p>Inspired by NautilusOS — thank you for the inspiration!</p>
           <p className="text-primary">Created by p0tato and Dannygo ☀</p>

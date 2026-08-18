@@ -49,7 +49,7 @@ serve(async (req) => {
     const headers = {
       'Authorization': `token ${pat}`,
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'SolarnovaOS-Terminal',
+      'User-Agent': 'Star Stream-Terminal',
     };
 
     if (action === 'clone' || action === 'pull') {

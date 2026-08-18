@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-const AUTO_FRIEND_ADMIN_KEY = 'solarnova_auto_friend_admin';
-const ADMIN_BEFRIEND_ALL_KEY = 'solarnova_admin_befriend_all_v2';
+const AUTO_FRIEND_ADMIN_KEY = 'starstream_auto_friend_admin';
+const ADMIN_BEFRIEND_ALL_KEY = 'starstream_admin_befriend_all_v2';
 
 export function useAutoFriendAdmin() {
   const { user, sessionToken } = useAuth();

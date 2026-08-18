@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Music2, Sparkles } from 'lucide-react';
 import { YouTubeMusicPlayer } from '@/components/music/YouTubeMusicPlayer';
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 let hasLoadedOnce = false;
 
@@ -81,7 +81,7 @@ export function DesktopMusic() {
         </p>
 
         <p className="text-[10px] text-muted-foreground/50 uppercase tracking-widest">
-          Solarnova Music
+          Star Stream Music
         </p>
       </div>
     );

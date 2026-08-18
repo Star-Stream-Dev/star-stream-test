@@ -64,7 +64,7 @@ export const WhiteboardPage = () => {
             <h3 className="text-lg font-semibold text-foreground">Community</h3>
           </div>
           <p className="text-sm text-muted-foreground">
-            A shared whiteboard for everyone in Solarnova. Each user gets a unique assigned color so you can see who drew what.
+            A shared whiteboard for everyone in Star Stream. Each user gets a unique assigned color so you can see who drew what.
           </p>
         </button>
 

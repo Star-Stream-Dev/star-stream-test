@@ -192,7 +192,7 @@ export function GameEmbed({ url, title, gameId, onClose }: GameEmbedProps) {
       {isMathepicSite && (
         <div className="absolute top-14 left-0 right-0 bg-muted/50 border-b border-border/30 px-4 py-2 z-10">
           <p className="text-center text-xs text-muted-foreground">
-            <span className="font-medium">Disclaimer:</span> This content is provided through a third-party embedded service. Solarnova does not own, operate, or control the embedded website. 
+            <span className="font-medium">Disclaimer:</span> This content is provided through a third-party embedded service. Star Stream does not own, operate, or control the embedded website. 
             We are not responsible for the content, availability, or any issues arising from the use of this third-party service.
           </p>
         </div>

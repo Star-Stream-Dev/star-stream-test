@@ -1,7 +1,7 @@
 [package]
-name = "p0tatotheking/solarnova"
+name = "p0tatotheking/star-stream"
 version = "1.0.0"
-description = "SolarNova - Games, Chat & Music Platform"
+description = "Star Stream - Games, Chat & Music Platform"
 
 [dependencies]
 "sharrattj/static-web-server" = "1"

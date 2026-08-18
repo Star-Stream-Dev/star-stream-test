@@ -3,7 +3,7 @@ import { Search, Globe, Gamepad2, BookOpen, Newspaper, Star, ExternalLink } from
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useProxy, SearchEngine } from '@/contexts/ProxyContext';
-import solarnovaIcon from '@/assets/solarnova-icon.png';
+import starstreamIcon from '@/assets/starstream-icon.png';
 
 // Sites that are known to work well with the proxy
 const workingSites = [
@@ -64,13 +64,13 @@ export function ProxyStartPage() {
       {/* Logo and Title */}
       <div className="flex flex-col items-center gap-4 mb-8 animate-fade-in">
         <img 
-          src={solarnovaIcon} 
-          alt="Solarnova Proxy" 
+          src={starstreamIcon} 
+          alt="Star Stream Proxy" 
           className="w-20 h-20 drop-shadow-2xl"
         />
-        <h1 className="text-3xl font-bold text-gradient">Solarnova Proxy</h1>
+        <h1 className="text-3xl font-bold text-gradient">Star Stream Proxy</h1>
         <p className="text-muted-foreground text-center max-w-md text-sm">
-          Browse the web through Solarnova's built-in proxy browser
+          Browse the web through Star Stream's built-in proxy browser
         </p>
       </div>
 
