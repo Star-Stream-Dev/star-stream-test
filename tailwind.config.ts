@@ -47,7 +47,7 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Solarnova specific colors
+        // Star Stream specific colors
         purple: {
           300: "hsl(270, 70%, 70%)",
           400: "hsl(270, 70%, 60%)",
