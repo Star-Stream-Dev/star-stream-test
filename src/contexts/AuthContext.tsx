@@ -69,9 +69,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: { action: 'login', username, password },
       });
 
-      if (error || data?.error) {
-        return { error: data?.error || 'Invalid username or password' };
+      if (error) {
+        // Non-2xx responses throw; read the JSON body for the real message
+        let message = 'Invalid username or password';
+        const res = (error as { context?: Response }).context;
+        if (res && typeof res.json === 'function') {
+          try {
+            const body = await res.json();
+            if (body?.error) message = body.error;
+          } catch { /* ignore */ }
+        }
+        return { error: message };
       }
+
+      if (data?.error) {
+        return { error: data.error };
+      }
+
 
       const userData: User = {
         id: data.user_id,
