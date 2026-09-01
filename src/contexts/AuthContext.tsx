@@ -164,6 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isLoading,
         login,
+        signupWithInvite,
         logout,
         isAdmin: user?.role === 'admin',
         sessionToken,
