@@ -11,6 +11,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<{ error: string | null }>;
+  signupWithInvite: (inviteCode: string, username: string, password: string) => Promise<{ error: string | null }>;
   logout: () => void;
   isAdmin: boolean;
   sessionToken: string | null;
