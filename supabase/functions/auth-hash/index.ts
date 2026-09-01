@@ -52,7 +52,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, username, password, admin_id, session_token, user_id, new_password } = await req.json();
+    const { action, username, password, admin_id, session_token, user_id, new_password, invite_code } = await req.json();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -255,6 +255,56 @@ serve(async (req) => {
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    } else if (action === "signup_with_invite") {
+      const cleanUsername = typeof username === "string" ? username.trim() : "";
+      const cleanCode = typeof invite_code === "string" ? invite_code.trim().toLowerCase() : "";
+
+      if (!cleanCode) {
+        return new Response(JSON.stringify({ error: "Missing invite code" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (cleanUsername.length < 3 || cleanUsername.length > 32 || !/^[a-zA-Z0-9_.-]+$/.test(cleanUsername)) {
+        return new Response(JSON.stringify({ error: "Username must be 3-32 characters (letters, numbers, _ . -)" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (typeof password !== "string" || password.length < 6 || password.length > 200) {
+        return new Response(JSON.stringify({ error: "Password must be at least 6 characters" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { hash, salt } = await hashPasswordPBKDF2(password);
+      const { data: redeemed, error: redeemError } = await supabase.rpc("redeem_invite_link", {
+        p_code: cleanCode,
+        p_username: cleanUsername,
+        p_password_hash: hash,
+        p_password_salt: salt,
+      });
+
+      if (redeemError || !redeemed || redeemed.length === 0) {
+        return new Response(JSON.stringify({ error: redeemError?.message || "Could not redeem invite link" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const newUserId = redeemed[0].user_id;
+      const sessionTokenValue = generateSessionToken();
+      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      await supabase.from("user_sessions").insert({
+        user_id: newUserId,
+        session_token: sessionTokenValue,
+        expires_at: expiresAt,
+      });
+
+      return new Response(JSON.stringify({
+        user_id: newUserId,
+        username: redeemed[0].username,
+        role: "user",
+        session_token: sessionTokenValue,
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
     }
 
     return new Response(JSON.stringify({ error: "Invalid action" }), {
