@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY');
+    const YOUTUBE_API_KEY = Deno.env.get('GOOGLE_API_KEY') || Deno.env.get('YOUTUBE_API_KEY');
     if (!YOUTUBE_API_KEY) {
       throw new Error('YouTube API key not configured');
     }
