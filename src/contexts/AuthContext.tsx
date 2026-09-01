@@ -105,6 +105,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signupWithInvite = async (
+    inviteCode: string,
+    username: string,
+    password: string,
+  ): Promise<{ error: string | null }> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('auth-hash', {
+        body: { action: 'signup_with_invite', invite_code: inviteCode, username, password },
+      });
+
+      if (error) {
+        let message = 'Could not create your account';
+        const res = (error as { context?: Response }).context;
+        if (res && typeof res.json === 'function') {
+          try {
+            const body = await res.json();
+            if (body?.error) message = body.error;
+          } catch { /* ignore */ }
+        }
+        return { error: message };
+      }
+
+      if (data?.error) return { error: data.error };
+
+      const userData: User = {
+        id: data.user_id,
+        username: data.username,
+        role: data.role || 'user',
+      };
+      setUser(userData);
+      setSessionToken(data.session_token);
+      localStorage.setItem('starstream_user', JSON.stringify(userData));
+      localStorage.setItem('starstream_session_token', data.session_token);
+      return { error: null };
+    } catch (err) {
+      console.error('Signup error:', err);
+      return { error: 'An error occurred during signup' };
+    }
+  };
+
   const logout = () => {
     // Invalidate session on server
     if (sessionToken) {
