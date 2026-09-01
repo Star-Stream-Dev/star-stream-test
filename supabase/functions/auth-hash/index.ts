@@ -52,7 +52,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, username, password, admin_id, session_token, user_id, new_password } = await req.json();
+    const { action, username, password, admin_id, session_token, user_id, new_password, invite_code } = await req.json();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
