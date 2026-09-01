@@ -604,6 +604,86 @@ export type Database = {
           },
         ]
       }
+      invite_link_uses: {
+        Row: {
+          created_at: string
+          id: string
+          invite_id: string
+          user_id: string | null
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_id: string
+          user_id?: string | null
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_id?: string
+          user_id?: string | null
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invite_link_uses_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "invite_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invite_link_uses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invite_links: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          max_uses: number
+          note: string | null
+          uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+          note?: string | null
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+          note?: string | null
+          uses?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invite_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       message_reactions: {
         Row: {
           created_at: string
@@ -1408,6 +1488,13 @@ export type Database = {
         Args: { p_blocked_id: string; p_session_token: string }
         Returns: boolean
       }
+      check_invite_code: {
+        Args: { p_code: string }
+        Returns: {
+          remaining: number
+          valid: boolean
+        }[]
+      }
       clear_chat_messages: {
         Args: { p_session_token: string }
         Returns: boolean
@@ -1474,6 +1561,18 @@ export type Database = {
             }
             Returns: string
           }
+      create_invite_link: {
+        Args: { p_max_uses?: number; p_note?: string; p_session_token: string }
+        Returns: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          max_uses: number
+          note: string
+          uses: number
+        }[]
+      }
       create_rom: {
         Args: {
           p_console: string
@@ -1503,6 +1602,10 @@ export type Database = {
       }
       delete_game: {
         Args: { p_game_id: string; p_session_token: string }
+        Returns: boolean
+      }
+      delete_invite_link: {
+        Args: { p_invite_id: string; p_session_token: string }
         Returns: boolean
       }
       delete_my_friend_nickname: {
@@ -1540,6 +1643,20 @@ export type Database = {
           id: string
           role: Database["public"]["Enums"]["app_role"]
           username: string
+        }[]
+      }
+      get_invite_links: {
+        Args: { p_session_token: string }
+        Returns: {
+          code: string
+          created_at: string
+          created_by_username: string
+          id: string
+          is_active: boolean
+          max_uses: number
+          note: string
+          redeemed_usernames: string[]
+          uses: number
         }[]
       }
       get_my_algorithm_state: {
@@ -1611,6 +1728,18 @@ export type Database = {
         Args: { p_sender_id: string; p_session_token: string }
         Returns: boolean
       }
+      redeem_invite_link: {
+        Args: {
+          p_code: string
+          p_password_hash: string
+          p_password_salt: string
+          p_username: string
+        }
+        Returns: {
+          user_id: string
+          username: string
+        }[]
+      }
       reject_friend_request: {
         Args: { p_request_id: string; p_session_token: string }
         Returns: boolean
@@ -1642,6 +1771,14 @@ export type Database = {
           p_to_username: string
         }
         Returns: string
+      }
+      set_invite_link_active: {
+        Args: {
+          p_active: boolean
+          p_invite_id: string
+          p_session_token: string
+        }
+        Returns: boolean
       }
       start_game_session: {
         Args: {
