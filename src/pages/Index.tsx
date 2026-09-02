@@ -21,7 +21,6 @@ import { GameEmbed } from '@/components/GameEmbed';
 import { PipProvider, FloatingPipPlayer } from '@/components/YouTubePlayer';
 import { YouTubeApp } from '@/components/youtube/YouTubeApp';
 import { UnoGame } from '@/components/UnoGame';
-import { TVMoviesPlayer } from '@/components/TVMoviesPlayer';
 import { StudyHelper } from '@/components/StudyHelper';
 import { SettingsPage } from '@/components/SettingsPage';
 import { ProxyBrowser } from '@/components/proxy/ProxyBrowser';
@@ -47,7 +46,7 @@ import starstreamIcon from '@/assets/starstream-icon.png';
 import { useGameLayout } from '@/contexts/GameLayoutContext';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 
-type Section = 'home' | 'games' | 'chatroom' | 'bugs' | 'music' | 'announcements' | 'youtube' | 'uno' | 'tv' | 'solar' | 'settings' | 'proxy' | 'fnf' | 'whiteboard' | 'emulator';
+type Section = 'home' | 'games' | 'chatroom' | 'bugs' | 'music' | 'announcements' | 'youtube' | 'uno' | 'solar' | 'settings' | 'proxy' | 'fnf' | 'whiteboard' | 'emulator';
 
 
 const Index = () => {
@@ -250,7 +249,6 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
   const [showNavState, setShowNavState] = useState(false);
   const [typewriterText, setTypewriterText] = useState('');
   const [userViewMode, setUserViewMode] = useState(false);
-  const [showTVPlayer, setShowTVPlayer] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
   const { hasAccepted, handleAccept, handleDeny } = useDisclaimer();
   const { hasAccepted: proxyAccepted, handleAccept: acceptProxy, reset: resetProxyDisclaimer } = useProxyDisclaimer();
@@ -337,7 +335,6 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
     { id: 'home' as const, label: 'Home', icon: Home, disabled: false },
     { id: 'games' as const, label: 'Games', icon: Gamepad2, disabled: false },
     { id: 'fnf' as const, label: 'FNF Mods', icon: Mic2, disabled: false },
-    { id: 'tv' as const, label: 'TV & Movies', icon: Tv, disabled: false },
     { id: 'youtube' as const, label: 'YouTube', icon: Youtube, disabled: false },
     { id: 'music' as const, label: 'Music', icon: Music, disabled: false },
     { id: 'solar' as const, label: 'Solar AI', icon: Sparkles, disabled: false },
@@ -354,9 +351,7 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
   const handleNavClick = (id: string, disabled?: boolean) => {
     if (disabled) return;
     
-    if (id === 'tv') {
-      setShowTVPlayer(true);
-    } else if (id === 'proxy') {
+    if (id === 'proxy') {
       // Check if proxy disclaimer has been accepted
       if (proxyAccepted) {
         setActiveSection('proxy');
@@ -783,11 +778,6 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
           title={embeddedGame.title}
           onClose={() => setEmbeddedGame(null)}
         />
-      )}
-
-      {/* TV & Movies Fullscreen Player */}
-      {showTVPlayer && (
-        <TVMoviesPlayer onClose={() => setShowTVPlayer(false)} />
       )}
 
       {/* Admin Panel */}
