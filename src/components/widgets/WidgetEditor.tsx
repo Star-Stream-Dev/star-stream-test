@@ -46,9 +46,12 @@ export function WidgetEditor({ layout, onChange, onClose, onSave }: WidgetEditor
       type: catalog.type,
       visible: true,
       colSpan: catalog.defaultColSpan as 1 | 2 | 3 | 4,
-      title: type === 'text' ? 'My Note' : undefined,
+      title: type === 'text' ? 'My Note' : type === 'embed' ? 'My Embed' : undefined,
       content: type === 'text' ? 'Edit this text...' : undefined,
       links: type === 'quick-links' ? [{ label: '🎮 Games', target: 'games' }] : undefined,
+      url: type === 'embed' ? '' : undefined,
+      height: type === 'embed' ? 260 : undefined,
+
     };
     onChange([...layout, newWidget]);
     setShowCatalog(false);
@@ -170,6 +173,40 @@ export function WidgetEditor({ layout, onChange, onClose, onSave }: WidgetEditor
                 />
               </div>
             )}
+
+            {editingItem && editingItem.type === 'embed' && (
+              <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
+                <h3 className="text-sm font-semibold text-foreground">Edit Embed Widget</h3>
+                <Input
+                  value={editingItem.title || ''}
+                  onChange={(e) => updateWidget(editingItem.id, { title: e.target.value })}
+                  placeholder="Title (e.g. My Dashboard)"
+                  className="text-sm"
+                />
+                <Input
+                  value={editingItem.url || ''}
+                  onChange={(e) => updateWidget(editingItem.id, { url: e.target.value })}
+                  placeholder="https://example.com"
+                  className="text-sm"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Height</span>
+                  <Input
+                    type="number"
+                    min={120}
+                    max={900}
+                    value={editingItem.height ?? 260}
+                    onChange={(e) => updateWidget(editingItem.id, { height: Math.max(120, Math.min(900, parseInt(e.target.value) || 260)) })}
+                    className="text-sm w-28"
+                  />
+                  <span className="text-xs text-muted-foreground">px</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Some sites (Google, YouTube watch pages) block embedding. Use share/embed URLs when available.
+                </p>
+              </div>
+            )}
+
 
             {editingItem && (editingItem.type === 'quick-links') && (
               <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
