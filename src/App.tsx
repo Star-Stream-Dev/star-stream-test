@@ -10,6 +10,7 @@ import { GameLayoutProvider } from "@/contexts/GameLayoutContext";
 import { UserPreferencesProvider } from "@/contexts/UserPreferencesContext";
 import { DMNotificationBanner } from "@/components/DMNotificationBanner";
 import Index from "./pages/Index";
+import InviteSignup from "./pages/InviteSignup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
                 <BrowserRouter>
                   <Routes>
                     <Route path="/" element={<Index />} />
+                    <Route path="/invite/:code" element={<InviteSignup />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </BrowserRouter>
