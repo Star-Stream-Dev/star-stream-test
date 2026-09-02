@@ -164,12 +164,25 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
               <Joystick className="w-4 h-4" />
               ROMs
             </button>
+            <button
+              onClick={() => setActiveTab('invites')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+                activeTab === 'invites'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              <Ticket className="w-4 h-4" />
+              Invites
+            </button>
           </div>
 
           {activeTab === 'games' ? (
             <GameManagement />
           ) : activeTab === 'roms' ? (
             <RomManagement />
+          ) : activeTab === 'invites' ? (
+            <InviteManagement />
           ) : (
             <>
           {error && (
