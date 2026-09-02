@@ -46,9 +46,12 @@ export function WidgetEditor({ layout, onChange, onClose, onSave }: WidgetEditor
       type: catalog.type,
       visible: true,
       colSpan: catalog.defaultColSpan as 1 | 2 | 3 | 4,
-      title: type === 'text' ? 'My Note' : undefined,
+      title: type === 'text' ? 'My Note' : type === 'embed' ? 'My Embed' : undefined,
       content: type === 'text' ? 'Edit this text...' : undefined,
       links: type === 'quick-links' ? [{ label: '🎮 Games', target: 'games' }] : undefined,
+      url: type === 'embed' ? '' : undefined,
+      height: type === 'embed' ? 260 : undefined,
+
     };
     onChange([...layout, newWidget]);
     setShowCatalog(false);
