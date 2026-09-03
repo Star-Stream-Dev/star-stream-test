@@ -45,6 +45,8 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
   // Widget layout
   const [layout, setLayout] = useState<WidgetConfig[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   // Load layout on mount
   useEffect(() => {
@@ -57,6 +59,24 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     if (user) {
       saveLayout(user.id, layout);
     }
+  };
+
+  const handleDropWidget = (targetId: string) => {
+    if (!dragId || dragId === targetId || !user) {
+      setDragId(null);
+      setDragOverId(null);
+      return;
+    }
+    const from = layout.findIndex(w => w.id === dragId);
+    const to = layout.findIndex(w => w.id === targetId);
+    if (from === -1 || to === -1) return;
+    const next = [...layout];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setLayout(next);
+    saveLayout(user.id, next);
+    setDragId(null);
+    setDragOverId(null);
   };
 
   // Load and update persistent stats
