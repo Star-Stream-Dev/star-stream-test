@@ -216,7 +216,35 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
               `${mobileSpan === 2 ? 'col-span-2' : 'col-span-1'} ` +
               `${desktopSpan === 4 ? 'md:col-span-4' : desktopSpan === 3 ? 'md:col-span-3' : desktopSpan === 2 ? 'md:col-span-2' : 'md:col-span-1'}`;
             return (
-              <div key={widget.id} className={`${spanClass} min-w-0`}>
+              <div
+                key={widget.id}
+                className={`${spanClass} min-w-0 transition-all ${
+                  dragOverId === widget.id && dragId !== widget.id
+                    ? 'ring-2 ring-primary/60 rounded-2xl scale-[0.98]'
+                    : ''
+                } ${dragId === widget.id ? 'opacity-40' : ''}`}
+                draggable
+                onDragStart={(e) => {
+                  setDragId(widget.id);
+                  e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'move';
+                  if (dragOverId !== widget.id) setDragOverId(widget.id);
+                }}
+                onDragLeave={() => {
+                  if (dragOverId === widget.id) setDragOverId(null);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  handleDropWidget(widget.id);
+                }}
+                onDragEnd={() => {
+                  setDragId(null);
+                  setDragOverId(null);
+                }}
+              >
                 <WidgetRenderer
                   widget={widget}
                   onNavigate={onNavigate}
