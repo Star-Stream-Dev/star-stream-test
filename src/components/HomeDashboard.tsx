@@ -45,8 +45,13 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
   // Widget layout
   const [layout, setLayout] = useState<WidgetConfig[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [jiggle, setJiggle] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
-  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const longPressTimer = useRef<number | null>(null);
+  const startPoint = useRef<{ x: number; y: number } | null>(null);
+  const pendingId = useRef<string | null>(null);
+  const layoutRef = useRef<WidgetConfig[]>([]);
+  layoutRef.current = layout;
 
   // Load layout on mount
   useEffect(() => {
@@ -61,23 +66,79 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     }
   };
 
-  const handleDropWidget = (targetId: string) => {
-    if (!dragId || dragId === targetId || !user) {
-      setDragId(null);
-      setDragOverId(null);
+  const persist = useCallback((next: WidgetConfig[]) => {
+    if (user) saveLayout(user.id, next);
+  }, [user]);
+
+  const reorder = useCallback((fromId: string, toId: string) => {
+    setLayout(prev => {
+      const from = prev.findIndex(w => w.id === fromId);
+      const to = prev.findIndex(w => w.id === toId);
+      if (from === -1 || to === -1 || from === to) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  }, []);
+
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      window.clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    pendingId.current = null;
+  };
+
+  const onWidgetPointerDown = (e: React.PointerEvent, id: string) => {
+    if ((e.target as HTMLElement).closest('a,button,input,select,textarea,iframe')) return;
+    startPoint.current = { x: e.clientX, y: e.clientY };
+    if (jiggle) {
+      setDragId(id);
       return;
     }
-    const from = layout.findIndex(w => w.id === dragId);
-    const to = layout.findIndex(w => w.id === targetId);
-    if (from === -1 || to === -1) return;
-    const next = [...layout];
-    const [moved] = next.splice(from, 1);
-    next.splice(to, 0, moved);
-    setLayout(next);
-    saveLayout(user.id, next);
-    setDragId(null);
-    setDragOverId(null);
+    pendingId.current = id;
+    longPressTimer.current = window.setTimeout(() => {
+      setJiggle(true);
+      setDragId(pendingId.current);
+      if (navigator.vibrate) navigator.vibrate(10);
+    }, 400);
   };
+
+  // Global drag tracking (works with touch, pen and mouse)
+  useEffect(() => {
+    const handleMove = (e: PointerEvent) => {
+      if (!dragId) {
+        if (longPressTimer.current && startPoint.current) {
+          const dx = Math.abs(e.clientX - startPoint.current.x);
+          const dy = Math.abs(e.clientY - startPoint.current.y);
+          if (dx > 10 || dy > 10) cancelLongPress();
+        }
+        return;
+      }
+      e.preventDefault();
+      const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+      const cell = el?.closest('[data-widget-id]') as HTMLElement | null;
+      const targetId = cell?.dataset.widgetId;
+      if (targetId && targetId !== dragId) reorder(dragId, targetId);
+    };
+    const handleUp = () => {
+      cancelLongPress();
+      if (dragId) {
+        setDragId(null);
+        persist(layoutRef.current);
+      }
+    };
+    window.addEventListener('pointermove', handleMove, { passive: false });
+    window.addEventListener('pointerup', handleUp);
+    window.addEventListener('pointercancel', handleUp);
+    return () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+      window.removeEventListener('pointercancel', handleUp);
+    };
+  }, [dragId, reorder, persist]);
+
 
   // Load and update persistent stats
   useEffect(() => {
