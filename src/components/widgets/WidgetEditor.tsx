@@ -126,7 +126,7 @@ export function WidgetEditor({ layout, onChange, onClose, onSave }: WidgetEditor
                     </select>
 
                     {/* Edit button for text/quick-links */}
-                    {(widget.type === 'text' || widget.type === 'quick-links') && (
+                    {(widget.type === 'text' || widget.type === 'quick-links' || widget.type === 'embed') && (
                       <Button
                         variant="ghost"
                         size="icon"
