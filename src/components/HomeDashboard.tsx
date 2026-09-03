@@ -257,7 +257,17 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
       </div>
 
       {/* Edit button */}
-      <div className="flex justify-end mb-3">
+      <div className="flex justify-end items-center gap-2 mb-3">
+        {jiggle ? (
+          <button
+            onClick={() => { setJiggle(false); setDragId(null); persist(layout); }}
+            className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium"
+          >
+            Done
+          </button>
+        ) : (
+          <span className="text-[11px] text-muted-foreground hidden sm:inline">Hold a widget to rearrange</span>
+        )}
         <button
           onClick={() => setIsEditing(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary hover:bg-primary/20 transition-colors"
@@ -270,41 +280,28 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
       {/* Widget Grid */}
       <div className="rounded-3xl p-3 md:p-8" style={glassStyle}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-min">
-          {visibleWidgets.map(widget => {
+          {visibleWidgets.map((widget, i) => {
             const desktopSpan = widget.colSpan || 1;
             const mobileSpan = Math.min(desktopSpan, 2);
             const spanClass =
               `${mobileSpan === 2 ? 'col-span-2' : 'col-span-1'} ` +
               `${desktopSpan === 4 ? 'md:col-span-4' : desktopSpan === 3 ? 'md:col-span-3' : desktopSpan === 2 ? 'md:col-span-2' : 'md:col-span-1'}`;
+            const isDragging = dragId === widget.id;
             return (
               <div
                 key={widget.id}
-                className={`${spanClass} min-w-0 transition-all ${
-                  dragOverId === widget.id && dragId !== widget.id
-                    ? 'ring-2 ring-primary/60 rounded-2xl scale-[0.98]'
-                    : ''
-                } ${dragId === widget.id ? 'opacity-40' : ''}`}
-                draggable
-                onDragStart={(e) => {
-                  setDragId(widget.id);
-                  e.dataTransfer.effectAllowed = 'move';
+                data-widget-id={widget.id}
+                onPointerDown={(e) => onWidgetPointerDown(e, widget.id)}
+                onContextMenu={(e) => { if (jiggle) e.preventDefault(); }}
+                style={{
+                  touchAction: jiggle ? 'none' : undefined,
+                  animationDelay: `${(i % 4) * 60}ms`,
                 }}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.dataTransfer.dropEffect = 'move';
-                  if (dragOverId !== widget.id) setDragOverId(widget.id);
-                }}
-                onDragLeave={() => {
-                  if (dragOverId === widget.id) setDragOverId(null);
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  handleDropWidget(widget.id);
-                }}
-                onDragEnd={() => {
-                  setDragId(null);
-                  setDragOverId(null);
-                }}
+                className={`${spanClass} min-w-0 rounded-2xl transition-transform duration-200 ${
+                  jiggle && !isDragging ? 'animate-jiggle' : ''
+                } ${isDragging ? 'scale-105 opacity-90 ring-2 ring-primary/60 shadow-2xl z-10 cursor-grabbing' : ''} ${
+                  jiggle ? 'select-none' : ''
+                }`}
               >
                 <WidgetRenderer
                   widget={widget}
@@ -321,6 +318,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
           })}
         </div>
       </div>
+
 
       {/* Developer Mode button */}
       {onDevMode && (
