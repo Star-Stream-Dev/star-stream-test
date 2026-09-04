@@ -271,46 +271,8 @@ export function WidgetRenderer({
         </div>
       );
 
-    case 'embed': {
-      const url = (widget.url || '').trim();
-      const height = widget.height || 260;
-      const safe = /^https?:\/\//i.test(url) ? url : '';
-      return (
-        <div className={baseClass + ' overflow-hidden'}>
-          <div className="flex items-center justify-between mb-2 gap-2">
-            <p className="font-semibold text-foreground truncate">{widget.title || 'Embed'}</p>
-            {safe && (
-              <a
-                href={safe}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-primary hover:underline flex items-center gap-1 flex-shrink-0"
-              >
-                Open <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
-          </div>
-          {safe ? (
-            <iframe
-              src={safe}
-              title={widget.title || 'Embedded content'}
-              className="w-full rounded-xl bg-background border border-border/50"
-              style={{ height }}
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
-            />
-          ) : (
-            <div
-              className="w-full rounded-xl border border-dashed border-primary/30 flex items-center justify-center text-xs text-muted-foreground"
-              style={{ height }}
-            >
-              Add a URL in the widget editor
-            </div>
-          )}
-        </div>
-      );
-    }
+    case 'embed':
+      return <EmbedWidget widget={widget} baseClass={baseClass} />;
 
     case 'spacer':
 
