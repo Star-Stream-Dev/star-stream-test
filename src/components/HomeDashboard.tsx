@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Clock, MessageSquare, Bell, Gamepad2, Timer, Shield, User, TrendingUp, Calendar, Zap, Trophy, Terminal, Pencil } from 'lucide-react';
+import { Clock, MessageSquare, Bell, Gamepad2, Timer, Shield, User, TrendingUp, Calendar, Zap, Trophy, Terminal, Pencil, Move } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -287,6 +287,10 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
   };
 
   const visibleWidgets = layout.filter(w => w.visible);
+  const canvasHeight = Math.max(
+    600,
+    ...visibleWidgets.map(w => (w.y ?? 0) + (w.type === 'embed' ? (w.height || 260) + 120 : 200))
+  );
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-6">
