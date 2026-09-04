@@ -28,7 +28,15 @@ jobs:
       - run: npm ci  --loglevel verbose
 
       - name: Build
+        env:
+          # Serves the app from https://<user>.github.io/<repo>/
+          # If you use a custom domain or a <user>.github.io repo, set this to "/"
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}      
         run: npm run build --loglevel verbose
+        
         
       - name: SPA fallback + disable Jekyll
         run: |
