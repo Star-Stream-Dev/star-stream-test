@@ -303,7 +303,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
       </div>
 
       {/* Edit button */}
-      <div className="flex justify-end items-center gap-2 mb-3">
+      <div className="flex justify-end items-center gap-2 mb-3 flex-wrap">
         {jiggle ? (
           <button
             onClick={() => { setJiggle(false); setDragId(null); persist(layout); }}
@@ -312,8 +312,21 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
             Done
           </button>
         ) : (
-          <span className="text-[11px] text-muted-foreground hidden sm:inline">Hold a widget to rearrange</span>
+          <span className="text-[11px] text-muted-foreground hidden sm:inline">
+            {freeMode ? 'Hold a widget to move it anywhere' : 'Hold a widget to rearrange'}
+          </span>
         )}
+        <button
+          onClick={toggleFreeMode}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs transition-colors ${
+            freeMode
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20'
+          }`}
+        >
+          <Move className="w-3.5 h-3.5" />
+          Free Layout
+        </button>
         <button
           onClick={() => setIsEditing(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary hover:bg-primary/20 transition-colors"
@@ -323,15 +336,14 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
         </button>
       </div>
 
-      {/* Widget Grid */}
-      <div className="rounded-3xl p-3 md:p-8" style={glassStyle}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-min">
-          {visibleWidgets.map((widget, i) => {
-            const desktopSpan = widget.colSpan || 1;
-            const mobileSpan = Math.min(desktopSpan, 2);
-            const spanClass =
-              `${mobileSpan === 2 ? 'col-span-2' : 'col-span-1'} ` +
-              `${desktopSpan === 4 ? 'md:col-span-4' : desktopSpan === 3 ? 'md:col-span-3' : desktopSpan === 2 ? 'md:col-span-2' : 'md:col-span-1'}`;
+      {/* Widget canvas */}
+      {freeMode ? (
+        <div
+          ref={canvasRef}
+          className="relative rounded-3xl p-3 md:p-6"
+          style={{ ...glassStyle, minHeight: canvasHeight }}
+        >
+          {visibleWidgets.map((widget) => {
             const isDragging = dragId === widget.id;
             return (
               <div
@@ -340,12 +352,15 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
                 onPointerDown={(e) => onWidgetPointerDown(e, widget.id)}
                 onContextMenu={(e) => { if (jiggle) e.preventDefault(); }}
                 style={{
+                  position: 'absolute',
+                  left: `${widget.x ?? 0}%`,
+                  top: `${widget.y ?? 0}px`,
+                  width: `${widget.w ?? 50}%`,
                   touchAction: jiggle ? 'none' : undefined,
-                  animationDelay: `${(i % 4) * 60}ms`,
                 }}
-                className={`${spanClass} min-w-0 rounded-2xl transition-transform duration-200 ${
+                className={`min-w-0 rounded-2xl p-1 ${
                   jiggle && !isDragging ? 'animate-jiggle' : ''
-                } ${isDragging ? 'scale-105 opacity-90 ring-2 ring-primary/60 shadow-2xl z-10 cursor-grabbing' : ''} ${
+                } ${isDragging ? 'scale-105 opacity-90 ring-2 ring-primary/60 shadow-2xl z-20 cursor-grabbing' : ''} ${
                   jiggle ? 'select-none' : ''
                 }`}
               >
@@ -363,7 +378,48 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
             );
           })}
         </div>
-      </div>
+      ) : (
+        <div className="rounded-3xl p-3 md:p-8" style={glassStyle}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-min">
+            {visibleWidgets.map((widget, i) => {
+              const desktopSpan = widget.colSpan || 1;
+              const mobileSpan = Math.min(desktopSpan, 2);
+              const spanClass =
+                `${mobileSpan === 2 ? 'col-span-2' : 'col-span-1'} ` +
+                `${desktopSpan === 4 ? 'md:col-span-4' : desktopSpan === 3 ? 'md:col-span-3' : desktopSpan === 2 ? 'md:col-span-2' : 'md:col-span-1'}`;
+              const isDragging = dragId === widget.id;
+              return (
+                <div
+                  key={widget.id}
+                  data-widget-id={widget.id}
+                  onPointerDown={(e) => onWidgetPointerDown(e, widget.id)}
+                  onContextMenu={(e) => { if (jiggle) e.preventDefault(); }}
+                  style={{
+                    touchAction: jiggle ? 'none' : undefined,
+                    animationDelay: `${(i % 4) * 60}ms`,
+                  }}
+                  className={`${spanClass} min-w-0 rounded-2xl transition-transform duration-200 ${
+                    jiggle && !isDragging ? 'animate-jiggle' : ''
+                  } ${isDragging ? 'scale-105 opacity-90 ring-2 ring-primary/60 shadow-2xl z-10 cursor-grabbing' : ''} ${
+                    jiggle ? 'select-none' : ''
+                  }`}
+                >
+                  <WidgetRenderer
+                    widget={widget}
+                    onNavigate={onNavigate}
+                    sessionTime={sessionTime}
+                    userStats={userStats}
+                    recentGames={recentGames}
+                    currentTime={currentTime}
+                    unreadAnnouncements={unreadAnnouncements}
+                    unreadMessage={unreadMessage}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
 
       {/* Developer Mode button */}
