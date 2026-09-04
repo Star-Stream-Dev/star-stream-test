@@ -122,6 +122,10 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-5px)" },
         },
+        "jiggle": {
+          "0%, 100%": { transform: "rotate(-0.6deg) translateY(0)" },
+          "50%": { transform: "rotate(0.6deg) translateY(-1px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -138,6 +142,7 @@ export default {
         "blur-in": "blur-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
+        "jiggle": "jiggle 0.28s ease-in-out infinite",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
