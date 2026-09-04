@@ -22,6 +22,10 @@ export interface WidgetConfig {
   links?: { label: string; target: string }[]; // for quick-links
   url?: string; // for embed widgets
   height?: number; // for embed widgets (px)
+  // Free-placement mode (aesthetic canvas): position on the home canvas
+  x?: number; // left, % of canvas width
+  y?: number; // top, px from canvas top
+  w?: number; // width, % of canvas width
 }
 
 export const WIDGET_CATALOG: { type: WidgetType; label: string; icon: string; description: string; defaultColSpan: number }[] = [
