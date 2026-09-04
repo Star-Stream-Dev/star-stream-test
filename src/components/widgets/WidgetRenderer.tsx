@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Clock, MessageSquare, Bell, Gamepad2, Timer, Shield, User, TrendingUp, Zap, Trophy, Calendar, ExternalLink } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Clock, MessageSquare, Bell, Gamepad2, Timer, Shield, User, TrendingUp, Zap, Trophy, Calendar, ExternalLink, Maximize2, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -319,19 +320,36 @@ function EmbedWidget({ widget, baseClass }: { widget: WidgetConfig; baseClass: s
     return () => window.clearTimeout(t);
   }, [src]);
 
+  const [fullscreen, setFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setFullscreen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [fullscreen]);
+
   return (
     <div className={baseClass + ' overflow-hidden'}>
       <div className="flex items-center justify-between mb-2 gap-2">
         <p className="font-semibold text-foreground truncate">{widget.title || 'Embed'}</p>
         {src && (
-          <a
-            href={src}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-primary hover:underline flex items-center gap-1 flex-shrink-0"
-          >
-            Open <ExternalLink className="w-3 h-3" />
-          </a>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setFullscreen(true)}
+              className="text-xs text-primary hover:underline flex items-center gap-1"
+            >
+              Fullscreen <Maximize2 className="w-3 h-3" />
+            </button>
+            <a
+              href={src}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
+            >
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         )}
       </div>
       {!src ? (
@@ -357,19 +375,65 @@ function EmbedWidget({ widget, baseClass }: { widget: WidgetConfig; baseClass: s
           </a>
         </div>
       ) : (
-        <iframe
-          src={src}
-          title={widget.title || 'Embedded content'}
-          className="w-full rounded-xl bg-background border border-border/50"
-          style={{ height }}
-          onLoad={() => setLoaded(true)}
-          onError={() => setBlocked(true)}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          allowFullScreen
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
-        />
+        <div className="relative w-full rounded-xl overflow-hidden" style={{ height }}>
+          <iframe
+            src={src}
+            title={widget.title || 'Embedded content'}
+            className="w-full h-full bg-background border border-border/50 rounded-xl"
+            onLoad={() => setLoaded(true)}
+            onError={() => setBlocked(true)}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          />
+          {/* Click-to-expand overlay (keeps the tile draggable) */}
+          <button
+            onClick={() => setFullscreen(true)}
+            aria-label="Open embed fullscreen"
+            className="absolute inset-0 bg-background/0 hover:bg-background/30 transition-colors flex items-center justify-center group"
+          >
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-lg bg-background/80 border border-primary/30 text-xs text-primary flex items-center gap-1">
+              <Maximize2 className="w-3 h-3" /> Fullscreen
+            </span>
+          </button>
+        </div>
+      )}
+
+      {fullscreen && createPortal(
+        <div className="fixed inset-0 z-[200] bg-background flex flex-col animate-fade-in">
+          <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-border/50 bg-card/60 backdrop-blur">
+            <p className="font-semibold text-foreground truncate">{widget.title || 'Embed'}</p>
+            <div className="flex items-center gap-3">
+              <a
+                href={src}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
+              >
+                Open <ExternalLink className="w-3 h-3" />
+              </a>
+              <button
+                onClick={() => setFullscreen(false)}
+                className="p-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-colors"
+                aria-label="Close fullscreen"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <iframe
+            src={src}
+            title={widget.title || 'Embedded content'}
+            className="flex-1 w-full bg-background"
+            referrerPolicy="no-referrer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+          />
+        </div>,
+        document.body
       )}
     </div>
   );
