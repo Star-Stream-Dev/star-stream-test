@@ -68,3 +68,33 @@ export function loadLayout(userId: string): WidgetConfig[] {
 export function saveLayout(userId: string, layout: WidgetConfig[]) {
   localStorage.setItem(`${LAYOUT_STORAGE_KEY}_${userId}`, JSON.stringify(layout));
 }
+
+const FREE_MODE_KEY = 'starstream_widget_freemode';
+
+export function loadFreeMode(userId: string): boolean {
+  try {
+    return localStorage.getItem(`${FREE_MODE_KEY}_${userId}`) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function saveFreeMode(userId: string, enabled: boolean) {
+  localStorage.setItem(`${FREE_MODE_KEY}_${userId}`, enabled ? '1' : '0');
+}
+
+/** Give every widget a sensible starting position for free-placement mode. */
+export function seedFreePositions(layout: WidgetConfig[]): WidgetConfig[] {
+  let x = 0;
+  let y = 0;
+  let rowHeight = 0;
+  return layout.map((w) => {
+    if (w.x !== undefined && w.y !== undefined) return w;
+    const width = Math.min(100, (w.colSpan || 1) * 25);
+    if (x + width > 100) { x = 0; y += rowHeight + 16; rowHeight = 0; }
+    const placed = { ...w, x, y, w: width };
+    x += width;
+    rowHeight = Math.max(rowHeight, w.type === 'embed' ? (w.height || 260) + 80 : 150);
+    return placed;
+  });
+}
