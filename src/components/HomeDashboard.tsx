@@ -183,7 +183,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
       window.removeEventListener('pointerup', handleUp);
       window.removeEventListener('pointercancel', handleUp);
     };
-  }, [dragId, reorder, persist]);
+  }, [dragId, reorder, persist, moveFree]);
 
 
   // Load and update persistent stats
