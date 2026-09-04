@@ -282,3 +282,95 @@ export function WidgetRenderer({
       return <div className={baseClass}><p className="text-muted-foreground">Unknown widget</p></div>;
   }
 }
+
+function normalizeEmbedUrl(raw: string): string {
+  let url = (raw || '').trim();
+  if (!url) return '';
+  if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '');
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      const v = u.searchParams.get('v');
+      if (v) return `https://www.youtube.com/embed/${v}`;
+      if (u.pathname.startsWith('/shorts/')) return `https://www.youtube.com/embed/${u.pathname.split('/')[2]}`;
+    }
+    if (host === 'youtu.be') return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
+    if (host === 'drive.google.com' && /\/file\/d\//.test(u.pathname)) {
+      return `https://drive.google.com/file/d/${u.pathname.split('/')[3]}/preview`;
+    }
+    return u.toString();
+  } catch {
+    return '';
+  }
+}
+
+function EmbedWidget({ widget, baseClass }: { widget: WidgetConfig; baseClass: string }) {
+  const height = widget.height || 260;
+  const src = normalizeEmbedUrl(widget.url || '');
+  const [blocked, setBlocked] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setBlocked(false);
+    setLoaded(false);
+    if (!src) return;
+    const t = window.setTimeout(() => setLoaded((l) => { if (!l) setBlocked(true); return l; }), 6000);
+    return () => window.clearTimeout(t);
+  }, [src]);
+
+  return (
+    <div className={baseClass + ' overflow-hidden'}>
+      <div className="flex items-center justify-between mb-2 gap-2">
+        <p className="font-semibold text-foreground truncate">{widget.title || 'Embed'}</p>
+        {src && (
+          <a
+            href={src}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary hover:underline flex items-center gap-1 flex-shrink-0"
+          >
+            Open <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
+      </div>
+      {!src ? (
+        <div
+          className="w-full rounded-xl border border-dashed border-primary/30 flex items-center justify-center text-xs text-muted-foreground"
+          style={{ height }}
+        >
+          Add a URL in the widget editor
+        </div>
+      ) : blocked ? (
+        <div
+          className="w-full rounded-xl border border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 text-center px-3"
+          style={{ height }}
+        >
+          <p className="text-xs text-muted-foreground">This site blocks embedding.</p>
+          <a
+            href={src}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/30 text-xs text-primary hover:bg-primary/25 transition-colors flex items-center gap-1"
+          >
+            Open in new tab <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      ) : (
+        <iframe
+          src={src}
+          title={widget.title || 'Embedded content'}
+          className="w-full rounded-xl bg-background border border-border/50"
+          style={{ height }}
+          onLoad={() => setLoaded(true)}
+          onError={() => setBlocked(true)}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+          allowFullScreen
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+        />
+      )}
+    </div>
+  );
+}
