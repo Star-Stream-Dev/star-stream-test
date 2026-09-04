@@ -112,9 +112,29 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     pendingId.current = null;
   };
 
+  const rememberGrabOffset = (e: React.PointerEvent) => {
+    const cell = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    grabOffset.current = { dx: e.clientX - cell.left, dy: e.clientY - cell.top };
+  };
+
+  const moveFree = useCallback((id: string, clientX: number, clientY: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    setLayout(prev => prev.map(w => {
+      if (w.id !== id) return w;
+      const width = w.w ?? 50;
+      const leftPx = clientX - rect.left - grabOffset.current.dx;
+      const topPx = clientY - rect.top - grabOffset.current.dy;
+      const xPct = Math.max(0, Math.min(100 - width, (leftPx / rect.width) * 100));
+      return { ...w, x: Math.round(xPct * 10) / 10, y: Math.max(0, Math.round(topPx)) };
+    }));
+  }, []);
+
   const onWidgetPointerDown = (e: React.PointerEvent, id: string) => {
     if ((e.target as HTMLElement).closest('a,button,input,select,textarea,iframe')) return;
     startPoint.current = { x: e.clientX, y: e.clientY };
+    rememberGrabOffset(e);
     if (jiggle) {
       setDragId(id);
       return;
@@ -139,6 +159,10 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
         return;
       }
       e.preventDefault();
+      if (freeModeRef.current) {
+        moveFree(dragId, e.clientX, e.clientY);
+        return;
+      }
       const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
       const cell = el?.closest('[data-widget-id]') as HTMLElement | null;
       const targetId = cell?.dataset.widgetId;
