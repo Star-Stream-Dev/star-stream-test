@@ -5,7 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { WidgetRenderer } from '@/components/widgets/WidgetRenderer';
 import { WidgetEditor } from '@/components/widgets/WidgetEditor';
-import { loadLayout, saveLayout } from '@/components/widgets/widgetTypes';
+import { loadLayout, saveLayout, loadFreeMode, saveFreeMode, seedFreePositions } from '@/components/widgets/widgetTypes';
 import type { WidgetConfig } from '@/components/widgets/widgetTypes';
 
 interface HomeDashboardProps {
@@ -47,18 +47,40 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
   const [isEditing, setIsEditing] = useState(false);
   const [jiggle, setJiggle] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [freeMode, setFreeMode] = useState(false);
   const longPressTimer = useRef<number | null>(null);
   const startPoint = useRef<{ x: number; y: number } | null>(null);
   const pendingId = useRef<string | null>(null);
   const layoutRef = useRef<WidgetConfig[]>([]);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+  const grabOffset = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+  const freeModeRef = useRef(false);
   layoutRef.current = layout;
+  freeModeRef.current = freeMode;
 
   // Load layout on mount
   useEffect(() => {
     if (user) {
-      setLayout(loadLayout(user.id));
+      const free = loadFreeMode(user.id);
+      setFreeMode(free);
+      const loaded = loadLayout(user.id);
+      setLayout(free ? seedFreePositions(loaded) : loaded);
     }
   }, [user]);
+
+  const toggleFreeMode = () => {
+    if (!user) return;
+    const next = !freeMode;
+    setFreeMode(next);
+    saveFreeMode(user.id, next);
+    if (next) {
+      const seeded = seedFreePositions(layoutRef.current);
+      setLayout(seeded);
+      saveLayout(user.id, seeded);
+    }
+    setJiggle(false);
+    setDragId(null);
+  };
 
   const handleSaveLayout = () => {
     if (user) {
