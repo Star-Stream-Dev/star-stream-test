@@ -67,7 +67,8 @@ export function InviteManagement() {
     }
   };
 
-  const inviteUrl = (code: string) => `${window.location.origin}/invite/${code}`;
+  const inviteUrl = (code: string) =>
+    `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/invite/${code}`;
 
   const handleCopy = async (link: InviteLink) => {
     try {
