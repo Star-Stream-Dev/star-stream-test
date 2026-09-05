@@ -10,9 +10,8 @@
    `https://<user>.github.io/<repo>/`.
 
 Notes:
-- The base path is set automatically from the repo name. For a custom domain or a
-  `<user>.github.io` repo, change `VITE_BASE_PATH` in `.github/workflows/deploy.yml` to `/`.
-- Deep links / refreshes work via `404.html` (copied from `index.html`) plus the redirect
-  script in `index.html`.
+- The base path is detected automatically: `/` for a `<user>.github.io` repo or when a
+  `public/CNAME` file exists (custom domain), otherwise `/<repo-name>/`.
+- Deep links / refreshes (e.g. `/invite/<code>`) work via `404.html`, copied from `index.html`.
 - Backend (database, auth, edge functions) keeps running on Lovable Cloud — GitHub Pages
   only hosts the static frontend.
