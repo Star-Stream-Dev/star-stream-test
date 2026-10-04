@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 
 // TEMP: Bypass login gate for AdSense crawler verification
 const BYPASS_AUTH = false;
-import { Home, Gamepad2, MessageSquare, Bug, Music, LogOut, Shield, Megaphone, Youtube, Eye, EyeOff, Globe, Spade, Sparkles, Settings, Mic2, Paintbrush, Joystick } from 'lucide-react';
+import { Home, Gamepad2, MessageSquare, Bug, Music, LogOut, Shield, Megaphone, Youtube, Eye, EyeOff, Globe, Spade, Sparkles, Settings, Mic2, Paintbrush, Joystick, Monitor } from 'lucide-react';
 import { DiscordChat } from '@/components/DiscordChat';
+import { CloudDesktop } from '@/components/CloudDesktop';
 import { BootScreen } from '@/components/BootScreen';
 import { StarStreamBackground } from '@/components/StarStreamBackground';
 import { SolarTerminal } from '@/components/SolarTerminal';
@@ -47,7 +48,7 @@ import starstreamIcon from '@/assets/starstream-icon.png';
 import { useGameLayout } from '@/contexts/GameLayoutContext';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 
-type Section = 'home' | 'games' | 'chatroom' | 'bugs' | 'music' | 'announcements' | 'youtube' | 'uno' | 'solar' | 'settings' | 'proxy' | 'fnf' | 'whiteboard' | 'emulator';
+type Section = 'home' | 'games' | 'chatroom' | 'bugs' | 'music' | 'announcements' | 'youtube' | 'uno' | 'solar' | 'settings' | 'proxy' | 'fnf' | 'whiteboard' | 'emulator' | 'desktop';
 
 
 const Index = () => {
@@ -345,6 +346,7 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
     { id: 'settings' as const, label: 'Settings', icon: Settings, disabled: false },
     { id: 'proxy' as const, label: 'Proxy (beta)', icon: Globe, disabled: false },
     { id: 'bugs' as const, label: 'Bugs', icon: Bug, disabled: false },
+    { id: 'desktop' as const, label: 'Desktop', icon: Monitor, disabled: false },
   ];
 
   const handleNavClick = (id: string, disabled?: boolean) => {
@@ -719,6 +721,12 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
                 ) : (
                   <FNFSection onGameClick={handleGameClick} />
                 )}
+              </section>
+            )}
+
+            {activeSection === 'desktop' && (
+              <section className="py-16 px-4 sm:px-6 lg:px-8">
+                <CloudDesktop />
               </section>
             )}
 
