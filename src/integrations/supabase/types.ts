@@ -1052,6 +1052,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_desktop_streams: {
+        Row: {
+          created_at: string
+          id: string
+          is_online: boolean
+          last_heartbeat: string | null
+          stream_token: string
+          tunnel_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_online?: boolean
+          last_heartbeat?: string | null
+          stream_token?: string
+          tunnel_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_online?: boolean
+          last_heartbeat?: string | null
+          stream_token?: string
+          tunnel_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_desktop_streams_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_music_favorites: {
         Row: {
           created_at: string
@@ -1663,6 +1704,15 @@ export type Database = {
         Args: { p_session_token: string }
         Returns: Json
       }
+      get_my_desktop_stream: {
+        Args: { p_session_token: string }
+        Returns: {
+          is_online: boolean
+          last_heartbeat: string
+          stream_token: string
+          tunnel_url: string
+        }[]
+      }
       get_my_direct_messages: {
         Args: { p_other_user_id: string; p_session_token: string }
         Returns: {
@@ -1740,6 +1790,10 @@ export type Database = {
           username: string
         }[]
       }
+      regenerate_my_stream_token: {
+        Args: { p_session_token: string }
+        Returns: string
+      }
       reject_friend_request: {
         Args: { p_request_id: string; p_session_token: string }
         Returns: boolean
@@ -1778,6 +1832,10 @@ export type Database = {
           p_invite_id: string
           p_session_token: string
         }
+        Returns: boolean
+      }
+      set_my_stream_url: {
+        Args: { p_session_token: string; p_tunnel_url: string }
         Returns: boolean
       }
       start_game_session: {
@@ -1909,6 +1967,14 @@ export type Database = {
           p_session_token: string
           p_thumbnail_url?: string
           p_title: string
+        }
+        Returns: boolean
+      }
+      update_stream_tunnel: {
+        Args: {
+          p_is_online: boolean
+          p_stream_token: string
+          p_tunnel_url: string
         }
         Returns: boolean
       }
