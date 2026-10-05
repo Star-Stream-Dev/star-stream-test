@@ -299,7 +299,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
         {typewriterText}
         <span className="animate-pulse text-primary">|</span>
       </h1>
-      <p className="text-center text-muted-foreground text-sm mb-2">Hub for all games • made by p0tato and Dannygo</p>
+      <p className="text-center text-muted-foreground text-sm mb-2">Hub for all games • made by p0tato and Rebelleader4123</p>
       <div className="flex justify-center mb-6">
         <span className="inline-block px-3 py-1 bg-primary/20 text-primary text-xs rounded-full border border-primary/30">
           ✨ Now with encrypted chatrooms
