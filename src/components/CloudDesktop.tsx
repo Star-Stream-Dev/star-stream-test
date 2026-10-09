@@ -161,6 +161,17 @@ export function CloudDesktop() {
         </div>
       </div>
 
+      {info?.tunnel_url && (
+        <div className="rounded-xl border border-primary/40 bg-card p-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">Your stream link (synced to your account):</span>
+          <code className="flex-1 min-w-0 truncate text-sm text-primary select-all">{info.tunnel_url}</code>
+          <Button size="sm" onClick={() => { navigator.clipboard.writeText(info.tunnel_url!).then(() => toast.success('Link copied'), () => toast.error('Copy blocked — select the link and copy it')); }}>
+            <Copy className="w-4 h-4 mr-1" />Copy
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => window.open(info.tunnel_url!, '_blank', 'noopener')}>Open</Button>
+        </div>
+      )}
+
       {online ? (
         <div ref={frameRef} className="flex-1 min-h-[60vh] rounded-xl overflow-hidden border border-border bg-card">
           <iframe key={frameKey} src={info!.tunnel_url!} title="Remote Desktop" className="w-full h-full min-h-[60vh]"
