@@ -139,12 +139,14 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
 
   const fsSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pinSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaves = useRef(0);
   const customSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const setFileSystem = useCallback((fs: Record<string, FileSystemNode>) => {
     setFileSystemState(fs);
     try { localStorage.setItem('starstream-desktop-fs', JSON.stringify(fs)); } catch {}
     if (user) {
+      pendingSaves.current = Date.now();
       if (fsSaveTimeout.current) clearTimeout(fsSaveTimeout.current);
       fsSaveTimeout.current = setTimeout(() => {
         supabase.rpc('upsert_my_file_system', {
@@ -153,7 +155,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
         }).then(() => {});
       }, 1500);
     }
-  }, [user]);
+  }, [user, sessionToken]);
 
   const [games, setGames] = useState<any[]>([]);
   const [pinnedApps, setPinnedAppsState] = useState<string[]>(() => {
@@ -167,6 +169,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
       const next = updater(prev);
       localStorage.setItem('starstream-desktop-pinned', JSON.stringify(next));
       if (user) {
+        pendingSaves.current = Date.now();
         if (pinSaveTimeout.current) clearTimeout(pinSaveTimeout.current);
         pinSaveTimeout.current = setTimeout(() => {
           supabase.rpc('upsert_my_pinned_apps', {
@@ -189,6 +192,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
       folders: overrides.folders ?? folders,
       desktop_theme: overrides.desktop_theme ?? theme,
     };
+    pendingSaves.current = Date.now();
     if (customSaveTimeout.current) clearTimeout(customSaveTimeout.current);
     customSaveTimeout.current = setTimeout(() => {
       supabase.rpc('upsert_my_desktop_customizations', {
@@ -214,13 +218,16 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
     });
   }, [saveCustomizations, hiddenApps, customIcons, customNames, iconPositions, folders, theme]);
 
-  useEffect(() => {
+  const loadFromCloud = useCallback(() => {
     if (!user) return;
+    // Don't overwrite local edits that haven't reached the server yet
+    if (Date.now() - pendingSaves.current < 4000) return;
     Promise.all([
       supabase.from('desktop_file_systems').select('file_system').eq('user_id', user.id).maybeSingle(),
       supabase.from('desktop_pinned_apps').select('pinned_apps').eq('user_id', user.id).maybeSingle(),
       supabase.from('desktop_customizations').select('*').eq('user_id', user.id).maybeSingle(),
     ]).then(([fsResult, pinsResult, customResult]) => {
+      if (Date.now() - pendingSaves.current < 4000) return;
       if (fsResult.data?.file_system) {
         const dbFs = fsResult.data.file_system as unknown as Record<string, FileSystemNode>;
         setFileSystemState(dbFs);
@@ -245,6 +252,21 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
       }
     });
   }, [user]);
+
+  // Initial load + keep in sync with other devices
+  useEffect(() => {
+    if (!user) return;
+    loadFromCloud();
+    const onVisible = () => { if (document.visibilityState === 'visible') loadFromCloud(); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', loadFromCloud);
+    const t = setInterval(loadFromCloud, 15000);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', loadFromCloud);
+      clearInterval(t);
+    };
+  }, [user, loadFromCloud]);
 
   useEffect(() => {
     supabase.from('games').select('id, title, url, embed, category, hosted_path').order('display_order').limit(500).then(({ data }) => {
