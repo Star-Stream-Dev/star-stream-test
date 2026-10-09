@@ -139,12 +139,14 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
 
   const fsSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pinSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaves = useRef(0);
   const customSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const setFileSystem = useCallback((fs: Record<string, FileSystemNode>) => {
     setFileSystemState(fs);
     try { localStorage.setItem('starstream-desktop-fs', JSON.stringify(fs)); } catch {}
     if (user) {
+      pendingSaves.current = Date.now();
       if (fsSaveTimeout.current) clearTimeout(fsSaveTimeout.current);
       fsSaveTimeout.current = setTimeout(() => {
         supabase.rpc('upsert_my_file_system', {
@@ -153,7 +155,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
         }).then(() => {});
       }, 1500);
     }
-  }, [user]);
+  }, [user, sessionToken]);
 
   const [games, setGames] = useState<any[]>([]);
   const [pinnedApps, setPinnedAppsState] = useState<string[]>(() => {
@@ -167,6 +169,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
       const next = updater(prev);
       localStorage.setItem('starstream-desktop-pinned', JSON.stringify(next));
       if (user) {
+        pendingSaves.current = Date.now();
         if (pinSaveTimeout.current) clearTimeout(pinSaveTimeout.current);
         pinSaveTimeout.current = setTimeout(() => {
           supabase.rpc('upsert_my_pinned_apps', {
@@ -189,6 +192,7 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
       folders: overrides.folders ?? folders,
       desktop_theme: overrides.desktop_theme ?? theme,
     };
+    pendingSaves.current = Date.now();
     if (customSaveTimeout.current) clearTimeout(customSaveTimeout.current);
     customSaveTimeout.current = setTimeout(() => {
       supabase.rpc('upsert_my_desktop_customizations', {
@@ -213,11 +217,6 @@ export function DesktopEnvironment({ onExit }: DesktopEnvironmentProps) {
       desktop_theme: overrides.desktop_theme ?? theme,
     });
   }, [saveCustomizations, hiddenApps, customIcons, customNames, iconPositions, folders, theme]);
-
-  const pendingSaves = useRef(0);
-  const markSaving = useCallback(() => {
-    pendingSaves.current = Date.now();
-  }, []);
 
   const loadFromCloud = useCallback(() => {
     if (!user) return;
