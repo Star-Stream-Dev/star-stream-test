@@ -24,9 +24,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
-      - run: npm ci  --loglevel verbose
+      # bun.lock is the lockfile Lovable keeps up to date; package-lock.json drifts and breaks `npm ci`
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
 
       - name: Work out the base path
         id: base
