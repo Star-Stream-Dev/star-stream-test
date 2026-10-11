@@ -51,6 +51,11 @@
     --theme-swatch-pink: 330 70% 55%;
     --theme-swatch-cyan: 185 70% 45%;
     --theme-swatch-midnight: 240 50% 45%;
+    --color-wheel-spectrum: conic-gradient(hsl(0 100% 50%), hsl(60 100% 50%), hsl(120 100% 50%), hsl(180 100% 50%), hsl(240 100% 50%), hsl(300 100% 50%), hsl(360 100% 50%));
+    --color-wheel-saturation: radial-gradient(circle, hsl(0 0% 100%), hsl(0 0% 100% / 0));
+    --color-wheel-handle: 0 0% 100%;
+    --color-wheel-handle-shadow: 0 0 0 1px hsl(0 0% 0% / .6), 0 2px 4px hsl(0 0% 0% / .4);
+    --app-dock-space: calc(76px + env(safe-area-inset-bottom));
   }
 
   .dark {
@@ -98,6 +103,12 @@
 }
 
 /* Custom scrollbar */
+.theme-color-wheel { background-image: var(--color-wheel-saturation), var(--color-wheel-spectrum); }
+.theme-wheel-handle { border: 2px solid hsl(var(--color-wheel-handle)); box-shadow: var(--color-wheel-handle-shadow); transform: translate(-50%, -50%); }
+.theme-color-sample { background-color: hsl(var(--selected-color)); }
+.app-content { padding-bottom: var(--app-dock-space); }
+.app-fullscreen { bottom: var(--app-dock-space); }
+
 ::-webkit-scrollbar {
   width: 8px;
 }

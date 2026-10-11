@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import { ThemeColorWheel } from '@/components/ThemeColorWheel';
+import { Button } from '@/components/ui/button';
 
 interface UserProfile {
   id: string;
@@ -62,7 +64,7 @@ const THEME_OPTIONS: { id: ThemePreset; name: string; color: string }[] = [
 export function SettingsPage({ friends: propFriends, nicknames: propNicknames, onNicknamesChange, onProfileChange }: SettingsPageProps) {
   const { user, sessionToken } = useAuth();
   const { snowfallEnabled, setSnowfallEnabled } = useSnowfall();
-  const { currentTheme, setCurrentTheme, customBackground, setCustomBackground, glassEnabled, setGlassEnabled } = useTheme();
+  const { currentTheme, setCurrentTheme, customBackground, setCustomBackground, glassEnabled, setGlassEnabled, primaryColor, accentColor, setPrimaryColor, setAccentColor } = useTheme();
   const { layoutMode, setLayoutMode } = useGameLayout();
   const { popupsDisabled, setPopupsDisabled, transitionsDisabled, setTransitionsDisabled } = useUserPreferences();
 
@@ -356,12 +358,17 @@ export function SettingsPage({ friends: propFriends, nicknames: propNicknames, o
                 <Palette className="w-5 h-5 text-primary" />
                 Theme Colors
               </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                <ThemeColorWheel label="Theme" value={primaryColor} onChange={setPrimaryColor} />
+                <ThemeColorWheel label="Accent" value={accentColor} onChange={setAccentColor} />
+              </div>
               <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
                 {THEME_OPTIONS.map((theme) => (
-                  <button
+                  <Button variant="ghost"
                     key={theme.id}
+                    aria-label={`${theme.name} preset`}
                     onClick={() => setCurrentTheme(theme.id)}
-                    className={`aspect-square rounded-xl transition-all flex items-center justify-center ${
+                    className={`aspect-square h-auto p-0 rounded-lg transition-all flex items-center justify-center ${
                       currentTheme === theme.id 
                         ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110' 
                         : 'hover:scale-105'
@@ -370,9 +377,9 @@ export function SettingsPage({ friends: propFriends, nicknames: propNicknames, o
                     title={theme.name}
                   >
                     {currentTheme === theme.id && (
-                      <Sparkles className="w-5 h-5 text-white drop-shadow-lg" />
+                      <Sparkles className="w-5 h-5 text-primary-foreground drop-shadow-lg" />
                     )}
-                  </button>
+                  </Button>
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mt-3">
