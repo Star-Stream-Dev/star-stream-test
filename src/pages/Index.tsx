@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 // TEMP: Bypass login gate for AdSense crawler verification
 const BYPASS_AUTH = false;
@@ -444,13 +445,11 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
         </div>
       </nav>
 
-      {showNav && (
-        <div className="fixed inset-0 z-[60] bg-background/60 backdrop-blur-sm flex items-end justify-center" onClick={() => setShowNav(false)}>
-          <div id="app-menu" role="dialog" aria-modal="true" aria-label="All apps" onClick={event => event.stopPropagation()}
-            onKeyDown={event => { if (event.key === 'Escape') setShowNav(false); }}
-            className="w-full max-w-2xl max-h-[80vh] overflow-y-auto bg-card border border-border/40 rounded-t-lg safe-area-pb">
+      <Dialog open={showNav} onOpenChange={setShowNav}>
+          <DialogContent id="app-menu" aria-describedby={undefined}
+            className="top-auto bottom-0 translate-y-0 p-0 gap-0 max-w-2xl max-h-[80vh] overflow-y-auto bg-card border-border/40 rounded-t-lg safe-area-pb [&>button]:hidden">
             <div className="flex items-center justify-between p-5 border-b border-border/30">
-              <div className="flex items-center gap-3"><img src={starstreamIcon} alt="" className="w-8 h-8" /><div><h2 className="font-semibold">Star Stream</h2><p className="text-xs text-muted-foreground">@{user.username}</p></div></div>
+              <div className="flex items-center gap-3"><img src={starstreamIcon} alt="" className="w-8 h-8" /><div><DialogTitle>Star Stream</DialogTitle><p className="text-xs text-muted-foreground">@{user.username}</p></div></div>
               <Button variant="ghost" size="icon" aria-label="Close menu" onClick={() => setShowNav(false)}><X /></Button>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-4">
@@ -463,9 +462,8 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
               {isAdmin && <Button variant="ghost" className="h-20 flex-col text-xs text-primary" onClick={() => { setShowAdminPanel(true); setShowNav(false); }}><Shield className="!w-6 !h-6" />Admin</Button>}
             </div>
             <div className="p-4 border-t border-border/30"><Button variant="ghost" className="w-full text-destructive" onClick={logout}><LogOut />Log out</Button></div>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+      </Dialog>
 
       {/* Fullscreen sections - kept mounted to avoid re-loading */}
       <div className={`fixed inset-0 app-fullscreen z-40 bg-background ${activeSection === 'chatroom' ? 'animate-fade-in' : 'pointer-events-none invisible'}`}
