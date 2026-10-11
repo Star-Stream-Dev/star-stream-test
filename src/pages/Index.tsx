@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 // TEMP: Bypass login gate for AdSense crawler verification
 const BYPASS_AUTH = false;
-import { Home, Gamepad2, MessageSquare, Bug, Music, LogOut, Shield, Megaphone, Youtube, Eye, EyeOff, Globe, Spade, Sparkles, Settings, Mic2, Paintbrush, Joystick, Monitor } from 'lucide-react';
+import { Home, Gamepad2, MessageSquare, LayoutGrid, X, Bug, Music, LogOut, Shield, Megaphone, Youtube, Eye, EyeOff, Globe, Spade, Sparkles, Settings, Mic2, Paintbrush, Joystick, Monitor } from 'lucide-react';
 import { DiscordChat } from '@/components/DiscordChat';
 import { CloudDesktop } from '@/components/CloudDesktop';
 import { BootScreen } from '@/components/BootScreen';
@@ -427,247 +429,51 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
       {!popupsDisabled && <TutorialOverlay />}
       {/* Changelog Modal */}
       {!popupsDisabled && <ChangelogModal />}
-      {/* Mobile bottom tab bar - native app style, 5 fixed tabs */}
-      {!['chatroom', 'music', 'youtube', 'proxy', 'emulator'].includes(activeSection) && (
-      <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/40"
-        style={{
-          background: 'hsl(var(--background) / 0.85)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
-      >
-        <div className="grid grid-cols-5 items-end h-16 px-1">
-          {[
-            navItems[0], // Home
-            navItems[1], // Games
-            navItems[8], // Chat
-            navItems[5], // Music
-          ].map((item) => {
-            const isActive = activeSection === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id, item.disabled)}
-                className="relative flex flex-col items-center justify-center gap-1 h-full transition-colors active:scale-95"
-              >
-                {isActive && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 rounded-full bg-primary" />
-                )}
-                <item.icon
-                  className={`w-[22px] h-[22px] transition-colors ${
-                    isActive ? 'text-primary' : 'text-muted-foreground'
-                  }`}
-                  strokeWidth={isActive ? 2.4 : 2}
-                />
-                <span
-                  className={`text-[10px] font-medium leading-none ${
-                    isActive ? 'text-primary' : 'text-muted-foreground'
-                  }`}
-                >
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
-          <button
-            onClick={() => setShowNav(!showNav)}
-            className="relative flex flex-col items-center justify-center gap-1 h-full transition-colors active:scale-95"
-          >
-            {showNav && (
-              <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 rounded-full bg-primary" />
-            )}
-            <div className={`flex flex-col gap-[3px] ${showNav ? 'text-primary' : 'text-muted-foreground'}`}>
-              <span className="block w-[18px] h-[2px] rounded-full bg-current" />
-              <span className="block w-[18px] h-[2px] rounded-full bg-current" />
-              <span className="block w-[18px] h-[2px] rounded-full bg-current" />
-            </div>
-            <span className={`text-[10px] font-medium leading-none ${showNav ? 'text-primary' : 'text-muted-foreground'}`}>
-              More
-            </span>
-          </button>
+      <nav aria-label="Main navigation" className="fixed bottom-0 inset-x-0 z-50 border-t border-border/40 bg-background/90 backdrop-blur-xl safe-area-pb">
+        <div className="mx-auto grid grid-cols-4 max-w-lg h-14 px-2">
+          {navItems.filter(item => ['home', 'games', 'chatroom'].includes(item.id)).map(item => (
+            <Button key={item.id} variant="ghost" onClick={() => handleNavClick(item.id)}
+              aria-current={activeSection === item.id ? 'page' : undefined}
+              className={`tutorial-${item.id}-nav h-14 rounded-none flex-col gap-1 text-[10px] ${activeSection === item.id ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}>
+              <item.icon className="!w-5 !h-5" />{item.label}
+            </Button>
+          ))}
+          <Button variant="ghost" onClick={() => setShowNav(!showNav)} aria-expanded={showNav} aria-controls="app-menu"
+            className={`tutorial-sidebar-trigger h-14 rounded-none flex-col gap-1 text-[10px] ${showNav || !['home', 'games', 'chatroom'].includes(activeSection) ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}>
+            <LayoutGrid className="!w-5 !h-5" />More
+          </Button>
         </div>
       </nav>
-      )}
 
-
-      {/* Mobile "More" sheet - slides up from bottom */}
-      {showNav && (
-        <div
-          className="md:hidden fixed inset-0 z-[60] flex flex-col animate-in fade-in duration-200"
-          style={{ background: 'hsl(var(--background) / 0.6)', backdropFilter: 'blur(8px)' }}
-          onClick={() => setShowNav(false)}
-        >
-          <div className="flex-1" />
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="rounded-t-3xl border-t border-border/40 animate-in slide-in-from-bottom duration-300 flex flex-col max-h-[85vh]"
-            style={{
-              background: 'hsl(var(--card))',
-              paddingBottom: 'env(safe-area-inset-bottom)',
-            }}
-          >
-            {/* Grabber */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+      <Dialog open={showNav} onOpenChange={setShowNav}>
+          <DialogContent id="app-menu" aria-describedby={undefined}
+            className="top-auto bottom-0 translate-y-0 p-0 gap-0 max-w-2xl max-h-[80vh] overflow-y-auto bg-card border-border/40 rounded-t-lg safe-area-pb [&>button]:hidden">
+            <div className="flex items-center justify-between p-5 border-b border-border/30">
+              <div className="flex items-center gap-3"><img src={starstreamIcon} alt="" className="w-8 h-8" /><div><DialogTitle>Star Stream</DialogTitle><p className="text-xs text-muted-foreground">@{user.username}</p></div></div>
+              <Button variant="ghost" size="icon" aria-label="Close menu" onClick={() => setShowNav(false)}><X /></Button>
             </div>
-
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-2 pb-4">
-              <div className="flex items-center gap-3">
-                <img src={starstreamIcon} alt="Star Stream" className="w-9 h-9" />
-                <div className="flex flex-col">
-                  <span className="text-base font-bold text-gradient leading-tight">STAR STREAM V3</span>
-                  <span className="text-[11px] text-muted-foreground leading-tight">@{user.username}</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowNav(false)}
-                className="w-9 h-9 rounded-full flex items-center justify-center bg-muted/40 text-foreground active:scale-90 transition-transform"
-                aria-label="Close menu"
-              >
-                <span className="text-xl leading-none">×</span>
-              </button>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-4">
+              {navItems.filter(item => !['home', 'games', 'chatroom'].includes(item.id)).map(item => (
+                <Button key={item.id} variant="ghost" onClick={() => handleNavClick(item.id, item.disabled)} disabled={item.disabled}
+                  className={`tutorial-${item.id}-nav h-20 flex-col gap-2 whitespace-normal text-xs ${activeSection === item.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
+                  <item.icon className="!w-6 !h-6" />{item.label}
+                </Button>
+              ))}
+              {isAdmin && <Button variant="ghost" className="h-20 flex-col text-xs text-primary" onClick={() => { setShowAdminPanel(true); setShowNav(false); }}><Shield className="!w-6 !h-6" />Admin</Button>}
             </div>
-
-            {/* App grid - scrollable */}
-            <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
-              <div className="grid grid-cols-4 gap-2">
-                {navItems.map((item) => {
-                  const isActive = activeSection === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleNavClick(item.id, item.disabled)}
-                      disabled={item.disabled}
-                      className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-2xl transition-all active:scale-95 ${
-                        item.disabled ? 'opacity-40' : ''
-                      }`}
-                    >
-                      <div
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-                          isActive
-                            ? 'bg-gradient-primary text-primary-foreground shadow-glow'
-                            : 'bg-muted/50 text-foreground'
-                        }`}
-                      >
-                        <item.icon className="w-5 h-5" />
-                      </div>
-                      <span className="text-[10px] font-medium text-center text-muted-foreground line-clamp-1">
-                        {item.label}
-                      </span>
-                    </button>
-                  );
-                })}
-                {isAdmin && (
-                  <button
-                    onClick={() => {
-                      setShowAdminPanel(true);
-                      setShowNav(false);
-                    }}
-                    className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-2xl active:scale-95"
-                  >
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-primary/15 text-primary">
-                      <Shield className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-medium text-center text-muted-foreground">Admin</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Logout row */}
-              <button
-                onClick={logout}
-                className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium active:scale-[0.98] transition-transform"
-              >
-                <LogOut className="w-4 h-4" />
-                Log out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Desktop hover trigger zone */}
-      <div 
-        className="tutorial-sidebar-trigger hidden md:block fixed top-0 left-0 bottom-0 w-4 z-50"
-        onMouseEnter={() => setShowNav(true)}
-      />
-
-      {/* Desktop Sidebar Navigation */}
-      <nav 
-        className={`hidden md:block fixed top-0 left-0 bottom-0 w-64 z-50 transition-all duration-300 ${
-          showNav ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
-        }`}
-        onMouseLeave={() => setShowNav(false)}
-      >
-        <div className="h-full border-r border-border/30 bg-background/95 backdrop-blur-lg flex flex-col">
-          <div className="p-6 flex items-center gap-3">
-            <img src={starstreamIcon} alt="Star Stream" className="w-10 h-10" />
-            <span className="text-xl font-bold text-gradient">STAR STREAM V3</span>
-          </div>
-
-          <div className="border-t border-border/30 mx-4" />
-
-          <div className="flex-1 min-h-0 py-4 px-3 overflow-y-auto space-y-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(var(--border)) transparent' }}>
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id, item.disabled)}
-                disabled={item.disabled}
-                className={`tutorial-${item.id}-nav w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-300 text-sm ${
-                  item.disabled
-                    ? 'text-muted-foreground/40 cursor-not-allowed'
-                    : activeSection === item.id
-                      ? 'bg-gradient-primary text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                }`}
-              >
-                <item.icon className="w-4 h-4 shrink-0" />
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="border-t border-border/30 mx-4" />
-
-          <div className="p-4 space-y-2">
-            {isAdmin && (
-              <button
-                onClick={() => {
-                  setShowAdminPanel(true);
-                  setShowNav(false);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-primary hover:bg-muted/30 transition-colors"
-              >
-                <Shield className="w-4 h-4" />
-                <span>Admin Panel</span>
-              </button>
-            )}
-            <div className="flex items-center justify-between px-4 py-2">
-              <span className="text-sm text-muted-foreground truncate">{user.username}</span>
-              <button
-                onClick={logout}
-                className="p-2 text-muted-foreground hover:text-destructive transition-colors rounded-lg hover:bg-muted/30"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+            <div className="p-4 border-t border-border/30"><Button variant="ghost" className="w-full text-destructive" onClick={logout}><LogOut />Log out</Button></div>
+          </DialogContent>
+      </Dialog>
 
       {/* Fullscreen sections - kept mounted to avoid re-loading */}
-      <div className={`fixed inset-0 z-40 bg-background ${activeSection === 'chatroom' ? 'animate-fade-in' : 'pointer-events-none invisible'}`}
+      <div className={`fixed inset-0 app-fullscreen z-40 bg-background ${activeSection === 'chatroom' ? 'animate-fade-in' : 'pointer-events-none invisible'}`}
         style={activeSection !== 'chatroom' ? { display: 'none' } : undefined}
         key="chatroom-persistent"
       >
         <DiscordChat onClose={() => setActiveSection('home')} />
       </div>
 
-      <div className={`fixed inset-0 z-40 bg-background ${activeSection === 'music' ? 'animate-fade-in' : 'pointer-events-none invisible'}`}
+      <div className={`fixed inset-0 app-fullscreen z-40 bg-background ${activeSection === 'music' ? 'animate-fade-in' : 'pointer-events-none invisible'}`}
         style={activeSection !== 'music' ? { display: 'none' } : undefined}
         key="music-persistent"
       >
@@ -675,14 +481,14 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
       </div>
 
       {activeSection === 'youtube' && (
-        <div className="fixed inset-0 z-40 bg-background animate-fade-in">
+        <div className="fixed inset-0 app-fullscreen z-40 bg-background animate-fade-in">
           <YouTubeApp />
         </div>
       )}
 
       {/* Proxy Browser - fullscreen */}
       {activeSection === 'proxy' && (
-        <div className="fixed inset-0 z-40 bg-background animate-fade-in">
+        <div className="fixed inset-0 app-fullscreen z-40 bg-background animate-fade-in">
           <ProxyBrowser onClose={() => setActiveSection('home')} />
         </div>
       )}
@@ -694,7 +500,7 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
 
       {/* Main content - only show for non-fullscreen sections */}
       {!['chatroom', 'music', 'youtube', 'proxy', 'emulator'].includes(activeSection) && (
-        <main className="relative">
+        <main className="relative app-content">
           <div key={activeSection} className="animate-fade-in">
             {activeSection === 'home' && (
               <HomeDashboard 

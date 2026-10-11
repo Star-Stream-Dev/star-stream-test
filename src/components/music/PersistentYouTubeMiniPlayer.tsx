@@ -19,7 +19,7 @@ export function PersistentYouTubeMiniPlayer({ onExpand }: PersistentYouTubeMiniP
   if (!currentTrack) return null;
 
   return (
-    <div className="fixed bottom-20 md:bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 z-40 bg-card/95 backdrop-blur-lg border border-border/50 rounded-xl shadow-2xl overflow-hidden">
+    <div className="fixed bottom-[var(--app-dock-space)] left-4 right-4 md:left-auto md:right-4 md:w-80 z-40 bg-card/95 backdrop-blur-lg border border-border/50 rounded-xl shadow-2xl overflow-hidden">
       {/* Progress bar */}
       <div className="h-0.5 bg-muted">
         <div
