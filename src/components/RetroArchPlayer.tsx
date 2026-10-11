@@ -51,7 +51,7 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
   // Playing state — show the emulator
   if (selectedCore && romUrl) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex flex-col">
+      <div className="fixed inset-0 app-fullscreen z-40 bg-background flex flex-col">
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border shrink-0">
           <div className="flex items-center gap-3">
@@ -81,7 +81,7 @@ export function RetroArchPlayer({ onClose }: RetroArchPlayerProps) {
 
   // Selection screen
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+    <div className="fixed inset-0 app-fullscreen z-40 bg-background flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card shrink-0">
         <Button variant="ghost" size="icon" onClick={onClose}>
