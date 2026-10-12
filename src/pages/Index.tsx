@@ -450,9 +450,9 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
                   <item.icon className="!w-6 !h-6" />{item.label}
                 </Button>
               ))}
-              {isAdmin && <Button variant="ghost" className="h-20 flex-col text-xs text-primary" onClick={() => { setShowAdminPanel(true); setShowNav(false); }}><Shield className="!w-6 !h-6" />Admin</Button>}
+              {isAdmin && <Button variant="ghost" className="h-20 flex-col text-xs text-primary rounded-2xl" onClick={() => { setShowAdminPanel(true); setShowNav(false); }}><Shield className="!w-6 !h-6" />Admin</Button>}
             </div>
-            <div className="p-4 border-t border-border/30"><Button variant="ghost" className="w-full text-destructive" onClick={logout}><LogOut />Log out</Button></div>
+            <div className="p-4 border-t border-border/30"><Button variant="ghost" className="w-full text-destructive rounded-full" onClick={logout}><LogOut />Log out</Button></div>
           </DialogContent>
       </Dialog>
 
