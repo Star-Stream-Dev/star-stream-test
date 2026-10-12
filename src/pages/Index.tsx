@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { FloatingDock } from '@/components/FloatingDock';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 // TEMP: Bypass login gate for AdSense crawler verification
@@ -429,21 +430,11 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
       {!popupsDisabled && <TutorialOverlay />}
       {/* Changelog Modal */}
       {!popupsDisabled && <ChangelogModal />}
-      <nav aria-label="Main navigation" className="fixed bottom-0 inset-x-0 z-50 border-t border-border/40 bg-background/90 backdrop-blur-xl safe-area-pb">
-        <div className="mx-auto grid grid-cols-4 max-w-lg h-14 px-2">
-          {navItems.filter(item => ['home', 'games', 'chatroom'].includes(item.id)).map(item => (
-            <Button key={item.id} variant="ghost" onClick={() => handleNavClick(item.id)}
-              aria-current={activeSection === item.id ? 'page' : undefined}
-              className={`tutorial-${item.id}-nav h-14 rounded-none flex-col gap-1 text-[10px] ${activeSection === item.id ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}>
-              <item.icon className="!w-5 !h-5" />{item.label}
-            </Button>
-          ))}
-          <Button variant="ghost" onClick={() => setShowNav(!showNav)} aria-expanded={showNav} aria-controls="app-menu"
-            className={`tutorial-sidebar-trigger h-14 rounded-none flex-col gap-1 text-[10px] ${showNav || !['home', 'games', 'chatroom'].includes(activeSection) ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}>
-            <LayoutGrid className="!w-5 !h-5" />More
-          </Button>
-        </div>
-      </nav>
+      <FloatingDock
+        items={['home', 'games', 'chatroom', 'music', 'youtube', 'desktop', 'settings'].flatMap(id => navItems.filter(item => item.id === id))}
+        activeSection={activeSection} menuOpen={showNav}
+        onNavigate={handleNavClick} onMore={() => setShowNav(!showNav)}
+      />
 
       <Dialog open={showNav} onOpenChange={setShowNav}>
           <DialogContent id="app-menu" aria-describedby={undefined}
