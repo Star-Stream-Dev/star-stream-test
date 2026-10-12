@@ -112,22 +112,22 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     pendingId.current = null;
   };
 
+  const grabSize = useRef({ w: 0, h: 0 });
   const rememberGrabOffset = (e: React.PointerEvent) => {
     const cell = (e.currentTarget as HTMLElement).getBoundingClientRect();
     grabOffset.current = { dx: e.clientX - cell.left, dy: e.clientY - cell.top };
+    grabSize.current = { w: cell.width, h: cell.height };
   };
 
   const moveFree = useCallback((id: string, clientX: number, clientY: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
     setLayout(prev => prev.map(w => {
       if (w.id !== id) return w;
-      const width = w.w ?? 50;
-      const leftPx = clientX - rect.left - grabOffset.current.dx;
-      const topPx = clientY - rect.top - grabOffset.current.dy;
-      const xPct = Math.max(0, Math.min(100 - width, (leftPx / rect.width) * 100));
-      return { ...w, x: Math.round(xPct * 10) / 10, y: Math.max(0, Math.round(topPx)) };
+      const leftPx = Math.max(0, Math.min(vw - grabSize.current.w, clientX - grabOffset.current.dx));
+      const topPx = Math.max(0, Math.min(vh - Math.min(grabSize.current.h, vh), clientY - grabOffset.current.dy));
+      const xPct = (leftPx / vw) * 100;
+      return { ...w, x: Math.round(xPct * 10) / 10, y: Math.round(topPx) };
     }));
   }, []);
 
@@ -344,8 +344,8 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
       {freeMode ? (
         <div
           ref={canvasRef}
-          className="relative rounded-3xl p-3 md:p-6"
-          style={{ ...glassStyle, minHeight: canvasHeight }}
+          className="fixed inset-0 z-30 pointer-events-none"
+          aria-label="Desktop widgets"
         >
           {visibleWidgets.map((widget) => {
             const isDragging = dragId === widget.id;
@@ -359,7 +359,8 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
                   position: 'absolute',
                   left: `${widget.x ?? 0}%`,
                   top: `${widget.y ?? 0}px`,
-                  width: `${widget.w ?? 50}%`,
+                  width: `min(${widget.w ?? 50}vw, ${(widget.w ?? 50) * 10.24}px)`,
+                  pointerEvents: 'auto',
                   touchAction: jiggle ? 'none' : undefined,
                 }}
                 className={`min-w-0 rounded-2xl p-1 ${
