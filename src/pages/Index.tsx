@@ -438,21 +438,21 @@ function IndexInner({ onDevMode }: { onDevMode: () => void }) {
 
       <Dialog open={showNav} onOpenChange={setShowNav}>
           <DialogContent id="app-menu" aria-describedby={undefined}
-            className="top-auto bottom-0 translate-y-0 p-0 gap-0 max-w-2xl max-h-[80vh] overflow-y-auto bg-card border-border/40 rounded-t-lg safe-area-pb [&>button]:hidden">
+            className="top-auto bottom-0 translate-y-0 p-0 gap-0 max-w-2xl max-h-[80vh] overflow-y-auto bg-card border-border/40 rounded-t-[2rem] safe-area-pb [&>button]:hidden">
             <div className="flex items-center justify-between p-5 border-b border-border/30">
               <div className="flex items-center gap-3"><img src={starstreamIcon} alt="" className="w-8 h-8" /><div><DialogTitle>Star Stream</DialogTitle><p className="text-xs text-muted-foreground">@{user.username}</p></div></div>
               <Button variant="ghost" size="icon" aria-label="Close menu" onClick={() => setShowNav(false)}><X /></Button>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-4">
-              {navItems.filter(item => !['home', 'games', 'chatroom'].includes(item.id)).map(item => (
+              {navItems.map(item => (
                 <Button key={item.id} variant="ghost" onClick={() => handleNavClick(item.id, item.disabled)} disabled={item.disabled}
-                  className={`tutorial-${item.id}-nav h-20 flex-col gap-2 whitespace-normal text-xs ${activeSection === item.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
+                  className={`tutorial-${item.id}-nav h-20 flex-col gap-2 whitespace-normal text-xs rounded-2xl ${activeSection === item.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
                   <item.icon className="!w-6 !h-6" />{item.label}
                 </Button>
               ))}
-              {isAdmin && <Button variant="ghost" className="h-20 flex-col text-xs text-primary" onClick={() => { setShowAdminPanel(true); setShowNav(false); }}><Shield className="!w-6 !h-6" />Admin</Button>}
+              {isAdmin && <Button variant="ghost" className="h-20 flex-col text-xs text-primary rounded-2xl" onClick={() => { setShowAdminPanel(true); setShowNav(false); }}><Shield className="!w-6 !h-6" />Admin</Button>}
             </div>
-            <div className="p-4 border-t border-border/30"><Button variant="ghost" className="w-full text-destructive" onClick={logout}><LogOut />Log out</Button></div>
+            <div className="p-4 border-t border-border/30"><Button variant="ghost" className="w-full text-destructive rounded-full" onClick={logout}><LogOut />Log out</Button></div>
           </DialogContent>
       </Dialog>
 
