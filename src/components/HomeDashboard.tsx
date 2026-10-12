@@ -7,6 +7,21 @@ import { WidgetRenderer } from '@/components/widgets/WidgetRenderer';
 import { WidgetEditor } from '@/components/widgets/WidgetEditor';
 import { loadLayout, saveLayout, loadFreeMode, saveFreeMode, seedFreePositions } from '@/components/widgets/widgetTypes';
 import type { WidgetConfig } from '@/components/widgets/widgetTypes';
+import { FreeItem, type FreeRect } from '@/components/widgets/FreeItem';
+
+type PageItemKey = 'title' | 'subtitle' | 'badge' | 'controls' | 'devmode';
+const pageItemsKey = (uid: string) => `starstream_home_items_${uid}`;
+const defaultPageItems = (): Record<PageItemKey, FreeRect> => {
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+  const cw = Math.min(vw - 32, 700);
+  return {
+    title: { x: Math.round((vw - cw) / 2), y: 24, w: cw },
+    subtitle: { x: Math.round((vw - cw) / 2), y: 100, w: cw },
+    badge: { x: Math.round(vw / 2 - 120), y: 130, w: 240 },
+    controls: { x: Math.max(8, vw - 360), y: 170, w: 350 },
+    devmode: { x: Math.round(vw / 2 - 80), y: 220, w: 160 },
+  };
+};
 
 interface HomeDashboardProps {
   typewriterText: string;
@@ -56,6 +71,35 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
   const grabOffset = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
   const freeModeRef = useRef(false);
   layoutRef.current = layout;
+  const [pageItems, setPageItems] = useState<Record<PageItemKey, FreeRect>>(defaultPageItems);
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const raw = localStorage.getItem(pageItemsKey(user.id));
+      if (raw) setPageItems({ ...defaultPageItems(), ...JSON.parse(raw) });
+    } catch { /* ignore */ }
+  }, [user]);
+  const setPageItem = (k: PageItemKey, r: FreeRect) => setPageItems(p => ({ ...p, [k]: r }));
+  const commitPageItem = (k: PageItemKey, r: FreeRect) => setPageItems(p => {
+    const next = { ...p, [k]: r };
+    if (user) localStorage.setItem(pageItemsKey(user.id), JSON.stringify(next));
+    return next;
+  });
+  const widgetRect = (w: WidgetConfig): FreeRect => {
+    const vw = window.innerWidth;
+    const pct = w.w ?? 50;
+    return { x: ((w.x ?? 0) / 100) * vw, y: w.y ?? 0, w: Math.min((pct / 100) * vw, pct * 10.24), h: w.h };
+  };
+  const applyWidgetRect = (id: string, r: FreeRect, save: boolean) => {
+    const vw = window.innerWidth;
+    setLayout(prev => {
+      const next = prev.map(w => w.id === id
+        ? { ...w, x: Math.round((r.x / vw) * 1000) / 10, y: r.y, w: Math.round((r.w / vw) * 1000) / 10, h: r.h }
+        : w);
+      if (save) persist(next);
+      return next;
+    });
+  };
   freeModeRef.current = freeMode;
 
   // Load layout on mount
@@ -291,6 +335,67 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     600,
     ...visibleWidgets.map(w => (w.y ?? 0) + (w.type === 'embed' ? (w.height || 260) + 120 : 200))
   );
+
+  if (freeMode) {
+    const pi = (k: PageItemKey, label: string, node: React.ReactNode) => (
+      <FreeItem key={k} label={label} rect={pageItems[k]} editing={jiggle}
+        onChange={(r) => setPageItem(k, r)} onCommit={(r) => commitPageItem(k, r)}>{node}</FreeItem>
+    );
+    return (
+      <div className="fixed inset-0 z-30 pointer-events-none" aria-label="Home layout">
+        {pi('title', 'Title', (
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-gradient">
+            {typewriterText}<span className="animate-pulse text-primary">|</span>
+          </h1>
+        ))}
+        {pi('subtitle', 'Subtitle', (
+          <p className="text-center text-muted-foreground text-sm">Hub for all games • made by p0tato and Rebelleader4123</p>
+        ))}
+        {pi('badge', 'Badge', (
+          <div className="flex justify-center">
+            <span className="inline-block px-3 py-1 bg-primary/20 text-primary text-xs rounded-full border border-primary/30">✨ Now with encrypted chatrooms</span>
+          </div>
+        ))}
+        {pi('controls', 'Layout buttons', (
+          <div className="flex justify-end items-center gap-2 flex-wrap">
+            <button onClick={() => setJiggle(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs text-primary hover:bg-primary/20">
+              <Move className="w-3.5 h-3.5" /> Arrange
+            </button>
+            <button onClick={toggleFreeMode} className="px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs">Free Layout: On</button>
+            <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs text-primary hover:bg-primary/20">
+              <Pencil className="w-3.5 h-3.5" /> Edit Widgets
+            </button>
+          </div>
+        ))}
+        {onDevMode && pi('devmode', 'Developer Mode button', (
+          <div className="flex justify-center">
+            <button onClick={onDevMode} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/30 border border-border/30 text-muted-foreground hover:text-foreground text-xs">
+              <Terminal className="w-3.5 h-3.5" /> Developer Mode
+            </button>
+          </div>
+        ))}
+        {visibleWidgets.map(widget => (
+          <FreeItem key={widget.id} label={widget.title || widget.type} rect={widgetRect(widget)} editing={jiggle}
+            onChange={(r) => applyWidgetRect(widget.id, r, false)} onCommit={(r) => applyWidgetRect(widget.id, r, true)}>
+            <WidgetRenderer widget={widget} onNavigate={onNavigate} sessionTime={sessionTime} userStats={userStats}
+              recentGames={recentGames} currentTime={currentTime} unreadAnnouncements={unreadAnnouncements} unreadMessage={unreadMessage} />
+          </FreeItem>
+        ))}
+        {jiggle && (
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-full bg-card/90 border border-border shadow-xl backdrop-blur">
+            <span className="text-xs text-muted-foreground">Drag to move • corner dot to resize</span>
+            <button onClick={() => { if (user) localStorage.removeItem(pageItemsKey(user.id)); setPageItems(defaultPageItems()); }} className="px-3 py-1 rounded-full bg-muted text-xs">Reset text</button>
+            <button onClick={() => { setJiggle(false); persist(layoutRef.current); }} className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">Done</button>
+          </div>
+        )}
+        {isEditing && (
+          <div className="pointer-events-auto">
+            <WidgetEditor layout={layout} onChange={setLayout} onClose={() => setIsEditing(false)} onSave={handleSaveLayout} />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-6">
