@@ -21,7 +21,7 @@ export function FloatingDock({ items, activeSection, menuOpen, onNavigate, onMor
   return (
     <div className="floating-dock-zone" data-open={menuOpen || undefined}>
       <span className="floating-dock-handle" aria-hidden="true" />
-      <nav aria-label="Main navigation" className="floating-dock flex items-center gap-0.5 p-1.5 border border-border/50 bg-card/90 backdrop-blur-xl rounded-lg">
+      <nav aria-label="Main navigation" className="floating-dock flex items-center gap-0.5 p-1.5 border border-border/50 bg-card/90 backdrop-blur-xl rounded-full">
         {items.map(item => (
           <Tooltip key={item.id}>
             <TooltipTrigger asChild>
