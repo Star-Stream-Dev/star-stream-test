@@ -26,6 +26,7 @@ export interface WidgetConfig {
   x?: number; // left, % of canvas width
   y?: number; // top, px from canvas top
   w?: number; // width, % of canvas width
+  h?: number; // free-layout height, px
 }
 
 export const WIDGET_CATALOG: { type: WidgetType; label: string; icon: string; description: string; defaultColSpan: number }[] = [
