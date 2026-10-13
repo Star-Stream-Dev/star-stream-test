@@ -11,50 +11,66 @@ interface Props {
   label?: string;
 }
 
-const MIN_W = 80;
-const MIN_H = 40;
+type Edge = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+const MIN_W = 60;
+const MIN_H = 30;
 
-/** Rainmeter-style item: drag anywhere on screen, resize from the corner while editing. */
+const HANDLES: { edge: Edge; cls: string; cursor: string }[] = [
+  { edge: 'n', cls: 'left-4 right-4 -top-2 h-4', cursor: 'ns-resize' },
+  { edge: 's', cls: 'left-4 right-4 -bottom-2 h-4', cursor: 'ns-resize' },
+  { edge: 'e', cls: 'top-4 bottom-4 -right-2 w-4', cursor: 'ew-resize' },
+  { edge: 'w', cls: 'top-4 bottom-4 -left-2 w-4', cursor: 'ew-resize' },
+  { edge: 'nw', cls: '-left-3 -top-3 w-6 h-6', cursor: 'nwse-resize' },
+  { edge: 'ne', cls: '-right-3 -top-3 w-6 h-6', cursor: 'nesw-resize' },
+  { edge: 'sw', cls: '-left-3 -bottom-3 w-6 h-6', cursor: 'nesw-resize' },
+  { edge: 'se', cls: '-right-3 -bottom-3 w-6 h-6', cursor: 'nwse-resize' },
+];
+
+/** Rainmeter-style item: drag anywhere, resize from any edge or corner while editing. */
 export const FreeItem = ({ rect, editing, onChange, onCommit, children, label }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
-  const latest = useRef(rect);
-  latest.current = rect;
 
-  const start = (e: React.PointerEvent, mode: 'move' | 'resize') => {
+  const start = (e: React.PointerEvent, edge: Edge | 'move') => {
     if (!editing) return;
     e.preventDefault();
     e.stopPropagation();
     const el = ref.current;
     if (!el) return;
     const box = el.getBoundingClientRect();
-    const sx = e.clientX, sy = e.clientY;
+    // Base always comes from what's actually on screen, so nothing jumps or shrinks.
     const base = { x: box.left, y: box.top, w: box.width, h: box.height };
+    const sx = e.clientX, sy = e.clientY;
+    let latest: FreeRect = { x: base.x, y: base.y, w: base.w, h: rect.h };
+
     const move = (ev: PointerEvent) => {
       ev.preventDefault();
       const vw = window.innerWidth, vh = window.innerHeight;
       const dx = ev.clientX - sx, dy = ev.clientY - sy;
-      let next: FreeRect;
-      if (mode === 'move') {
-        next = {
-          ...latest.current,
-          x: Math.round(Math.max(0, Math.min(vw - Math.min(base.w, vw), base.x + dx))),
+      if (edge === 'move') {
+        latest = {
+          x: Math.round(Math.max(-base.w + 40, Math.min(vw - 40, base.x + dx))),
           y: Math.round(Math.max(0, Math.min(vh - 30, base.y + dy))),
+          w: base.w,
+          h: rect.h,
         };
       } else {
-        next = {
-          ...latest.current,
-          w: Math.round(Math.max(MIN_W, Math.min(vw - base.x, base.w + dx))),
-          h: Math.round(Math.max(MIN_H, Math.min(vh - base.y, base.h + dy))),
-        };
+        let { x, y, w, h } = base;
+        if (edge.includes('e')) w = base.w + dx;
+        if (edge.includes('s')) h = base.h + dy;
+        if (edge.includes('w')) { w = base.w - dx; x = base.x + dx; }
+        if (edge.includes('n')) { h = base.h - dy; y = base.y + dy; }
+        if (w < MIN_W) { if (edge.includes('w')) x -= MIN_W - w; w = MIN_W; }
+        if (h < MIN_H) { if (edge.includes('n')) y -= MIN_H - h; h = MIN_H; }
+        const changesH = edge.includes('n') || edge.includes('s');
+        latest = { x: Math.round(x), y: Math.round(Math.max(0, y)), w: Math.round(w), h: changesH ? Math.round(h) : rect.h };
       }
-      latest.current = next;
-      onChange(next);
+      onChange(latest);
     };
     const up = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
-      onCommit(latest.current);
+      onCommit(latest);
     };
     window.addEventListener('pointermove', move, { passive: false });
     window.addEventListener('pointerup', up);
@@ -76,17 +92,18 @@ export const FreeItem = ({ rect, editing, onChange, onCommit, children, label }:
         touchAction: editing ? 'none' : undefined,
         cursor: editing ? 'move' : undefined,
       }}
-      className={`rounded-2xl ${editing ? 'ring-2 ring-primary/60 ring-dashed select-none' : ''}`}
+      className={`rounded-2xl ${editing ? 'outline-dashed outline-2 outline-primary/70 select-none' : ''}`}
     >
-      <div className={`w-full h-full overflow-auto ${editing ? 'pointer-events-none' : ''}`}>{children}</div>
-      {editing && (
+      <div className={`w-full h-full overflow-hidden ${editing ? 'pointer-events-none' : ''}`}>{children}</div>
+      {editing && HANDLES.map(hd => (
         <div
-          role="slider"
-          aria-label={`Resize ${label ?? 'item'}`}
-          onPointerDown={(e) => start(e, 'resize')}
-          className="absolute -right-2 -bottom-2 w-5 h-5 rounded-full bg-primary border-2 border-background cursor-nwse-resize"
+          key={hd.edge}
+          aria-label={`Resize ${label ?? 'item'} ${hd.edge}`}
+          onPointerDown={(e) => start(e, hd.edge)}
+          style={{ cursor: hd.cursor, touchAction: 'none' }}
+          className={`absolute ${hd.cls} ${hd.edge.length === 2 ? 'rounded-full bg-primary border-2 border-background' : ''}`}
         />
-      )}
+      ))}
     </div>
   );
 };
