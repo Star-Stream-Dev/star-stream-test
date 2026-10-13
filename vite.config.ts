@@ -37,6 +37,11 @@ export default defineConfig(({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
+      // One React copy only — prevents "dispatcher.useEffect" null crashes after dependency re-bundling.
+      dedupe: ["react", "react-dom", "react/jsx-runtime", "@tanstack/react-query"],
+    },
+    optimizeDeps: {
+      include: ["react", "react-dom", "react/jsx-runtime", "@tanstack/react-query"],
     },
   };
 });
