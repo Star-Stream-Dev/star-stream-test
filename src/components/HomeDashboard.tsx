@@ -112,6 +112,76 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     }
   }, [user]);
 
+  // ---- Cross-device sync of the whole home layout ----
+  const syncReady = useRef(false);
+  const applyingRemote = useRef(false);
+  const lastSynced = useRef<string | null>(null);
+  const pushTimer = useRef<number | null>(null);
+  const pageItemsRef = useRef(pageItems);
+  pageItemsRef.current = pageItems;
+
+  useEffect(() => {
+    if (!user || !sessionToken) return;
+    syncReady.current = false;
+    lastSynced.current = null;
+    let cancelled = false;
+    const pull = async () => {
+      if (pushTimer.current) return; // local change pending; don't clobber
+      const { data, error } = await supabase.rpc('get_my_home_layout', { p_session_token: sessionToken });
+      if (cancelled || error) return;
+      const row = Array.isArray(data) ? data[0] : null;
+      if (!row) {
+        if (!syncReady.current) {
+          syncReady.current = true;
+          // First time: upload this device's layout
+          const ts = await supabase.rpc('save_my_home_layout', {
+            p_session_token: sessionToken,
+            p_state: { layout: layoutRef.current, freeMode: freeModeRef.current, pageItems: pageItemsRef.current } as never,
+          });
+          if (!ts.error) lastSynced.current = ts.data as string;
+        }
+        return;
+      }
+      if (row.updated_at !== lastSynced.current) {
+        const st = (row.state || {}) as { layout?: WidgetConfig[]; freeMode?: boolean; pageItems?: Record<PageItemKey, FreeRect> };
+        applyingRemote.current = true;
+        if (Array.isArray(st.layout)) { setLayout(st.layout); saveLayout(user.id, st.layout); }
+        if (typeof st.freeMode === 'boolean') { setFreeMode(st.freeMode); saveFreeMode(user.id, st.freeMode); }
+        if (st.pageItems) {
+          setPageItems({ ...defaultPageItems(), ...st.pageItems });
+          localStorage.setItem(pageItemsKey(user.id), JSON.stringify(st.pageItems));
+        }
+        lastSynced.current = row.updated_at;
+        setTimeout(() => { applyingRemote.current = false; }, 0);
+      }
+      syncReady.current = true;
+    };
+    pull();
+    const iv = window.setInterval(pull, 10000);
+    const onFocus = () => pull();
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onFocus);
+    return () => {
+      cancelled = true;
+      clearInterval(iv);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onFocus);
+    };
+  }, [user, sessionToken]);
+
+  useEffect(() => {
+    if (!user || !sessionToken || !syncReady.current || applyingRemote.current || dragId) return;
+    if (pushTimer.current) clearTimeout(pushTimer.current);
+    pushTimer.current = window.setTimeout(async () => {
+      const { data, error } = await supabase.rpc('save_my_home_layout', {
+        p_session_token: sessionToken,
+        p_state: { layout: layoutRef.current, freeMode: freeModeRef.current, pageItems: pageItemsRef.current } as never,
+      });
+      if (!error) lastSynced.current = data as string;
+      pushTimer.current = null;
+    }, 1200);
+  }, [layout, freeMode, pageItems, user, sessionToken, dragId]);
+
   const toggleFreeMode = () => {
     if (!user) return;
     const next = !freeMode;
