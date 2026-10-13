@@ -87,6 +87,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
   });
   const widgetRect = (w: WidgetConfig): FreeRect => {
     const vw = window.innerWidth;
+    if (typeof w.fw === 'number') return { x: w.fx ?? 0, y: w.fy ?? 0, w: w.fw, h: w.fh };
     const pct = w.w ?? 50;
     return { x: ((w.x ?? 0) / 100) * vw, y: w.y ?? 0, w: Math.min((pct / 100) * vw, pct * 10.24), h: w.h };
   };
@@ -94,7 +95,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     const vw = window.innerWidth;
     setLayout(prev => {
       const next = prev.map(w => w.id === id
-        ? { ...w, x: Math.round((r.x / vw) * 1000) / 10, y: r.y, w: Math.round((r.w / vw) * 1000) / 10, h: r.h }
+        ? { ...w, fx: r.x, fy: r.y, fw: r.w, fh: r.h, x: Math.round((r.x / vw) * 1000) / 10, y: r.y }
         : w);
       if (save) persist(next);
       return next;
@@ -118,6 +119,8 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
   const lastSynced = useRef<string | null>(null);
   const pushTimer = useRef<number | null>(null);
   const pageItemsRef = useRef(pageItems);
+  const jiggleRef = useRef(false);
+  jiggleRef.current = jiggle;
   pageItemsRef.current = pageItems;
 
   useEffect(() => {
@@ -126,7 +129,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     lastSynced.current = null;
     let cancelled = false;
     const pull = async () => {
-      if (pushTimer.current) return; // local change pending; don't clobber
+      if (pushTimer.current || jiggleRef.current) return; // local change pending or arranging; don't clobber
       const { data, error } = await supabase.rpc('get_my_home_layout', { p_session_token: sessionToken });
       if (cancelled || error) return;
       const row = Array.isArray(data) ? data[0] : null;
