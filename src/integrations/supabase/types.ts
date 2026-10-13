@@ -604,6 +604,35 @@ export type Database = {
           },
         ]
       }
+      home_layouts: {
+        Row: {
+          id: string
+          state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          state?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          state?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "home_layouts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invite_link_uses: {
         Row: {
           created_at: string
@@ -1747,6 +1776,13 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_my_home_layout: {
+        Args: { p_session_token: string }
+        Returns: {
+          state: Json
+          updated_at: string
+        }[]
+      }
       get_my_unread_dms: {
         Args: { p_session_token: string }
         Returns: {
@@ -1813,6 +1849,10 @@ export type Database = {
       save_my_algorithm_state: {
         Args: { p_session_token: string; p_state: Json }
         Returns: boolean
+      }
+      save_my_home_layout: {
+        Args: { p_session_token: string; p_state: Json }
+        Returns: string
       }
       seed_admin_user: {
         Args: { p_password_hash: string; p_username: string }
