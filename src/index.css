@@ -135,6 +135,20 @@
 @media (max-width: 359px) { .dock-icon { width: 30px; } }
 @media (prefers-reduced-motion: reduce) { .floating-dock, .floating-dock-handle { transition: none; } }
 
+/* Hide the page-level scrollbar (content still scrolls normally) */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/* Never allow sideways page scroll */
+body {
+  overflow-x: clip;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }

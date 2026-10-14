@@ -207,7 +207,7 @@ function IndexContent({ onDevMode }: { onDevMode: () => void }) {
   const { customBackground } = useTheme();
   
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       {/* Custom Background */}
       {customBackground.type !== 'none' && (
         <div className="fixed inset-0 z-0">
