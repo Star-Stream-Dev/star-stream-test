@@ -9,10 +9,11 @@ import { loadLayout, saveLayout, loadFreeMode, saveFreeMode, seedFreePositions }
 import type { WidgetConfig } from '@/components/widgets/widgetTypes';
 import { FreeItem, type FreeRect } from '@/components/widgets/FreeItem';
 
+export const DESIGN_W = 1280;
 type PageItemKey = 'title' | 'subtitle' | 'badge' | 'controls' | 'devmode';
 const pageItemsKey = (uid: string) => `starstream_home_items_${uid}`;
 const defaultPageItems = (): Record<PageItemKey, FreeRect> => {
-  const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+  const vw = DESIGN_W;
   const cw = Math.min(vw - 32, 700);
   return {
     title: { x: Math.round((vw - cw) / 2), y: 24, w: cw },
@@ -71,6 +72,13 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
   const grabOffset = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
   const freeModeRef = useRef(false);
   layoutRef.current = layout;
+  const [vp, setVp] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+  useEffect(() => {
+    const on = () => setVp({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener('resize', on);
+    return () => window.removeEventListener('resize', on);
+  }, []);
+  const scale = vp.w / DESIGN_W;
   const [pageItems, setPageItems] = useState<Record<PageItemKey, FreeRect>>(defaultPageItems);
   useEffect(() => {
     if (!user) return;
@@ -86,13 +94,13 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
     return next;
   });
   const widgetRect = (w: WidgetConfig): FreeRect => {
-    const vw = window.innerWidth;
+    const vw = DESIGN_W;
     if (typeof w.fw === 'number') return { x: w.fx ?? 0, y: w.fy ?? 0, w: w.fw, h: w.fh };
     const pct = w.w ?? 50;
     return { x: ((w.x ?? 0) / 100) * vw, y: w.y ?? 0, w: Math.min((pct / 100) * vw, pct * 10.24), h: w.h };
   };
   const applyWidgetRect = (id: string, r: FreeRect, save: boolean) => {
-    const vw = window.innerWidth;
+    const vw = DESIGN_W;
     setLayout(prev => {
       const next = prev.map(w => w.id === id
         ? { ...w, fx: r.x, fy: r.y, fw: r.w, fh: r.h, x: Math.round((r.x / vw) * 1000) / 10, y: r.y }
@@ -411,11 +419,12 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
 
   if (freeMode) {
     const pi = (k: PageItemKey, label: string, node: React.ReactNode) => (
-      <FreeItem key={k} label={label} rect={pageItems[k]} editing={jiggle}
+      <FreeItem key={k} scale={scale} label={label} rect={pageItems[k]} editing={jiggle}
         onChange={(r) => setPageItem(k, r)} onCommit={(r) => commitPageItem(k, r)}>{node}</FreeItem>
     );
     return (
-      <div className="fixed inset-0 z-30 pointer-events-none" aria-label="Home layout">
+      <div className="fixed inset-0 z-30 pointer-events-none overflow-hidden" aria-label="Home layout">
+        <div className="absolute top-0 left-0" style={{ width: DESIGN_W, height: vp.h / scale, transform: `scale(${scale})`, transformOrigin: '0 0' }}>
         {pi('title', 'Title', (
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-gradient">
             {typewriterText}<span className="animate-pulse text-primary">|</span>
@@ -448,12 +457,13 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
           </div>
         ))}
         {visibleWidgets.map(widget => (
-          <FreeItem key={widget.id} label={widget.title || widget.type} rect={widgetRect(widget)} editing={jiggle}
+          <FreeItem key={widget.id} scale={scale} label={widget.title || widget.type} rect={widgetRect(widget)} editing={jiggle}
             onChange={(r) => applyWidgetRect(widget.id, r, false)} onCommit={(r) => applyWidgetRect(widget.id, r, true)}>
             <WidgetRenderer widget={widget} onNavigate={onNavigate} sessionTime={sessionTime} userStats={userStats}
               recentGames={recentGames} currentTime={currentTime} unreadAnnouncements={unreadAnnouncements} unreadMessage={unreadMessage} />
           </FreeItem>
         ))}
+        </div>
         {jiggle && (
           <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-full bg-card/90 border border-border shadow-xl backdrop-blur">
             <span className="text-xs text-muted-foreground">Drag to move • corner dot to resize</span>
