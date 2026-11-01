@@ -423,7 +423,7 @@ export const HomeDashboard = ({ typewriterText, onNavigate, onDevMode }: HomeDas
         onChange={(r) => setPageItem(k, r)} onCommit={(r) => commitPageItem(k, r)}>{node}</FreeItem>
     );
     return (
-      <div className="fixed inset-0 z-30 pointer-events-none overflow-hidden" aria-label="Home layout">
+      <div className="fixed inset-0 z-30 pointer-events-none" aria-label="Home layout">
         <div className="absolute top-0 left-0" style={{ width: DESIGN_W, height: vp.h / scale, transform: `scale(${scale})`, transformOrigin: '0 0' }}>
         {pi('title', 'Title', (
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center text-gradient">
