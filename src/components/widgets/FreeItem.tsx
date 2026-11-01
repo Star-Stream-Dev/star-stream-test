@@ -9,6 +9,8 @@ interface Props {
   onCommit: (r: FreeRect) => void;
   children: ReactNode;
   label?: string;
+  /** screen px per layout px; layout uses a fixed design width so it looks the same on every screen */
+  scale?: number;
 }
 
 type Edge = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
@@ -27,7 +29,7 @@ const HANDLES: { edge: Edge; cls: string; cursor: string }[] = [
 ];
 
 /** Rainmeter-style item: drag anywhere, resize from any edge or corner while editing. */
-export const FreeItem = ({ rect, editing, onChange, onCommit, children, label }: Props) => {
+export const FreeItem = ({ rect, editing, onChange, onCommit, children, label, scale = 1 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const start = (e: React.PointerEvent, edge: Edge | 'move') => {
@@ -38,14 +40,16 @@ export const FreeItem = ({ rect, editing, onChange, onCommit, children, label }:
     if (!el) return;
     const box = el.getBoundingClientRect();
     // Base always comes from what's actually on screen, so nothing jumps or shrinks.
-    const base = { x: box.left, y: box.top, w: box.width, h: box.height };
+    const parent = (el.offsetParent as HTMLElement | null)?.getBoundingClientRect();
+    const ox = parent?.left ?? 0, oy = parent?.top ?? 0;
+    const base = { x: (box.left - ox) / scale, y: (box.top - oy) / scale, w: box.width / scale, h: box.height / scale };
     const sx = e.clientX, sy = e.clientY;
     let latest: FreeRect = { x: base.x, y: base.y, w: base.w, h: rect.h };
 
     const move = (ev: PointerEvent) => {
       ev.preventDefault();
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const dx = ev.clientX - sx, dy = ev.clientY - sy;
+      const vw = window.innerWidth / scale, vh = window.innerHeight / scale;
+      const dx = (ev.clientX - sx) / scale, dy = (ev.clientY - sy) / scale;
       if (edge === 'move') {
         latest = {
           x: Math.round(Math.max(-base.w + 40, Math.min(vw - 40, base.x + dx))),
@@ -83,7 +87,7 @@ export const FreeItem = ({ rect, editing, onChange, onCommit, children, label }:
       aria-label={label}
       onPointerDown={(e) => start(e, 'move')}
       style={{
-        position: 'fixed',
+        position: 'absolute',
         left: rect.x,
         top: rect.y,
         width: rect.w,

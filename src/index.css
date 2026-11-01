@@ -108,7 +108,7 @@
 .theme-wheel-handle { border: 2px solid hsl(var(--color-wheel-handle)); box-shadow: var(--color-wheel-handle-shadow); transform: translate(-50%, -50%); }
 .theme-color-sample { background-color: hsl(var(--selected-color)); }
 .app-content { padding-bottom: var(--app-dock-space); }
-.app-fullscreen { bottom: var(--app-dock-space); }
+.app-fullscreen { bottom: 0; }
 .floating-dock-zone {
   position: fixed;
   bottom: 0;
