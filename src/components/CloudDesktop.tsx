@@ -175,6 +175,13 @@ export function CloudDesktop() {
         </div>
       </div>
 
+      {loadError && (
+        <div className="rounded-xl border border-destructive/50 bg-destructive/10 p-3 flex items-center gap-2 text-sm text-destructive">
+          <span className="flex-1">{loadError}</span>
+          <Button size="sm" variant="outline" onClick={load}>Retry</Button>
+        </div>
+      )}
+
       {info?.tunnel_url && (
         <div className="rounded-xl border border-primary/40 bg-card p-3 flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted-foreground">Your stream link (synced to your account):</span>
