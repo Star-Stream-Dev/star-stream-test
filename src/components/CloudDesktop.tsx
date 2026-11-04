@@ -95,12 +95,19 @@ export function CloudDesktop() {
   const [info, setInfo] = useState<StreamInfo | null>(null);
   const [manual, setManual] = useState('');
   const [frameKey, setFrameKey] = useState(0);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
     if (!sessionToken) return;
     const { data, error } = await supabase.rpc('get_my_desktop_stream' as any, { p_session_token: sessionToken });
-    if (error) { console.error(error); return; }
+    if (error) {
+      console.error(error);
+      const msg = /session/i.test(error.message) ? 'Your login expired — log out and back in to see your desktop link.' : `Couldn't load your desktop link: ${error.message}`;
+      setLoadError(msg);
+      return;
+    }
+    setLoadError(null);
     const row = (data as StreamInfo[] | null)?.[0];
     if (row) setInfo(prev => {
       if (prev?.tunnel_url !== row.tunnel_url) setFrameKey(k => k + 1);
@@ -111,7 +118,14 @@ export function CloudDesktop() {
   useEffect(() => {
     load();
     const t = setInterval(load, 10000);
-    return () => clearInterval(t);
+    const onVis = () => { if (document.visibilityState === 'visible') load(); };
+    window.addEventListener('focus', load);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      clearInterval(t);
+      window.removeEventListener('focus', load);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, [load]);
 
   const download = () => {
@@ -160,6 +174,13 @@ export function CloudDesktop() {
           <Button size="sm" onClick={download} disabled={!info}><Download className="w-4 h-4 mr-1" />Download Launcher</Button>
         </div>
       </div>
+
+      {loadError && (
+        <div className="rounded-xl border border-destructive/50 bg-destructive/10 p-3 flex items-center gap-2 text-sm text-destructive">
+          <span className="flex-1">{loadError}</span>
+          <Button size="sm" variant="outline" onClick={load}>Retry</Button>
+        </div>
+      )}
 
       {info?.tunnel_url && (
         <div className="rounded-xl border border-primary/40 bg-card p-3 flex flex-wrap items-center gap-2">
